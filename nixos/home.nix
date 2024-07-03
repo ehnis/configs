@@ -20,7 +20,6 @@
     bottles
     steam-run
     vesktop
-    gnome.adwaita-icon-theme
   ];
   #programs.ags = {
   #  enable = true;
@@ -30,14 +29,6 @@
     settings = {
       options.upscaling_method = "nearest_neighbour";
     };
-  };
-  qt = {
-    enable = true;
-    platformTheme.name = "gtk3";
-    #style = {
-    #  name = "lightly";
-    #  package = pkgs.lightly-qt;
-    #};
   };
   programs.obs-studio = {
     enable = true;
@@ -56,8 +47,7 @@
     gtk4.extraConfig.gtk-hint-font-metrics = 1;
     cursorTheme.name = "Bibata-Modern-Classic";
     iconTheme = {
-      name = "MoreWaita";
-      package = pkgs.morewaita-icon-theme;
+      name = "Windows-Eleven";
     };
     theme.name = "Materia-dark";
     font.name = "Noto Sans Medium";

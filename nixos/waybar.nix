@@ -16,10 +16,6 @@
         min-height: 0px;
         min-width: 0px;
       }
-      tooltip {
-        background-color: rgba(0,0,0,0.1);
-        text-shadow: none;
-      }      
       #custom-notification {
         font-size: 16px
       }
@@ -498,7 +494,6 @@
             "memory"
             "cpu"
             "temperature"
-            "custom/gpu"
           ];
         };
         "pulseaudio#mic" = {
@@ -621,7 +616,7 @@
         };
         "temperature" = {
           interval = 1;
-          hwmon-path = ["/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input" "/sys/class/hwmon/hwmon3/temp1_input"];
+          hwmon-path = ["/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input" "/sys/class/hwmon/hwmon3/temp1_input"];
           format = "<span color='#7AA2F7'> {temperatureC}°C  </span>";
           tooltip-format = "Core Temp: {temperatureC}°C ";
         };

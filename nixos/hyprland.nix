@@ -70,7 +70,6 @@
       ];
       windowrule = [
         "pin, ^(polkit-gnome-authentication-agent-1)$"
-	"opacity 0.99 override 0.99 override, title:^(MainPicker)$"
       ];
       layerrule = [
 	"blur, waybar"
@@ -83,7 +82,6 @@
         "blur, swaync-control-center"
         "blur, swaync-notification-window"
 	"blur, .*"
-	"blurpopups, .*"
 	"noanim, selection"
 	"ignorealpha 0.9, selection"
 	"ignorezero, corner0"
@@ -102,24 +100,30 @@
       ];  
       exec-once = [
         "killall screen; ~/bot/start-bot.sh"
-        "firefox & vesktop --enable-blink-features=MiddleClickAutoscroll"
-        "sleep 10; gpu-screen-recorder -w screen -q ultra -a $(pactl get-default-sink).monitor -a $(pactl get-default-source) -f 60 -r 300 -c mp4 -o ~/Games/Replays"
+        "sleep 10; gpu-screen-recorder -w HDMI-A-1 -q ultra -a $(pactl get-default-sink).monitor -a $(pactl get-default-source) -f 60 -r 300 -c mp4 -o ~/Games/Replays"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
 	"hyprctl setcursor Bibata-Modern-Classic 24"
       ]; 
+      monitor = [
+        "eDP-1, 1920x1080, 0x1080, 1"
+        "HDMI-A-1, 1920x1080@165, 0x0, 1"
+      ];
+      workspace = [
+        "w[tg1-9],monitor:[HDMI-A-1]"
+      ];      
       input = {
 	kb_layout = "us,ru";
         kb_options = "grp:alt_shift_toggle";
         repeat_delay = 200;
         follow_mouse = 1;
         touchpad = { natural_scroll = false; };
-        sensitivity = 1;
+        sensitivity = 0.2;
         accel_profile = "flat";
       };
       general = {
-        gaps_in = 5;
-        gaps_out = 5;
+        gaps_in = 0;
+        gaps_out = 0;
         border_size = 0;
         "col.active_border" = "rgb(4575da) rgb(6804b5)";
         "col.inactive_border" = "rgb(595959)";
@@ -132,7 +136,7 @@
           enabled = true;
       	  popups = true;
       	  popups_ignorealpha = 0;
-      	  ignore_opacity = true;
+      	  #ignore_opacity = true;
           size = 10;
       	  brightness = 0.8;
           passes = 3;
@@ -249,9 +253,10 @@
     settings = {
       ipc = "on";
       splash = false;
-      preload = [ "${./stuff/wallpaper.jpg}" ];
+      preload = [ "${./stuff/wallpapera.png}" ];
       wallpaper = [
-        "HDMI-A-1,${./stuff/wallpaper.jpg}"
+        "HDMI-A-1,${./stuff/wallpapera.png}"
+	"eDP-1,${./stuff/wallpapera.png}"
       ];
     };
   };

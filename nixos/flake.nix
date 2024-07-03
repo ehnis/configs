@@ -28,7 +28,7 @@
     ags.url = "github:Aylur/ags";
   };
 
-  outputs = {self, nixpkgs, home-manager, ...} @ inputs: let user = "l0lk3k"; hostname = "nixos"; in { # DON'T FORGET TO CHANGE USERNAME AND HOSTNAME HERE <<<<<<<<<<
+  outputs = {self, nixpkgs, home-manager, ...} @ inputs: let user = "ehnis"; hostname = "nixos"; in { # DON'T FORGET TO CHANGE USERNAME AND HOSTNAME HERE <<<<<<<<<<
     nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs user hostname; };
       modules = [

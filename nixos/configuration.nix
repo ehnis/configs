@@ -1,19 +1,7 @@
 { config, lib, inputs, pkgs, options, user, hostname, ... }:
 let
-  spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
-  package = config.boot.kernelPackages.nvidiaPackages.beta;
   fileroller = "org.gnome.FileRoller.desktop";
   long-script = "${pkgs.beep}/bin/beep -f 130 -l 100 -n -f 262 -l 100 -n -f 330 -l 100 -n -f 392 -l 100 -n -f 523 -l 100 -n -f 660 -l 100 -n -f 784 -l 300 -n -f 660 -l 300 -n -f 146 -l 100 -n -f 262 -l 100 -n -f 311 -l 100 -n -f 415 -l 100 -n -f 523 -l 100 -n -f 622 -l 100 -n -f 831 -l 300 -n -f 622 -l 300 -n -f 155 -l 100 -n -f 294 -l 100 -n -f 349 -l 100 -n -f 466 -l 100 -n -f 588 -l 100 -n -f 699 -l 100 -n -f 933 -l 300 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 1047 -l 400";
-  adblock = pkgs.fetchgit {
-    url = "https://github.com/rxri/spicetify-extensions";
-    rev = "9168bc5d6c3b816ba404d91161fd577b3bf43e4a";
-    sha256 = "sha256-kPjmDVyxtXG1puedQKD6HRP6eN/MPdEZ9Zs4Ao4RVtg=";
-  };
-  hazy = pkgs.fetchgit {
-    url = "https://github.com/Astromations/Hazy";
-    rev = "25e472cc4563918d794190e72cba6af8397d3a78";
-    sha256 = "sha256-zK17CWwYJNSyo5pbYdIDUMKyeqKkFbtghFoK9JBR/C8=";
-  };
 in
 {
   #Some services
@@ -23,23 +11,6 @@ in
     gvfs.enable = true;
     flatpak.enable = true;
     openssh.enable = true;
-    #desktopManager.plasma6.enable = true;
-    #displayManager = {
-    #  sddm = {
-    #    enable = true;
-    #    theme = "elegant";
-    #    settings = {
-    #      Autologin = {
-    #	    Session = "plasma.desktop";
-    #	    User = user;
-    #      };
-    #    };
-    #    wayland = {
-    #      enable = true;
-    #      compositor = "kwin";
-    #    };
-    #  };
-    #};
     sunshine = {
       autoStart = false;
       enable = true;
@@ -70,7 +41,7 @@ in
       xkb.layout = "us,ru";
       xkb.options = "grp:alt_shift_toggle";
       displayManager.startx.enable = true;
-      videoDrivers = ["nvidia" "amdgpu"];
+      videoDrivers = ["amdgpu"];
       enable = true;
     };
   };
@@ -90,33 +61,15 @@ in
   programs = {
     dconf.enable = true;
     xwayland.enable = true;
-    virt-manager.enable = true;
     zsh.enable = true;
     nm-applet.enable = true;
     adb.enable = true;
     firefox.nativeMessagingHosts.ff2mpv = true;
-    spicetify = {
-      enable = true;
-      theme = {
-        name = "Hazy";
-        src = hazy;
-        requiredExtensions = [
-          {
-	    filename = "adblock.js";
-	    src = "${adblock}/adblock";
-	  }
-        ];
-        appendName = false;
-        injectCss = true;
-        replaceColors = true;
-        overwriteAssets = true;
-        sidebarConfig = true;
-      };
-    };
   };
   #Some boot settings
   boot = {
     extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+    blacklistedKernelModules = [ "hid-uclogic" "wacom" ];
     initrd.systemd.enable = true;
     kernel.sysctl."kernel.sysrq" = 1;
     kernelPackages = pkgs.linuxPackages_zen; 
@@ -125,7 +78,6 @@ in
       options v4l2loopback devices=1 video_nr=1 card_label="OBS Cam" exclusive_caps=1
     '';
     kernelParams = [ 
-      "nvidia_drm.fbdev=1"
       "amd_iommu=on" 
       "iommu=pt"
     ];
@@ -183,40 +135,6 @@ in
         '';
         wantedBy = [ "multi-user.target" ];
       };
-      libvirtd = {
-        path = with pkgs; [ libvirt killall ];
-        preStart = 
-        let
-          qemuHook = pkgs.writeScript "qemu-hook" ''
-            #!${pkgs.bash}/bin/bash
-            GUEST_NAME="$1"
-            HOOK_NAME="$2"
-            STATE_NAME="$3"
-            MISC="''${@:4}"
-            
-            BASEDIR="$(dirname $0)"
-            
-            HOOKPATH="$BASEDIR/qemu.d/$GUEST_NAME/$HOOK_NAME/$STATE_NAME"
-            set -e # If a script exits with an error, we should as well.
-            
-            if [ -f "$HOOKPATH" ]; then
-            eval \""$HOOKPATH"\" "$@"
-            elif [ -d "$HOOKPATH" ]; then
-            while read file; do
-              eval \""$file"\" "$@"
-            done <<< "$(find -L "$HOOKPATH" -maxdepth 1 -type f -executable -print;)"
-            fi 
-          '';
-        in ''
-          mkdir -p /var/lib/libvirt/hooks
-          mkdir -p /var/lib/libvirt/hooks/qemu.d/win10/prepare/begin
-          mkdir -p /var/lib/libvirt/hooks/qemu.d/win10/release/end
-          # Copy hook files
-          ln -sf ${./stuff/start.sh} /var/lib/libvirt/hooks/qemu.d/win10/prepare/begin/start.sh
-          ln -sf ${./stuff/stop.sh} /var/lib/libvirt/hooks/qemu.d/win10/release/end/stop.sh
-          ln -sf ${qemuHook} /var/lib/libvirt/hooks/qemu
-        '';
-      };
     };
     user.services = {
       polkit_gnome = {
@@ -230,24 +148,18 @@ in
   };
   #Some hardware stuff
   hardware = {
+    opentabletdriver = {
+      enable = true;
+      package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "DADA30000"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });
+    };
     graphics = {
       enable = true;
       enable32Bit = true;
       extraPackages = with pkgs; [
-        nvidia-vaapi-driver
         libvdpau-va-gl
         vaapiVdpau
       ];
     };
-    nvidia = {
-      modesetting.enable = true;
-      powerManagement.enable = true;
-      powerManagement.finegrained = false;
-      open = false;
-      nvidiaSettings = false;
-      package = pkgs.nvidia-patch.patch-nvenc (pkgs.nvidia-patch.patch-fbc package);
-      #package = package;
-    };    
   };
   #Some environment stuff
   environment = {
@@ -262,46 +174,55 @@ in
       XCURSOR_SIZE = "24";
       EGL_PLATFORM = "wayland";
       MOZ_DISABLE_RDD_SANDBOX = "1";
-      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-      GBM_BACKEND = "nvidia-drm";
-      LIBVA_DRIVER_NAME = "nvidia";
     };
     systemPackages = with pkgs; [
       wget
       git
+      obs-studio
       neovim
       osu-lazer-bin
+      xclicker
       inotify-tools
       fastfetch
+      pitivi
+      libsForQt5.kdenlive
+      olive-editor
       hyprshot
+      vscodium
       cinnamon.nemo-with-extensions
       cinnamon.cinnamon-translations
       killall
+      ffmpeg
       wl-clipboard
       pulseaudio
+      prismlauncher
       nwg-look
       gnome.file-roller
       appimage-run
-      lutris
       cliphist
       libnotify
       swappy
       bibata-cursors
+      ffmpegthumbnailer
+      krita
+      dotnetCorePackages.sdk_9_0
+      gimp
       steam
       screen
       gamemode
       moonlight-qt
       desktop-file-utils
-      inputs.pollymc.packages.${pkgs.system}.pollymc
-      (nvtopPackages.nvidia.overrideAttrs (oldAttrs: { buildInputs = with lib; [ ncurses udev ]; }))
       (firefox.override { nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ff2mpv ]; })
+      wlogout
+      youtube-music
       mpv
+      ncmpcpp
+      mpd
       neovide
       fragments
       unrar
       pavucontrol
       brightnessctl
-      ytfzf
       mlocate
       imv
       cinnamon.nemo-fileroller
@@ -311,21 +232,15 @@ in
       (pkgs.callPackage ./ani-cli-ru.nix { })
       gpu-screen-recorder-gtk
       gpu-screen-recorder
-      android-tools
-      networkmanagerapplet
-      beep
-      elegant-sddm
-      #inputs.kwin-effects-forceblur.packages.${pkgs.system}.default
-      #(pkgs.callPackage ./linux-wallpaperengine.nix { })
     ] ++ (import ./stuff.nix pkgs).scripts ++ (import ./stuff.nix pkgs).hyprland-pkgs;
   };
   nixpkgs.config.permittedInsecurePackages = [ "freeimage-unstable-2021-11-01" ];
   #And here is some other small stuff
   documentation.nixos.enable = false;
-  virtualisation.libvirtd.enable = true;
   nixpkgs.overlays = [
     inputs.nvidia-patch.overlays.default
   ];
+  qt.enable = true;
   xdg.mime.defaultApplications = {
     "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
     "application/x-compressed-tar" = fileroller;
@@ -363,7 +278,6 @@ in
     [
       #./my-services.nix
       ./hardware-configuration.nix
-      inputs.spicetify-nix.nixosModule
       inputs.home-manager.nixosModules.home-manager
     ];
   fonts = {
@@ -390,12 +304,12 @@ in
   };
   users.users."${user}" = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "libvirtd" "libvirt ""uinput" "mlocate" "nginx" "input" "kvm" "adbusers" "vboxusers" "video" ];
+    extraGroups = [ "wheel" "uinput" "mlocate" "nginx" "input" "kvm" "adbusers" "vboxusers" "video" ];
     packages = with pkgs; [
       tree
     ];
   };
-    xdg.portal = { enable = true; extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ]; }; 
+    xdg.portal = { enable = true; extraPortals = [ pkgs.xdg-desktop-portal-hyprland ]; }; 
   xdg.portal.config.common.default = "*";
   networking.firewall.enable = false;
   system.stateVersion = "23.11";
