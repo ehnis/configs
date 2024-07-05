@@ -70,9 +70,9 @@ in
   boot = {
     extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
     blacklistedKernelModules = [ "hid-uclogic" "wacom" ];
-    initrd.systemd.enable = true;
+    #initrd.systemd.enable = true;
     kernel.sysctl."kernel.sysrq" = 1;
-    kernelPackages = pkgs.linuxPackages_zen; 
+    #kernelPackages = pkgs.linuxPackages_latest; 
     tmp.useTmpfs = true;
     extraModprobeConfig = ''
       options v4l2loopback devices=1 video_nr=1 card_label="OBS Cam" exclusive_caps=1
@@ -232,6 +232,7 @@ in
       (pkgs.callPackage ./ani-cli-ru.nix { })
       gpu-screen-recorder-gtk
       gpu-screen-recorder
+      snapper
     ] ++ (import ./stuff.nix pkgs).scripts ++ (import ./stuff.nix pkgs).hyprland-pkgs;
   };
   nixpkgs.config.permittedInsecurePackages = [ "freeimage-unstable-2021-11-01" ];
