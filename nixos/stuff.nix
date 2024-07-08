@@ -23,7 +23,7 @@ scripts = [ (pkgs.writeShellScriptBin "dinfo" ''
   (pkgs.writeShellScriptBin "gpu" ''
   usage=$(nvidia-smi | grep % | cut -b 73,74,75,76,77 | sed 's/ //g')
   temp=$(nvidia-smi | grep % | cut -b 9,10)
-  text="<span color='#02a62d'>  $usage  󰢮 </span>"
+  text="<span color='#27470b'>  $usage  󰢮 </span>"
   tooltip="GPU Usage: $usage\rGPU Temp: $temp°C"
   cat <<EOF
   {"text":"$text","tooltip":"$tooltip",}

@@ -44,6 +44,19 @@ in
       videoDrivers = ["amdgpu"];
       enable = true;
     };
+    snapper = {
+      persistentTimer = true;
+      configs.server = {
+        SUBVOLUME = "/home/${user}/server";
+	TIMELINE_LIMIT_YEARLY = "0";
+	TIMELINE_LIMIT_WEEKLY = "2";
+	TIMELINE_LIMIT_MONTHLY = "1";
+	TIMELINE_LIMIT_HOURLY = "24";
+	TIMELINE_LIMIT_DAILY = "7";
+	TIMELINE_CREATE = true;
+	TIMELINE_CLEANUP = true;
+      };
+    };
   };
   #Some security
   security = {
@@ -197,7 +210,7 @@ in
       pulseaudio
       prismlauncher
       nwg-look
-      gnome.file-roller
+      file-roller
       appimage-run
       cliphist
       libnotify

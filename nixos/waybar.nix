@@ -264,7 +264,7 @@
       #idle_inhibitor,
       #pulseaudio,
       #pulseaudio.mic {
-        color: #7aa2f7;
+        color: #800b15;
       }
       
       #backlight {
