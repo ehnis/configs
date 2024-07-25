@@ -2,8 +2,8 @@
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    plugins = [ inputs.hyprland-plugins.packages.${pkgs.system}.hyprexpo ];
-    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    #plugins = [ inputs.hyprland-plugins.packages.${pkgs.system}.hyprexpo ];
+    #package = inputs.hyprland.packages.${pkgs.system}.hyprland;
     settings = {
       "$mod" = "SUPER";
       bind = [
@@ -30,7 +30,6 @@
         "$mod, P, pseudo,"
         "$mod, J, togglesplit,"
         "$mod, F, exec, hyprctl dispatch fullscreen"
-        "$mod, Space, hyprexpo:expo, toggle"
         "$mod, left, movefocus, l"
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
@@ -106,12 +105,8 @@
 	"hyprctl setcursor Bibata-Modern-Classic 24"
       ]; 
       monitor = [
-        "eDP-1, 1920x1080, 0x1080, 1"
         "HDMI-A-1, 1920x1080@165, 0x0, 1"
       ];
-      workspace = [
-        "w[tg1-9],monitor:[HDMI-A-1]"
-      ];      
       input = {
 	kb_layout = "us,ru";
         kb_options = "grp:alt_shift_toggle";
@@ -167,8 +162,8 @@
 	];
       };
       debug = {
-        enable_stdout_logs = false;
-        disable_logs = true;
+        enable_stdout_logs = true;
+        disable_logs = false;
       };
       dwindle = {
         pseudotile = true;
@@ -188,17 +183,17 @@
       binds = {
         scroll_event_delay = 50;
       };
-      plugin = {
-        hyprexpo = {
-          columns = 3;
-          gap_size = 5;
-          bg_col = "rgb(111111)";
-          workspace_method = "first 1";
-          enable_gesture = true;
-          gesture_distance = 300;
-          gesture_positive = true;
-        };
-      };
+      #plugin = {
+       # hyprexpo = {
+        #  columns = 3;
+         # gap_size = 5;
+          #bg_col = "rgb(111111)";
+          #workspace_method = "first 1";
+          #enable_gesture = true;
+          #gesture_distance = 300;
+          #gesture_positive = true;
+      #  };
+    #  };
     };
     extraConfig = ''
       submap=passthrough
@@ -256,7 +251,6 @@
       preload = [ "${./stuff/wallpapera.png}" ];
       wallpaper = [
         "HDMI-A-1,${./stuff/wallpapera.png}"
-	"eDP-1,${./stuff/wallpapera.png}"
       ];
     };
   };

@@ -19,7 +19,6 @@
     xorg.xeyes
     bottles
     steam-run
-    vesktop
   ];
   #programs.ags = {
   #  enable = true;

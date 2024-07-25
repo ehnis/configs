@@ -11,19 +11,6 @@ in
     gvfs.enable = true;
     flatpak.enable = true;
     openssh.enable = true;
-    sunshine = {
-      autoStart = false;
-      enable = true;
-      capSysAdmin = true;
-      package = ( pkgs.sunshine.override { cudaSupport = true; } );
-    };
-    cron = {
-      enable = true;
-      systemCronJobs = [
-        "*/59 * * * *   root  update-cloudflare-dns /cloudflare1.conf"
-        "*/59 * * * *   root  update-cloudflare-dns /cloudflare2.conf"
-      ];
-    };
     locate = {
       enable = true;
       package = pkgs.mlocate;
@@ -41,18 +28,18 @@ in
       xkb.layout = "us,ru";
       xkb.options = "grp:alt_shift_toggle";
       displayManager.startx.enable = true;
-      videoDrivers = ["amdgpu"];
+      videoDrivers = [ "amdgpu"];
       enable = true;
     };
     snapper = {
       persistentTimer = true;
       configs.server = {
         SUBVOLUME = "/home/${user}/server";
-	TIMELINE_LIMIT_YEARLY = "0";
-	TIMELINE_LIMIT_WEEKLY = "2";
-	TIMELINE_LIMIT_MONTHLY = "1";
-	TIMELINE_LIMIT_HOURLY = "24";
-	TIMELINE_LIMIT_DAILY = "7";
+	TIMELINE_LIMIT_YEARLY = 0;
+	TIMELINE_LIMIT_WEEKLY = 2;
+	TIMELINE_LIMIT_MONTHLY = 1;
+	TIMELINE_LIMIT_HOURLY = 24;
+	TIMELINE_LIMIT_DAILY = 7;
 	TIMELINE_CREATE = true;
 	TIMELINE_CLEANUP = true;
       };
@@ -69,6 +56,33 @@ in
       capabilities = "cap_sys_admin+ep";
       source = "${pkgs.gpu-screen-recorder}/bin/gsr-kms-server";
     };
+    sudo.extraRules = [
+      {
+        groups = [ "deploy" ];
+        commands = [
+          {
+            command = "/nix/store/*/bin/switch-to-configuration";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/nix-store";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/nix-env";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = ''/bin/sh -c "readlink -e /nix/var/nix/profiles/system || readlink -e /run/current-system"'';
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/nix-collect-garbage";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
   };
   #Some programs
   programs = {
@@ -83,9 +97,9 @@ in
   boot = {
     extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
     blacklistedKernelModules = [ "hid-uclogic" "wacom" ];
-    #initrd.systemd.enable = true;
+    initrd.systemd.enable = true;
     kernel.sysctl."kernel.sysrq" = 1;
-    #kernelPackages = pkgs.linuxPackages_latest; 
+    kernelPackages = pkgs.linuxPackages_xanmod_latest; 
     tmp.useTmpfs = true;
     extraModprobeConfig = ''
       options v4l2loopback devices=1 video_nr=1 card_label="OBS Cam" exclusive_caps=1
@@ -150,6 +164,7 @@ in
       };
     };
     user.services = {
+      waybar.serviceConfig.Restart = "always";
       polkit_gnome = {
         path = [pkgs.bash];
 	script = ''
@@ -200,7 +215,7 @@ in
       pitivi
       libsForQt5.kdenlive
       olive-editor
-      hyprshot
+      hyprshot     
       vscodium
       cinnamon.nemo-with-extensions
       cinnamon.cinnamon-translations
@@ -229,10 +244,12 @@ in
       wlogout
       youtube-music
       mpv
+      rusty-psn
+      rpcs3
       ncmpcpp
       mpd
       neovide
-      fragments
+      qbittorrent
       unrar
       pavucontrol
       brightnessctl
@@ -246,6 +263,7 @@ in
       gpu-screen-recorder-gtk
       gpu-screen-recorder
       snapper
+      cached-nix-shell
     ] ++ (import ./stuff.nix pkgs).scripts ++ (import ./stuff.nix pkgs).hyprland-pkgs;
   };
   nixpkgs.config.permittedInsecurePackages = [ "freeimage-unstable-2021-11-01" ];
@@ -318,7 +336,11 @@ in
   };
   users.users."${user}" = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "uinput" "mlocate" "nginx" "input" "kvm" "adbusers" "vboxusers" "video" ];
+    extraGroups = [ "wheel" "uinput" "mlocate" "nginx" "input" "kvm" "adbusers" "vboxusers" "video" "deploy" ];
+    openssh.authorizedKeys.keys = [ 
+      ''ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOEop30AK3ka7ieej+xhvHAHwvkiGW2uinjF50bDBxt l0lk3k@nixos''
+      ''ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEQjJreCXvUdgGNVaEAkHHNaoP9zfjrFVsebaq5slIPV root@nixos''
+    ];
     packages = with pkgs; [
       tree
     ];
