@@ -17,6 +17,10 @@ in
       interval = "hourly";
       localuser = null;
     };
+    sunshine = {
+      enable = true;
+      capSysAdmin = true;
+    };
     pipewire = {
       enable = true;
       alsa.enable = true;
