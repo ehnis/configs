@@ -4,7 +4,7 @@ let
   long-script = "${pkgs.beep}/bin/beep -f 130 -l 100 -n -f 262 -l 100 -n -f 330 -l 100 -n -f 392 -l 100 -n -f 523 -l 100 -n -f 660 -l 100 -n -f 784 -l 300 -n -f 660 -l 300 -n -f 146 -l 100 -n -f 262 -l 100 -n -f 311 -l 100 -n -f 415 -l 100 -n -f 523 -l 100 -n -f 622 -l 100 -n -f 831 -l 300 -n -f 622 -l 300 -n -f 155 -l 100 -n -f 294 -l 100 -n -f 349 -l 100 -n -f 466 -l 100 -n -f 588 -l 100 -n -f 699 -l 100 -n -f 933 -l 300 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 1047 -l 400";
 in
 {
-  #Some services
+  #Some servicess
   services = {
     getty.autologinUser = user;
     printing.enable = true;
@@ -117,11 +117,14 @@ in
     ];
     loader = {
       efi.canTouchEfiVariables = true;
-      grub = {
+      #grub = {
+      #  enable = true;
+      #  efiSupport = true;
+      #  device = "nodev";
+      #  timeoutStyle = "hidden";
+      #};
+      systemd-boot = {
         enable = true;
-        efiSupport = true;
-        device = "nodev";
-	timeoutStyle = "hidden";
       };
     };
   };
@@ -187,10 +190,6 @@ in
     graphics = {
       enable = true;
       enable32Bit = true;
-      extraPackages = with pkgs; [
-        libvdpau-va-gl
-        vaapiVdpau
-      ];
     };
   };
   #Some environment stuff
@@ -209,6 +208,7 @@ in
     };
     systemPackages = with pkgs; [
       wget
+      filezilla
       git
       obs-studio
       neovim
@@ -216,13 +216,11 @@ in
       xclicker
       inotify-tools
       fastfetch
-      pitivi
       libsForQt5.kdenlive
-      olive-editor
       hyprshot     
       vscodium
-      cinnamon.nemo-with-extensions
-      cinnamon.cinnamon-translations
+      nemo-with-extensions
+      cinnamon-translations
       killall
       ffmpeg
       wl-clipboard
@@ -259,7 +257,7 @@ in
       brightnessctl
       mlocate
       imv
-      cinnamon.nemo-fileroller
+      nemo-fileroller
       zip
       jdk21
       myxer
@@ -273,9 +271,6 @@ in
   nixpkgs.config.permittedInsecurePackages = [ "freeimage-unstable-2021-11-01" ];
   #And here is some other small stuff
   documentation.nixos.enable = false;
-  nixpkgs.overlays = [
-    inputs.nvidia-patch.overlays.default
-  ];
   qt.enable = true;
   xdg.mime.defaultApplications = {
     "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
