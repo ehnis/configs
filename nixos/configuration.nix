@@ -17,6 +17,16 @@ in
       interval = "hourly";
       localuser = null;
     };
+    resolved = {
+      enable = true;
+    };
+    dnscrypt-proxy2 = {
+      enable = true;
+      settings = {
+        server_names = [ "cloudflare" "scaleway-fr" "yandex" "google" ];
+        listen_addresses = [ "127.0.0.1:53" "[::1]:53" ];
+      };
+    };
     sunshine = {
       enable = true;
       capSysAdmin = true;
@@ -151,7 +161,50 @@ in
   #Some systemd stuff
   systemd = {
     coredump.enable = false;
-    services = {
+    services = { 
+     zapret = {
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        path = with pkgs; [
+          iptables
+          ipset
+	  nftables
+	  	  (zapret.overrideAttrs (prev: {
+            installPhase = ''
+              ${prev.installPhase}
+              touch $out/usr/share/zapret/config
+            '';
+          }))
+          gawk
+        ];
+        serviceConfig = {
+          Type = "forking";
+          Restart = "no";
+          TimeoutSec = "30sec";
+          IgnoreSIGPIPE = "no";
+          KillMode = "none";
+          GuessMainPID = "no";
+          ExecStart = "${pkgs.bash}/bin/bash -c 'zapret start'";
+          ExecStop = "${pkgs.bash}/bin/bash -c 'zapret stop'";
+	  EnvironmentFile = pkgs.writeText "zapret-environment" ''
+            # MODE="tpws"
+	    MODE="nfqws"
+	    FWTYPE="iptables"
+	    MODE_HTTP=1
+	    MODE_HTTP_KEEPALIVE=1
+	    MODE_HTTPS=1
+	    MODE_QUIC=0
+	    MODE_FILTER=none
+	    DISABLE_IPV6=1
+	    INIT_APPLY_FW=1
+	    NFQWS_OPT_DESYNC="--dpi-desync=fake,split2 --dpi-desync-fooling=datanoack"
+	    #NFQWS_OPT_DESYNC="--dpi-desync=split2"
+	    #NFQWS_OPT_DESYNC="--dpi-desync=fake --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
+            # и прочая конфигурация которую можно получить с помощью nix-shell -p zapret --run blockchec
+          '';
+        };
+      };
       NetworkManager-wait-online.enable = false;
       startup-sound = {
         wantedBy = ["sysinit.target"];
@@ -217,6 +270,7 @@ in
       inotify-tools
       fastfetch
       libsForQt5.kdenlive
+      ipset
       hyprshot     
       vscodium
       nemo-with-extensions
@@ -232,6 +286,7 @@ in
       cliphist
       libnotify
       swappy
+      zapret
       bibata-cursors
       ffmpegthumbnailer
       krita
@@ -239,6 +294,7 @@ in
       gimp
       steam
       screen
+      nvtop
       gamemode
       moonlight-qt
       desktop-file-utils
@@ -328,6 +384,15 @@ in
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Moscow";
   i18n.defaultLocale = "ru_RU.UTF-8";
+  networking = {
+   nameservers = [ "::1" "127.0.0.1" ];
+    resolvconf.dnsSingleRequest = true;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 ];
+      allowedUDPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 ];
+      };
+  };
   console = {
     earlySetup = true;
     font = null;
@@ -346,6 +411,11 @@ in
   };
     xdg.portal = { enable = true; extraPortals = [ pkgs.xdg-desktop-portal-hyprland ]; }; 
   xdg.portal.config.common.default = "*";
-  networking.firewall.enable = false;
   system.stateVersion = "23.11";
+  users.users.tpws = {
+    isSystemUser = true;
+    group = "tpws";
+  };
+  users.groups.tpws = {};
+  virtualisation.waydroid.enable = true;
 }

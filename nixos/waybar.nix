@@ -7,7 +7,7 @@
       target = "hyprland-session.target";
     };
     style = ''
-      @define-color accent #2362ba;
+      @define-color accent #000000;
       * {
         font-family: "Noto Sans", "JetBrainsMono NF";
         font-size: 13px;
