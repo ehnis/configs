@@ -291,10 +291,11 @@ in
       ffmpegthumbnailer
       krita
       dotnetCorePackages.sdk_9_0
+      docker
       gimp
       steam
       screen
-      nvtop
+      nvtopPackages.full
       gamemode
       moonlight-qt
       desktop-file-utils
