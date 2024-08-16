@@ -17,7 +17,6 @@
 	"$mod_CTRL, Q, exec, neovide --frame none +term +startinsert '+set laststatus=0 ruler' '+set cmdheight=0' '+map <c-t> :tabnew +term<enter>'"
 	"$mod_CTRL, C, exec, hyprctl kill"
 	"$mod_CTRL, R, exec, killall -SIGUSR1 gpu-screen-recorder && notify-send 'GPU-Screen-Recorder' 'Повтор успешно сохранён'"
-	"$mod_CTRL, F, fakefullscreen"
 	"$mod_CTRL, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
         "$mod, F1, exec, gamemode.sh"
         "$mod, F2, exec, sheesh.sh"

@@ -1,7 +1,7 @@
 { config, lib, inputs, pkgs, options, user, hostname, ... }:
 let
   fileroller = "org.gnome.FileRoller.desktop";
-  long-script = "${pkgs.beep}/bin/beep -f 130 -l 100 -n -f 262 -l 100 -n -f 330 -l 100 -n -f 392 -l 100 -n -f 523 -l 100 -n -f 660 -l 100 -n -f 784 -l 300 -n -f 660 -l 300 -n -f 146 -l 100 -n -f 262 -l 100 -n -f 311 -l 100 -n -f 415 -l 100 -n -f 523 -l 100 -n -f 622 -l 100 -n -f 831 -l 300 -n -f 622 -l 300 -n -f 155 -l 100 -n -f 294 -l 100 -n -f 349 -l 100 -n -f 466 -l 100 -n -f 588 -l 100 -n -f 699 -l 100 -n -f 933 -l 300 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 1047 -l 400";
+  long-script = "${pkgs.beep}/bin/beep -l 100 -f 15804.2656402 -n -l 25 -f 19.4454364826 -n -l 25 -f 123.470825314 -n -l 50 -f 554.365261954 -n -l 75 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 50 -f 19.4454364826 -n -l 75 -f 783.990871963 -n -l 50 -f 19.4454364826 -n -l 75 -f 698.456462866 -n -l 50 -f 195.997717991 -n -l 25 -f 184.997211356 -n -l 50 -f 1108.73052391 -n -l 75 -f 783.990871963 -n -l 100 -f 138.591315488 -n -l 25 -f 155.563491861 -n -l 150 -f 698.456462866 -n -l 125 -f 195.997717991 -n -l 50 -f 554.365261954 -n -l 25 -f 587.329535835 -n -l 50 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 50 -f 19.4454364826 -n -l 75 -f 880.0 -n -l 25 -f 38.8908729653 -n -l 25 -f 19.4454364826 -n -l 75 -f 739.988845423 -n -l 75 -f 220.0 -n -l 75 -f 1108.73052391 -n -l 50 -f 880.0 -n -l 25 -f 19.4454364826 -n -l 75 -f 138.591315488 -n -l 25 -f 123.470825314 -n -l 150 -f 739.988845423 -n -l 125 -f 220.0 -n -l 75 -f 554.365261954 -n -l 50 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 25 -f 1046.5022612 -n -l 25 -f 1108.73052391 -n -l 25 -f 19.4454364826 -n -l 50 -f 783.990871963 -n -l 25 -f 830.60939516 -n -l 25 -f 19.4454364826 -n -l 25 -f 622.253967444 -n -l 75 -f 698.456462866 -n -l 50 -f 195.997717991 -n -l 25 -f 155.563491861 -n -l 50 -f 1108.73052391 -n -l 75 -f 783.990871963 -n -l 100 -f 138.591315488 -n -l 25 -f 19.4454364826 -n -l 125 -f 698.456462866 -n -l 150 -f 195.997717991 -n -l 50 -f 622.253967444 -n -l 75 -f 698.456462866 -n -l 75 -f 739.988845423 -n -l 25 -f 19.4454364826 -n -l 25 -f 38.8908729653 -n -l 125 -f 739.988845423 -n -l 100 -f 783.990871963 -n -l 25 -f 19.4454364826 -n -l 75 -f 783.990871963 -n -l 150 -f 880.0 -n -l 50 -f 19.4454364826 -n -l 125 -f 1108.73052391 -n -l 75 -f 261.625565301 -n -l 25 -f 277.182630977 -n -l 25 -f 261.625565301 ";
 in
 {
   #Some servicess
@@ -11,6 +11,12 @@ in
     gvfs.enable = true;
     flatpak.enable = true;
     openssh.enable = true;
+    nextjs-ollama-llm-ui.enable = true;
+    ollama = {
+      enable = true;
+      package = pkgs.ollama;
+      openFirewall = true;
+    };
     locate = {
       enable = true;
       package = pkgs.mlocate;
@@ -28,8 +34,10 @@ in
       };
     };
     sunshine = {
-      enable = true;
+      enable = false;
       capSysAdmin = true;
+      autoStart = false;
+      openFirewall = true;
     };
     pipewire = {
       enable = true;
@@ -161,6 +169,19 @@ in
   #Some systemd stuff
   systemd = {
     coredump.enable = false;
+    tmpfiles.rules = 
+    let
+      rocmEnv = pkgs.symlinkJoin {
+        name = "rocm-combined";
+        paths = with pkgs.rocmPackages; [
+          rocblas
+          hipblas
+          clr
+        ];
+      };
+    in [
+      "L+    /opt/rocm   -    -    -     -    ${rocmEnv}"
+    ];
     services = { 
      zapret = {
         after = [ "network-online.target" ];
@@ -205,7 +226,6 @@ in
           '';
         };
       };
-      NetworkManager-wait-online.enable = false;
       startup-sound = {
         wantedBy = ["sysinit.target"];
         enable = true;
@@ -213,14 +233,6 @@ in
         serviceConfig = {
           ExecStart = long-script;
         };
-      };
-      zerotier = {
-        description = "Starts a zerotier-one service";
-        path = [pkgs.bash pkgs.zerotierone];
-        script = ''
-          exec zerotier-one
-        '';
-        wantedBy = [ "multi-user.target" ];
       };
     };
     user.services = {
@@ -243,6 +255,9 @@ in
     graphics = {
       enable = true;
       enable32Bit = true;
+      extraPackages = with pkgs; [
+	rocmPackages.clr.icd
+      ];
     };
   };
   #Some environment stuff
@@ -260,6 +275,7 @@ in
       MOZ_DISABLE_RDD_SANDBOX = "1";
     };
     systemPackages = with pkgs; [
+      pyenv
       wget
       filezilla
       git
@@ -291,7 +307,6 @@ in
       ffmpegthumbnailer
       krita
       dotnetCorePackages.sdk_9_0
-      docker
       gimp
       steam
       screen
@@ -303,6 +318,7 @@ in
       wlogout
       youtube-music
       mpv
+      testdisk
       rusty-psn
       rpcs3
       ncmpcpp
@@ -323,6 +339,7 @@ in
       gpu-screen-recorder
       snapper
       cached-nix-shell
+      clblast
     ] ++ (import ./stuff.nix pkgs).scripts ++ (import ./stuff.nix pkgs).hyprland-pkgs;
   };
   nixpkgs.config.permittedInsecurePackages = [ "freeimage-unstable-2021-11-01" ];
@@ -390,8 +407,8 @@ in
     resolvconf.dnsSingleRequest = true;
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 ];
-      allowedUDPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 ];
+      allowedTCPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 11434 3000 ];
+      allowedUDPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 11434 3000 ];
       };
   };
   console = {
@@ -410,7 +427,7 @@ in
       tree
     ];
   };
-    xdg.portal = { enable = true; extraPortals = [ pkgs.xdg-desktop-portal-hyprland ]; }; 
+  xdg.portal = { enable = true; extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ]; }; 
   xdg.portal.config.common.default = "*";
   system.stateVersion = "23.11";
   users.users.tpws = {
@@ -419,4 +436,5 @@ in
   };
   users.groups.tpws = {};
   virtualisation.waydroid.enable = true;
+  nix.package = pkgs.nixVersions.latest;
 }
