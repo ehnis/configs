@@ -1,11 +1,13 @@
 { config, pkgs, inputs, lib, ... }:
 {
+  flatpak.enable=true;
   home.homeDirectory = "/home/${config.home.username}";
   home.stateVersion = "24.05";
   services.arrpc.enable = true;
   nixpkgs.config.allowUnfree = true;
   imports = [
     #inputs.ags.homeManagerModules.default
+    ./flatpak_home.nix
     ./zsh.nix
     ./kitty.nix
     ./hyprland.nix
@@ -14,7 +16,6 @@
     ./swaync.nix
   ];
   home.packages = with pkgs; [
-    remmina
     telegram-desktop
     xorg.xeyes
     bottles

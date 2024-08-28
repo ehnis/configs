@@ -4,12 +4,13 @@ let
   long-script = "${pkgs.beep}/bin/beep -l 100 -f 15804.2656402 -n -l 25 -f 19.4454364826 -n -l 25 -f 123.470825314 -n -l 50 -f 554.365261954 -n -l 75 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 50 -f 19.4454364826 -n -l 75 -f 783.990871963 -n -l 50 -f 19.4454364826 -n -l 75 -f 698.456462866 -n -l 50 -f 195.997717991 -n -l 25 -f 184.997211356 -n -l 50 -f 1108.73052391 -n -l 75 -f 783.990871963 -n -l 100 -f 138.591315488 -n -l 25 -f 155.563491861 -n -l 150 -f 698.456462866 -n -l 125 -f 195.997717991 -n -l 50 -f 554.365261954 -n -l 25 -f 587.329535835 -n -l 50 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 50 -f 19.4454364826 -n -l 75 -f 880.0 -n -l 25 -f 38.8908729653 -n -l 25 -f 19.4454364826 -n -l 75 -f 739.988845423 -n -l 75 -f 220.0 -n -l 75 -f 1108.73052391 -n -l 50 -f 880.0 -n -l 25 -f 19.4454364826 -n -l 75 -f 138.591315488 -n -l 25 -f 123.470825314 -n -l 150 -f 739.988845423 -n -l 125 -f 220.0 -n -l 75 -f 554.365261954 -n -l 50 -f 138.591315488 -n -l 75 -f 1108.73052391 -n -l 25 -f 1046.5022612 -n -l 25 -f 1108.73052391 -n -l 25 -f 19.4454364826 -n -l 50 -f 783.990871963 -n -l 25 -f 830.60939516 -n -l 25 -f 19.4454364826 -n -l 25 -f 622.253967444 -n -l 75 -f 698.456462866 -n -l 50 -f 195.997717991 -n -l 25 -f 155.563491861 -n -l 50 -f 1108.73052391 -n -l 75 -f 783.990871963 -n -l 100 -f 138.591315488 -n -l 25 -f 19.4454364826 -n -l 125 -f 698.456462866 -n -l 150 -f 195.997717991 -n -l 50 -f 622.253967444 -n -l 75 -f 698.456462866 -n -l 75 -f 739.988845423 -n -l 25 -f 19.4454364826 -n -l 25 -f 38.8908729653 -n -l 125 -f 739.988845423 -n -l 100 -f 783.990871963 -n -l 25 -f 19.4454364826 -n -l 75 -f 783.990871963 -n -l 150 -f 880.0 -n -l 50 -f 19.4454364826 -n -l 125 -f 1108.73052391 -n -l 75 -f 261.625565301 -n -l 25 -f 277.182630977 -n -l 25 -f 261.625565301 ";
 in
 {
+  flatpak.packages=[{ appId = "org.vinegarhq.Sober"; origin = "sober"; }];
+  flatpak.enable=true;
   #Some servicess
   services = {
     getty.autologinUser = user;
     printing.enable = true;
     gvfs.enable = true;
-    flatpak.enable = true;
     openssh.enable = true;
     nextjs-ollama-llm-ui.enable = true;
     ollama = {
@@ -277,7 +278,6 @@ in
     systemPackages = with pkgs; [
       pyenv
       wget
-      filezilla
       git
       obs-studio
       neovim
@@ -328,13 +328,13 @@ in
       unrar
       pavucontrol
       brightnessctl
+      rustdesk-flutter
       mlocate
       imv
       nemo-fileroller
       zip
       jdk21
       myxer
-      (pkgs.callPackage ./ani-cli-ru.nix { })
       gpu-screen-recorder-gtk
       gpu-screen-recorder
       snapper
@@ -382,6 +382,7 @@ in
   imports =
     [
       #./my-services.nix
+      ./flatpak.nix
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
     ];
@@ -407,8 +408,8 @@ in
     resolvconf.dnsSingleRequest = true;
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 11434 3000 ];
-      allowedUDPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 11434 3000 ];
+      allowedTCPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 25576 11434 3000 35099 25595 25545 ];
+      allowedUDPPorts = [ 22 80 25565 25566 25585 25575 25555 25568 25576 11434 3000 35099 25595 25545 ];
       };
   };
   console = {
@@ -435,6 +436,5 @@ in
     group = "tpws";
   };
   users.groups.tpws = {};
-  virtualisation.waydroid.enable = true;
   nix.package = pkgs.nixVersions.latest;
 }
