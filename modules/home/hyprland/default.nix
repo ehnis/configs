@@ -18,12 +18,16 @@ in
   
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ hyprshot pulseaudio hyprshot nautilus file-roller cliphist libnotify swappy brightnessctl imv myxer ffmpegthumbnailer bun esbuild fd dart-sass swww hyprpicker wttrbar ];
+    home.packages = with pkgs; [ hyprshot pulseaudio hyprshot nemo file-roller cliphist libnotify swappy brightnessctl imv myxer ffmpegthumbnailer bun esbuild fd dart-sass swww hyprpicker wttrbar ];
     wayland.windowManager.hyprland = {
       package = mkIf (!cfg.stable) inputs.hyprland.packages.${pkgs.system}.hyprland;
       plugins = lib.optionals (cfg.enable-plugins && cfg.stable) [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ] ++ lib.optionals (cfg.enable-plugins && !cfg.stable) [ inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors ];
       enable = true;
       settings = {
+        monitor = [
+          "HDMI-A-1, 1920x1080@165, 0x0, 1"
+        ];
+      
         "$mod" = "SUPER";
         bind = [
           ", Print, exec, hyprshot -m region"
@@ -48,7 +52,7 @@ in
           "$mod, Q, exec, kitty"
           "$mod, C, killactive,"
           "$mod, M, exec, wlogout -b 2 -L 500px -R 500px -c 30px -r 30px,"
-          "$mod, E, exec, nautilus -w"
+          "$mod, E, exec, nemo"
           "$mod, V, togglefloating,"
           "$mod, P, pseudo,"
           "$mod, J, togglesplit,"
@@ -125,7 +129,8 @@ in
           "animation slide left, swaync-control-center"
         ];  
         exec-once = [
-          "firefox & vesktop --ozone-platform-hint=auto"
+          "killall screen; ~bot/start-bot.sh"
+	  "firefox & vesktop --ozone-platform-hint=auto"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
           "hyprctl setcursor Bibata-Modern-Classic 24"
@@ -140,8 +145,8 @@ in
           accel_profile = "flat";
         };
         general = {
-          gaps_in = 5;
-          gaps_out = 5;
+          gaps_in = 1;
+          gaps_out = 1;
           border_size = 0;
           "col.active_border" = "rgb(4575da) rgb(6804b5)";
           "col.inactive_border" = "rgb(595959)";

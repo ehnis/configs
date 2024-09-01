@@ -61,8 +61,7 @@ in
       gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
       cursorTheme.name = "GoogleDot-Black";
       iconTheme = {
-        name = "MoreWaita";
-        package = pkgs.morewaita-icon-theme;
+        name = "Windows-Eleven";
       };
       theme.name = "Materia-dark";
       font.name = "Noto Sans Medium";

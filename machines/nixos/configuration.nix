@@ -1,5 +1,6 @@
 { config, pkgs, inputs, ... }:
 let
+   otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "ehnis"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });  
   user = "ehnis";
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
@@ -20,6 +21,7 @@ in
 
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
+  hardware.opentabletdriver.package = otd-package;
 
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
@@ -213,13 +215,13 @@ in
       file = {
         
 	# Enable swapfile
-	enable = false;
+	enable = true;
 
 	# Path to swapfile
 	path = "/var/lib/swapfile";
 
 	# Size of swapfile in MB
-	size = 4 * 1024;
+	size = 16 * 1024;
 
       };
 
@@ -236,6 +238,20 @@ in
     };
 
   };
+ 
+  services.snapper = {
+    persistentTimer = true;
+    configs.server = {
+      SUBVOLUME = "/home/${user}/server";
+      TIMELINE_LIMIT_YEARLY = 0;
+      TIMELINE_LIMIT_WEEKLY = 2;
+      TIMELINE_LIMIT_MONTHLY = 1;
+      TIMELINE_LIMIT_HOURLY = 24;
+      TIMELINE_LIMIT_DAILY = 7;
+      TIMELINE_CREATE = true;
+      TIMELINE_CLEANUP = true;
+    };
+  };
 
   environment = {
 
@@ -249,6 +265,9 @@ in
     };
 
     systemPackages = with pkgs; [
+      prismlauncher
+      rpcs3
+      krita
       wget
       git-lfs
       git
@@ -264,17 +283,14 @@ in
       nix-index
       remmina
       telegram-desktop
-      adwaita-icon-theme
       osu-lazer-bin
       steam
       moonlight-qt
-      inputs.pollymc.packages.${system}.pollymc
       nvtopPackages.amd
       qbittorrent
       pavucontrol
       any-nix-shell
       wl-clipboard
-      bottles
       vesktop
       networkmanager_dmenu
       neovide

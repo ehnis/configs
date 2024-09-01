@@ -18,7 +18,7 @@ in
         target = "hyprland-session.target";
       };
       style = ''
-        @define-color accent #2362ba;
+        @define-color accent #000000;
         * {
           font-family: "Noto Sans", "JetBrainsMono NF";
           font-size: 13px;
@@ -279,7 +279,7 @@ in
         #idle_inhibitor,
         #pulseaudio,
         #pulseaudio.mic {
-          color: #7aa2f7;
+          color: #750514;
         }
         
         #backlight {
