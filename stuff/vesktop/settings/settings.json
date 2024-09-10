@@ -47,7 +47,7 @@
             "enabled": false
         },
         "AlwaysTrust": {
-            "enabled": false
+            "enabled": true
         },
         "AnonymiseFileNames": {
             "enabled": false
@@ -71,7 +71,7 @@
             "enabled": false
         },
         "BetterGifPicker": {
-            "enabled": false
+            "enabled": true
         },
         "BetterNotesBox": {
             "enabled": false
@@ -155,7 +155,7 @@
             "enabled": false
         },
         "FakeNitro": {
-            "enabled": false
+            "enabled": true
         },
         "FakeProfileThemes": {
             "enabled": false
@@ -207,9 +207,9 @@
         },
         "ImageZoom": {
             "enabled": true,
-            "size": 590,
+            "size": 1000,
             "zoom": 1.9,
-            "nearestNeighbour": false,
+            "nearestNeighbour": true,
             "square": false,
             "invertScroll": true,
             "zoomSpeed": 0.5,
@@ -268,7 +268,7 @@
             "enabled": false
         },
         "MoreKaomoji": {
-            "enabled": false
+            "enabled": true
         },
         "MoreUserTags": {
             "enabled": false
@@ -412,10 +412,10 @@
             "enabled": false
         },
         "SecretRingToneEnabler": {
-            "enabled": false
+            "enabled": true
         },
         "Summaries": {
-            "enabled": false
+            "enabled": true
         },
         "SendTimestamps": {
             "enabled": false
@@ -532,10 +532,10 @@
             "enabled": false
         },
         "VoiceDownload": {
-            "enabled": false
+            "enabled": true
         },
         "VoiceMessages": {
-            "enabled": false
+            "enabled": true
         },
         "WebKeybinds": {
             "enabled": true

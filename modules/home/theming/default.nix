@@ -32,7 +32,7 @@ in
     };
     dconf.settings = {
       "org/nemo/preferences" = {
-        default-folder-viewer = "list-view";
+        default-folder-viewer = "icons-view";
         show-hidden-files = true;
         thumbnail-limit = lib.hm.gvariant.mkUint64 68719476736;
       };

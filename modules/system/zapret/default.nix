@@ -84,8 +84,8 @@ in
       resolvconf.dnsSingleRequest = true;
       firewall = {
         enable = true;
-        allowedTCPPorts = [ 22 80 9993 51820 8080 443 ];
-        allowedUDPPorts = [ 22 80 9993 51820 8080 443 ];
+        allowedTCPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 ];
+        allowedUDPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 ];
       };
     };
   };

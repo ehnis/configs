@@ -129,7 +129,7 @@ in
           "animation slide left, swaync-control-center"
         ];  
         exec-once = [
-          "killall screen; ~bot/start-bot.sh"
+          "killall screen; ~/bot/start-bot.sh"
 	  "firefox & vesktop --ozone-platform-hint=auto"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"

@@ -1,6 +1,6 @@
 { config, pkgs, inputs, ... }:
 let
-   otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "ehnis"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });  
+   otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "DADA30000"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });  
   user = "ehnis";
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
@@ -51,13 +51,13 @@ in
   users.mutableUsers = true;
 
   # Enable WayDroid
-  virtualisation.waydroid.enable = true;
+  virtualisation.waydroid.enable = false;
 
   # Autologin
   services.getty.autologinUser = user;
 
   # Enable russian anicli
-  anicli-ru.enable = true;
+  anicli-ru.enable = false;
   
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = true;
@@ -72,7 +72,7 @@ in
   zerotier.enable = false;
 
   # Enable spotify with theme
-  spicetify.enable = true;
+  spicetify.enable = false;
 
   # Enable mlocate (find files on system quickly)
   mlocate.enable = true;
@@ -265,6 +265,9 @@ in
     };
 
     systemPackages = with pkgs; [
+      rustdesk-flutter
+      kdenlive
+      ffmpeg-full
       prismlauncher
       rpcs3
       krita
@@ -280,6 +283,7 @@ in
       jdk21
       mpv
       firefox
+      libreoffice
       nix-index
       remmina
       telegram-desktop
@@ -294,6 +298,7 @@ in
       vesktop
       networkmanager_dmenu
       neovide
+      cached-nix-shell
     ] ++ (import ../../modules/system/stuff (pkgs)).scripts;
     
   };
