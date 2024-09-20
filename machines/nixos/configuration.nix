@@ -10,6 +10,10 @@ in
     ../../modules/system
   ];
 
+  # Enable RAM compression
+  zramSwap.enable = true;
+  zramSwap.memoryPercent = 12;
+
   # Enable IOMMU
   boot.kernelParams = [ "iommu=pt" ];
 
@@ -265,7 +269,13 @@ in
     };
 
     systemPackages = with pkgs; [
+      nemo-with-extensions
+      wlx-overlay-s
+      alvr
+      xclicker
+      unzip
       rustdesk-flutter
+      bottles
       kdenlive
       ffmpeg-full
       prismlauncher

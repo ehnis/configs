@@ -632,7 +632,8 @@ in
           };
           "temperature" = {
             interval = 1;
-            hwmon-path = ["/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input" "/sys/class/hwmon/hwmon3/temp1_input"];
+            hwmon-path = ["/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input" "/sys/class/hwmon/hwmon3/temp1_input"];
+        package = pkgs.morewaita-icon-theme;
             format = "<span color='#7AA2F7'> {temperatureC}°C  </span>";
             tooltip-format = "Core Temp: {temperatureC}°C ";
           };
