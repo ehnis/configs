@@ -270,6 +270,7 @@ in
 
     systemPackages = with pkgs; [
       nemo-with-extensions
+      nemo-fileroller
       wlx-overlay-s
       alvr
       xclicker

@@ -18,16 +18,21 @@ in
   
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ hyprshot pulseaudio hyprshot nemo file-roller cliphist libnotify swappy brightnessctl imv myxer ffmpegthumbnailer bun esbuild fd dart-sass swww hyprpicker wttrbar ];
+    home.packages = with pkgs; [ hyprshot pulseaudio hyprshot nemo-with-extensions nemo-fileroller file-roller cliphist libnotify swappy brightnessctl imv myxer ffmpegthumbnailer bun esbuild fd dart-sass swww hyprpicker wttrbar ];
     wayland.windowManager.hyprland = {
       package = mkIf (!cfg.stable) inputs.hyprland.packages.${pkgs.system}.hyprland;
       plugins = lib.optionals (cfg.enable-plugins && cfg.stable) [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ] ++ lib.optionals (cfg.enable-plugins && !cfg.stable) [ inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors ];
       enable = true;
       settings = {
         monitor = [
-          "HDMI-A-1, 1920x1080@165, 0x0, 1"
+          "DP-1, 1920x1080@165, 1920x0, 1"
+	  "HDMI-A-1, 1920x1080, 0x0, 1"
         ];
-      
+	workspace = [ 
+	  "w[tg1-5], monitor:DP-1"
+	  "w[tg6-10], monitor:HDMI-A-1"
+        ];
+
         "$mod" = "SUPER";
         bind = [
           ", Print, exec, hyprshot -m region"
@@ -298,6 +303,7 @@ in
         splash = false;
         preload = [ "${../../../stuff/wallpaper.png}" ];
         wallpaper = [
+          "DP-1,${../../../stuff/wallpaper.png}"
           "HDMI-A-1,${../../../stuff/wallpaper.png}"
         ];
       };

@@ -25,7 +25,14 @@ in
         nftables
         ipset
         curl
-	zapret
+	(zapret.overrideAttrs (finalAttrs: previousAttrs: {
+	  src = pkgs.fetchFromGitHub {
+	    owner = "bol-van";
+	    repo = "zapret";
+	    rev = "171ae7ccdc4789f889cc95844c1e5aaef41f9bcd";
+	    hash = "sha256-clO4hbvNPaIipiG5ujThSYfaWQ6M3DU24niUJjVdhPw=";
+	  };
+	}))
         gawk
       ];
       serviceConfig = {
@@ -43,29 +50,20 @@ in
           MODE_HTTP=1
           MODE_HTTP_KEEPALIVE=1
           MODE_HTTPS=1
-          MODE_QUIC=0
+          MODE_QUIC=1
           MODE_FILTER=none
           DISABLE_IPV6=1
           INIT_APPLY_FW=1
-          TPWS_OPT="--hostspell=HOST --split-http-req=method --split-pos=3 --hostcase --oob"
-          NFQWS_OPT_DESYNC="--dpi-desync=fake,split2 --dpi-desync-fooling=datanoack"
+          #NFQWS_OPT_DESYNC="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000"
           #NFQWS_OPT_DESYNC="--dpi-desync=split2"
-          #NFQWS_OPT_DESYNC="--dpi-desync=fake,split2 --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
+	  #NFQWS_OPT_DESYNC="--dpi-desync=split2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4"
+          NFQWS_OPT_DESYNC="--dpi-desync=split2 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,split2 --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
+	  #NFQWS_OPT_DESYNC_HTTP="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum" 
+	  #NFQWS_OPT_DESYNC_HTTP_SUFFIX="--dpi-desync=syndata"
+	  #NFQWS_OPT_DESYNC_HTTPS="--dpi-desync=fake,split --dpi-desync-fooling=badseq --dpi-desync-split-pos=1 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum"
+	  #NFQWS_OPT_DESYNC="--dpi-desync=fake,disorder2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fake-tls=${../../../stuff/tls_clienthello_www_google_com.bin}"
+	  #NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-ttl=0 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fooling=md5sig,badsum --dpi-desync-fake-quic=${../../../stuff/quic_initial_www_google_com.bin}"
           TMPDIR=/tmp
-          SET_MAXELEM=522288
-          IPSET_OPT="hashsize 262144 maxelem $SEX_MAXELEM"
-          IP2NET_OPT4="--prefix-length=22-30 --v4-threshold=3/4"
-          IP2NET_OPT6="--prefix-length=56-64 --v6-threshold=5"
-          AUTOHOSTLIST_RETRANS_THRESHOLD=3
-          AUTOHOSTLIST_FAIL_THRESHOLD=3
-          AUTOHOSTLIST_FAIL_TIME=60
-          AUTOHOSTLIST_DEBUGLOG=0
-          MDIG_THREADS=30
-          GZIP_LISTS=1
-          DESYNC_MARK=0x40000000
-          DESYNC_MARK_POSTNAT=0x20000000
-          FLOWOFFLOAD=donttouch
-          GETLIST=get_antifilter_ipsmart.sh
         '';
       };
     };
@@ -74,7 +72,7 @@ in
       dnscrypt-proxy2 = {
         enable = true;
         settings = {
-          server_names = [ "cloudflare" "scaleway-fr" "yandex" "google" ];
+          server_names = [ "cloudflare" "scaleway-fr" "google" ];
           listen_addresses = [ "127.0.0.1:53" "[::1]:53" ];
         };
       };
