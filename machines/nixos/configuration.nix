@@ -14,6 +14,10 @@ in
   zramSwap.enable = true;
   zramSwap.memoryPercent = 12;
 
+  # Enable ALVR
+  programs.alvr.enable = true;
+  programs.alvr.openFirewall = true;
+
   # Enable IOMMU
   boot.kernelParams = [ "iommu=pt" ];
 
@@ -31,7 +35,7 @@ in
   boot.tmp.useTmpfs = true;
 
   # Use mainline kernel instead of LTS kernel
-  boot.kernelPackages = pkgs.linuxPackages_testing; 
+  # boot.kernelPackages = pkgs.linuxPackages_testing; 
 
   # Enable SysRQ
   boot.kernel.sysctl."kernel.sysrq" = 1;
@@ -269,6 +273,7 @@ in
     };
 
     systemPackages = with pkgs; [
+      beatsabermodmanager
       nemo-with-extensions
       nemo-fileroller
       wlx-overlay-s
@@ -309,6 +314,7 @@ in
       vesktop
       networkmanager_dmenu
       neovide
+      qalculate-gtk
       cached-nix-shell
     ] ++ (import ../../modules/system/stuff (pkgs)).scripts;
     

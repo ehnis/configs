@@ -569,7 +569,12 @@
         },
         "NoMaskedUrlPaste": {
             "enabled": false
-        }
+        
+        },
+        "VolumeBooster": {
+            "enabled": true
+	}
+	
     },
     "notifications": {
         "timeout": 5000,

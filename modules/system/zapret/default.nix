@@ -53,6 +53,7 @@ in
           MODE_QUIC=1
           MODE_FILTER=none
           DISABLE_IPV6=1
+	  QUIC_PORTS=50000-65535
           INIT_APPLY_FW=1
           #NFQWS_OPT_DESYNC="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000"
           #NFQWS_OPT_DESYNC="--dpi-desync=split2"
@@ -63,6 +64,7 @@ in
 	  #NFQWS_OPT_DESYNC_HTTPS="--dpi-desync=fake,split --dpi-desync-fooling=badseq --dpi-desync-split-pos=1 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum"
 	  #NFQWS_OPT_DESYNC="--dpi-desync=fake,disorder2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fake-tls=${../../../stuff/tls_clienthello_www_google_com.bin}"
 	  #NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-ttl=0 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fooling=md5sig,badsum --dpi-desync-fake-quic=${../../../stuff/quic_initial_www_google_com.bin}"
+	  NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake,tamper --dpi-desync-any-protocol"
           TMPDIR=/tmp
         '';
       };
@@ -82,8 +84,8 @@ in
       resolvconf.dnsSingleRequest = true;
       firewall = {
         enable = true;
-        allowedTCPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 ];
-        allowedUDPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 ];
+        allowedTCPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 1000 878 567 ];
+        allowedUDPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 1000 878 567 ];
       };
     };
   };
