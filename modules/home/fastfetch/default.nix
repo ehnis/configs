@@ -102,8 +102,8 @@ in
                 key = "├─";
                 keyColor = "blue";
             }
-    
-            {
+            
+	    {
                 type = "shell";
                 key = "├─";
                 keyColor = "blue";

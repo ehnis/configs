@@ -5,10 +5,23 @@ let
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
 {
+  security.acme.acceptTerms = true;
+  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
+
+  # Enable MediaWiki
+  services.mediawiki.enable = true;
+  services.mediawiki.passwordFile = "/mediawikipassword.txt";
+  
+  services.mediawiki.httpd.virtualHost = {
+    hostName = "wiki.sanic.space";
+    adminAddr = "lublujisn78@gmail.com";
+    forceSSL = true;
+    enableACME = true;
+  };
 
   # Enable RAM compression
   zramSwap.enable = true;
@@ -298,10 +311,9 @@ in
       zip
       jdk21
       mpv
-      firefox
+      firefox-bin
       libreoffice
       nix-index
-      remmina
       telegram-desktop
       osu-lazer-bin
       steam
