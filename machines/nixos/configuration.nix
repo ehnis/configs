@@ -311,7 +311,6 @@ in
       zip
       jdk21
       mpv
-      firefox-bin
       libreoffice
       nix-index
       telegram-desktop
@@ -324,6 +323,7 @@ in
       any-nix-shell
       wl-clipboard
       vesktop
+      (firefox-bin.override { nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ]; })
       networkmanager_dmenu
       neovide
       qalculate-gtk

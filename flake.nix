@@ -20,9 +20,10 @@
     pollymc.url = "github:fn2006/PollyMC";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.4.1";
+    pipewire-screenaudio.url = "github:IceDBorn/pipewire-screenaudio";
   };
 
-  outputs = { nixpkgs, home-manager, ...} @ inputs: { 
+  outputs = { nixpkgs, pipewire-screenaudio, home-manager, ...} @ inputs: { 
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
