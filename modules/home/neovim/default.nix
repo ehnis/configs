@@ -17,6 +17,7 @@ in
       defaultEditor = true;
       vimAlias = true;
       vimdiffAlias = true;
+      plugins = with pkgs.vimPlugins; [ coc-nvim onedark-nvim ];
     };
     home.file.".config/nvim/init.vim".source = ../../../stuff/init.vim;
   };

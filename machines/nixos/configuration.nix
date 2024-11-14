@@ -286,6 +286,13 @@ in
     };
 
     systemPackages = with pkgs; [
+      vscodium
+      yarn
+      jetbrains.idea-community
+      nodejs
+      ccls
+      gcc
+      dotnet-sdk
       beatsabermodmanager
       nemo-with-extensions
       nemo-fileroller

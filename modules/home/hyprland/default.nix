@@ -55,7 +55,8 @@ in
           "$mod, F2, exec, sheesh.sh"
           "$mod, O, exec, killall -SIGUSR1 .waybar-wrapped"
           "$mod, Q, exec, kitty"
-          "$mod, C, killactive,"
+          "$mod_CTRL, F, fullscreenstate, 0 2"
+	  "$mod, C, killactive,"
           "$mod, M, exec, wlogout -b 2 -L 500px -R 500px -c 30px -r 30px,"
           "$mod, E, exec, nemo"
           "$mod, V, togglefloating,"
@@ -135,7 +136,7 @@ in
         ];  
         exec-once = [
           "killall screen; ~/bot/start-bot.sh"
-	  "firefox & vesktop --ozone-platform-hint=auto"
+	  "firefox --ozone-platform-hint=auto"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
           "hyprctl setcursor Bibata-Modern-Classic 24"
@@ -174,10 +175,6 @@ in
             noise = 0;
             vibrancy = 0;
           };
-          drop_shadow = "yes";
-          shadow_range = 4;
-          shadow_render_power = 3;
-          "col.shadow" = "rgba(1a1a1aee)";
         };
         animations = {
           enabled = true;
