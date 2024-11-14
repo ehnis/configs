@@ -316,6 +316,7 @@ in
       unrar
       android-tools
       zip
+      jdk23
       jdk21
       mpv
       libreoffice
