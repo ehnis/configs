@@ -12,6 +12,9 @@ in
     ../../modules/system
   ];
 
+  # Disable firewall
+  networking.firewall.enable = false;
+
   # Enable MediaWiki
   services.mediawiki.enable = true;
   services.mediawiki.passwordFile = "/mediawikipassword.txt";
@@ -59,6 +62,9 @@ in
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [ { domain = "*"; item = "core"; value = "0"; } ];
 
+  # Enable singbox proxy to my XRay vpn
+  singbox.enable = true;
+
   # Enable systemd coredumps
   systemd.coredump.enable = false;
 
@@ -81,7 +87,7 @@ in
   anicli-ru.enable = false;
   
   # Enable DPI (Deep packet inspection) bypass
-  zapret.enable = true;
+  zapret.enable = false;
   
   # Enable replays
   replays.enable = true;
