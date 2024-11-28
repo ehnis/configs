@@ -52,6 +52,7 @@ in
       settings = {
         monitor = [
           "DP-1, 1920x1080@165, 0x0, 1"
+          "LVDS-1, 1366x768@60, 0x0, 1" 
         ];
         "$mod" = "SUPER";
         bind = [
@@ -340,6 +341,7 @@ in
         preload = [ "${../../../stuff/wallpaper.png}" ];
         wallpaper = [
           "DP-1,${../../../stuff/wallpaper.png}"
+          "LVDS-1,${../../../stuff/wallpaper.png}"
         ];
       };
     };
