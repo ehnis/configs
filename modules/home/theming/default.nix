@@ -13,9 +13,9 @@ in
   config = mkIf cfg.enable {
     home.file = {
       ".themes".source = ../../../stuff/.themes;
-      ".config/gtk-4.0/assets".source = ../../../stuff/.themes/Materia-dark/gtk-4.0/assets;
-      ".config/gtk-4.0/gtk.css".source = ../../../stuff/.themes/Materia-dark/gtk-4.0/gtk.css;
-      ".config/gtk-4.0/icons".source = ../../../stuff/.themes/Materia-dark/gtk-4.0/icons;
+      ".config/gtk-4.0/assets".source = ../../../stuff/.themes/Fluent-Dark/gtk-4.0/assets;
+      ".config/gtk-4.0/gtk.css".source = ../../../stuff/.themes/Fluent-Dark/gtk-4.0/gtk.css;
+      ".config/gtk-4.0/icons".source = ../../../stuff/.themes/Fluent-Dark/gtk-4.0/gtk-dark.css;
       ".config/vesktop/settings".source = ../../../stuff/vesktop/settings;
       ".config/vesktop/settings.json".source = ../../../stuff/vesktop/settings.json;
       ".config/vesktop/themes".source = ../../../stuff/vesktop/themes;
@@ -32,7 +32,7 @@ in
     };
     dconf.settings = {
       "org/nemo/preferences" = {
-        default-folder-viewer = "icons-view";
+        default-folder-viewer = "list-view";
         show-hidden-files = true;
         thumbnail-limit = lib.hm.gvariant.mkUint64 68719476736;
       };
@@ -59,11 +59,12 @@ in
       enable = true;
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
       gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
-      cursorTheme.name = "GoogleDot-Black";
+      cursorTheme.name = "Bibata-Modern-Classic";
       iconTheme = {
         name = "Windows-Eleven";
+        package = pkgs.morewaita-icon-theme;
       };
-      theme.name = "Materia-dark";
+      theme.name = "Fluent-Dark";
       font.name = "Noto Sans Medium";
       font.size = 11;
     };

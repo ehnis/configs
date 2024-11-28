@@ -29,8 +29,8 @@ in
 	  src = pkgs.fetchFromGitHub {
 	    owner = "bol-van";
 	    repo = "zapret";
-	    rev = "171ae7ccdc4789f889cc95844c1e5aaef41f9bcd";
-	    hash = "sha256-clO4hbvNPaIipiG5ujThSYfaWQ6M3DU24niUJjVdhPw=";
+	    rev = "29c8aec1116d504692bebc16420d0e3ad65c030b";
+	    hash = "sha256-diWPEakHgYytBknng1Opfr7XZbf58JqzwPz8KbmNcBQ=";
 	  };
 	}))
         gawk
@@ -48,22 +48,14 @@ in
           MODE="nfqws"
           FWTYPE="iptables"
           MODE_HTTP=1
-          MODE_HTTP_KEEPALIVE=1
+          MODE_HTTP_KEEPALIVE=0
           MODE_HTTPS=1
           MODE_QUIC=1
+	  QUIC_PORTS=50000-65535
           MODE_FILTER=none
           DISABLE_IPV6=1
-	  QUIC_PORTS=50000-65535
           INIT_APPLY_FW=1
-          #NFQWS_OPT_DESYNC="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000"
-          #NFQWS_OPT_DESYNC="--dpi-desync=split2"
-	  #NFQWS_OPT_DESYNC="--dpi-desync=split2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4"
-          NFQWS_OPT_DESYNC="--dpi-desync=split2 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,split2 --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
-	  #NFQWS_OPT_DESYNC_HTTP="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum" 
-	  #NFQWS_OPT_DESYNC_HTTP_SUFFIX="--dpi-desync=syndata"
-	  #NFQWS_OPT_DESYNC_HTTPS="--dpi-desync=fake,split --dpi-desync-fooling=badseq --dpi-desync-split-pos=1 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum"
-	  #NFQWS_OPT_DESYNC="--dpi-desync=fake,disorder2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fake-tls=${../../../stuff/tls_clienthello_www_google_com.bin}"
-	  #NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-ttl=0 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fooling=md5sig,badsum --dpi-desync-fake-quic=${../../../stuff/quic_initial_www_google_com.bin}"
+          NFQWS_OPT_DESYNC="--dpi-desync=syndata,fake,split2 --dpi-desync-fooling=md5sig --dpi-desync-repeats=6"
 	  NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake,tamper --dpi-desync-any-protocol"
           TMPDIR=/tmp
         '';
@@ -74,7 +66,7 @@ in
       dnscrypt-proxy2 = {
         enable = true;
         settings = {
-          server_names = [ "cloudflare" "scaleway-fr" "google" ];
+          server_names = [ "cloudflare" "scaleway-fr" "google" "yandex" ];
           listen_addresses = [ "127.0.0.1:53" "[::1]:53" ];
         };
       };
@@ -84,8 +76,8 @@ in
       resolvconf.dnsSingleRequest = true;
       firewall = {
         enable = true;
-        allowedTCPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 1000 878 567 26900 ];
-        allowedUDPPorts = [ 22 80 9993 51820 8080 443 25565 25585 25575 24404 1000 878 567 26900 ];
+        allowedTCPPorts = [ 22 80 9993 51820 8080 443 1935 49152 8125 ];
+        allowedUDPPorts = [ 22 80 9993 51820 8080 443 1935 49152 8125 ];
       };
     };
   };

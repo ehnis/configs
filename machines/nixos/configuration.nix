@@ -1,6 +1,10 @@
-{ config, pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  ...
+}:
 let
-   otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "DADA30000"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });  
+  otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "DADA30000"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });
   user = "ehnis";
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
@@ -12,19 +16,38 @@ in
     ../../modules/system
   ];
 
-  # Disable firewall
+  systemd.services.lactd = {
+
+    enable = true;
+
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+
+      ExecStart = "${pkgs.lact}/bin/lact daemon";
+
+      #ExecStartPre = "${pkgs.coreutils-full}/bin/sleep 10";
+
+      Restart = "always";
+
+      Nice = -10;
+
+    };
+
+  };
+
+  programs.ydotool.enable = true;
+
+  # Disable annoying firewall
   networking.firewall.enable = false;
 
-  # Enable MediaWiki
-  services.mediawiki.enable = true;
-  services.mediawiki.passwordFile = "/mediawikipassword.txt";
-  
-  services.mediawiki.httpd.virtualHost = {
-    hostName = "wiki.sanic.space";
-    adminAddr = "lublujisn78@gmail.com";
-    forceSSL = true;
-    enableACME = true;
-  };
+  # Enable singbox proxy to my XRay vpn
+  singbox.enable = true;
+
+  # Run non-nix apps
+  programs.nix-ld.enable = true;
+
+  #boot.crashDump.enable = true;
 
   # Enable RAM compression
   zramSwap.enable = true;
@@ -34,14 +57,19 @@ in
   programs.alvr.enable = true;
   programs.alvr.openFirewall = true;
 
+  # Enable stuff in /bin and /usr/bin
+  services.envfs.enable = true;
+
   # Enable IOMMU
   boot.kernelParams = [ "iommu=pt" ];
 
   # Enable some important system zsh stuff
   programs.zsh.enable = true;
 
-  # GPU and CPU OC, fan control utility
-  programs.corectrl.enable = true;
+  # Enable portals
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.config.common.default = "*";
 
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
@@ -50,26 +78,44 @@ in
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 
-  # Use mainline kernel instead of LTS kernel
-  # boot.kernelPackages = pkgs.linuxPackages_testing; 
+  # Use mainline (or latest stable) kernel instead of LTS kernel
+  #boot.kernelPackages = pkgs.linuxPackages_testing;
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  #chaotic.scx.enable = true;
 
   # Enable SysRQ
   boot.kernel.sysctl."kernel.sysrq" = 1;
+
+  # Restrict amount of annoying cache
+  boot.kernel.sysctl."vm.dirty_bytes" = 50000000;
+  boot.kernel.sysctl."vm.dirty_background_bytes" = 50000000;
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
 
   # Disable usual coredumps (I hate them)
-  security.pam.loginLimits = [ { domain = "*"; item = "core"; value = "0"; } ];
-
-  # Enable singbox proxy to my XRay vpn
-  singbox.enable = true;
+  security.pam.loginLimits = [
+    {
+      domain = "*";
+      item = "core";
+      value = "0";
+    }
+  ];
 
   # Enable systemd coredumps
   systemd.coredump.enable = false;
 
   # Enable generation of NixOS documentation for modules (slows down builds)
   documentation.nixos.enable = false;
+
+  # Enable systemd-networkd for internet
+  #systemd.network.wait-online.enable = false;
+  #boot.initrd.systemd.network.enable = true;
+  #systemd.network.enable = true;
+  #networking.useNetworkd = true;
+
+  # Enable dhcpcd for using internet using ethernet cable
+  #networking.dhcpcd.enable = true;
 
   # Enable NetworkManager
   networking.networkmanager.enable = true;
@@ -85,10 +131,10 @@ in
 
   # Enable russian anicli
   anicli-ru.enable = false;
-  
+
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = false;
-  
+
   # Enable replays
   replays.enable = true;
 
@@ -99,7 +145,7 @@ in
   zerotier.enable = false;
 
   # Enable spotify with theme
-  spicetify.enable = false;
+  spicetify.enable = true;
 
   # Enable mlocate (find files on system quickly)
   mlocate.enable = true;
@@ -109,22 +155,32 @@ in
     # Set options for vm that is built using nixos-rebuild build-vm
     systemd.user.services.mpvpaper.enable = false;
     virtualisation = {
-       qemu.options = [ "-display sdl,gl=on" "-device virtio-vga-gl" "-enable-kvm" "-audio driver=sdl,model=virtio" ];
-       cores = 6;
-       diskSize = 1024 * 8;
-       msize = 16384 * 16;
-       memorySize = 1024*4;
+      qemu.options = [
+        "-display sdl,gl=on"
+        "-device virtio-vga-gl"
+        "-enable-kvm"
+        "-audio driver=sdl,model=virtio"
+      ];
+      cores = 6;
+      diskSize = 1024 * 8;
+      msize = 16384 * 16;
+      memorySize = 1024 * 4;
     };
 
   };
 
   flatpak = {
-   
+
     # Enable system flatpak
     enable = true;
 
     # Packages to install from flatpak
-    packages = [ { appId = "org.vinegarhq.Sober"; origin = "sober"; } ];
+    packages = [
+      {
+        flatpakref = "https://vixalien.github.io/muzika/muzika.flatpakref";
+        sha256 = "0skzklwnaqqyqj0491dpf746hzzhhxi5gxl1fwb1gyy03li6cj9p";
+      }
+    ];
 
   };
 
@@ -132,7 +188,7 @@ in
 
     # Enable some default fonts
     enableDefaultPackages = true;
-    
+
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
@@ -149,7 +205,18 @@ in
     # Sets password for this user using hash generated by mkpasswd
     hashedPassword = user-hash;
 
-    extraGroups = [ "wheel" "uinput" "mlocate" "nginx" "input" "kvm" "adbusers" "video" ];
+    extraGroups = [
+      "wheel"
+      "uinput"
+      "mlocate"
+      "nginx"
+      "input"
+      "kvm"
+      "ydotool"
+      "adbusers"
+      "video"
+      "corectrl"
+    ];
 
   };
 
@@ -163,12 +230,15 @@ in
     trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
 
     # Enable flakes
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
 
   };
 
   obs = {
-    
+
     # Enable OBS
     enable = true;
 
@@ -176,6 +246,9 @@ in
     virt-cam = true;
 
   };
+
+  # Enable nvidia stuff
+  nvidia.enable = false;
 
   amdgpu = {
 
@@ -198,7 +271,7 @@ in
       enable = false;
 
       # Enable my goofy website
-      website.enable = true;
+      website.enable = false;
 
       # Enable nextcloud
       nextcloud.enable = false;
@@ -211,7 +284,7 @@ in
   };
 
   disks = {
-    
+
     # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL NUKE THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
     enable = true;
 
@@ -219,7 +292,7 @@ in
     compression = true;
 
     second-disk = {
-      
+
       # Enable additional disk (must be btrfs)
       enable = false;
 
@@ -236,127 +309,127 @@ in
       path = "/home/${user}/Games";
 
     };
-    
+
     swap = {
 
       file = {
-        
-	# Enable swapfile
-	enable = true;
 
-	# Path to swapfile
-	path = "/var/lib/swapfile";
+        # Enable swapfile
+        enable = false;
 
-	# Size of swapfile in MB
-	size = 16 * 1024;
+        # Path to swapfile
+        path = "/var/lib/swapfile";
+
+        # Size of swapfile in MB
+        size = 16 * 1024;
 
       };
 
       partition = {
 
         # Enable swap partition
-	enable = false;
+        enable = true;
 
-	# Label of swap partition
-	label = "swap";
+        # Label of swap partition
+        label = "swap";
 
       };
 
     };
 
   };
- 
-  services.snapper = {
-    persistentTimer = true;
-    configs.server = {
-      SUBVOLUME = "/home/${user}/server";
-      TIMELINE_LIMIT_YEARLY = 0;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 1;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
 
   environment = {
 
+    pathsToLink = [ "/share/zsh" ];
+
     variables = {
-      GTK_THEME = "Materia-dark";
+      GTK_THEME = "Fluent-Dark";
+      ENVFS_RESOLVE_ALWAYS = "1";
       MOZ_ENABLE_WAYLAND = "1";
       TERMINAL = "kitty";
       EGL_PLATFORM = "wayland";
       MOZ_DISABLE_RDD_SANDBOX = "1";
-      NIXPKGS_ALLOW_UNFREE= "1";
+      NIXPKGS_ALLOW_UNFREE = "1";
     };
 
-    systemPackages = with pkgs; [
-      vscodium
-      yarn
-      jetbrains.idea-community
-      nodejs
-      ccls
-      gcc
-      dotnet-sdk
-      beatsabermodmanager
-      nemo-with-extensions
-      nemo-fileroller
-      wlx-overlay-s
-      alvr
-      xclicker
-      unzip
-      rustdesk-flutter
-      bottles
-      kdenlive
-      ffmpeg-full
-      prismlauncher
-      rpcs3
-      krita
-      wget
-      git-lfs
-      git
-      killall
-      gamemode
-      screen
-      unrar
-      android-tools
-      zip
-      jdk23
-      jdk21
-      mpv
-      libreoffice
-      nix-index
-      telegram-desktop
-      osu-lazer-bin
-      steam
-      moonlight-qt
-      nvtopPackages.amd
-      qbittorrent
-      pavucontrol
-      any-nix-shell
-      wl-clipboard
-      vesktop
-      (firefox-bin.override { nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ]; })
-      networkmanager_dmenu
-      neovide
-      qalculate-gtk
-      cached-nix-shell
-    ] ++ (import ../../modules/system/stuff (pkgs)).scripts;
-    
+    systemPackages =
+      with pkgs;
+      [
+        pyright
+        lsd
+        gamescope
+        kdiskmark
+        nixfmt-rfc-style
+        gdb
+        gdu
+        gcc
+        nixd
+        nodejs
+        yarn
+        ccls
+        (firefox-bin.override {
+          nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
+        })
+        wget
+        git-lfs
+        git
+        killall
+        gamemode
+        screen
+        unrar
+        android-tools
+        zip
+        jdk23
+        mpv
+        nix-index
+        remmina
+        telegram-desktop
+        adwaita-icon-theme
+        osu-lazer-bin
+        steam
+        prismlauncher
+	rpcs3
+	krita
+	beatsabermodmanager
+	nemo-with-extensions
+	nemo-fileroller
+	alvr
+	kdenlive
+        cached-nix-shell
+        nvtopPackages.amd
+        qbittorrent
+        pavucontrol
+        wl-clipboard
+        bottles
+        vesktop
+        networkmanager_dmenu
+        neovide
+        comma
+        lact
+        libreoffice
+        qalculate-gtk
+        p7zip
+        inputs.nix-alien.packages.${system}.nix-alien
+        inputs.nix-search.packages.${system}.default
+      ]
+      ++ (import ../../modules/system/stuff pkgs).scripts;
+
   };
- 
+
   boot.loader = {
 
     efi.canTouchEfiVariables = true;
 
     systemd-boot.enable = true;
 
+    systemd-boot.memtest86.enable = true;
+
     timeout = 0;
 
   };
 
-  nix.package = pkgs.nixVersions.latest;
+  #nix.package = pkgs.nixVersions.latest;
 
   services = {
 
@@ -369,6 +442,8 @@ in
     pipewire = {
       enable = true;
       alsa.enable = true;
+      alsa.support32Bit = true;
+      jack.enable = true;
       pulse.enable = true;
     };
 
@@ -430,10 +505,12 @@ in
 
     earlySetup = true;
 
-    keyMap = "us,ru";
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-k16n.psf.gz";
+
+    keyMap = "ru";
 
   };
 
   system.stateVersion = "23.11";
-  
+
 }

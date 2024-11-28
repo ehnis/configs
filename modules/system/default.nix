@@ -12,6 +12,7 @@
     ./obs
     ./flatpak
     ./mlocate
+    ./nvidia
     ./singbox
   ];
 }

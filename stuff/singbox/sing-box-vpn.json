@@ -15,6 +15,7 @@
     {
       "type": "tun",
       "tag": "tun-in",
+      "sniff": true,
       "interface_name": "tun0",
       "inet4_address": "172.19.0.1/28",
       "mtu": 9000,
@@ -45,17 +46,8 @@
     "auto_detect_interface": true,
     "rules": [
       {
-        "source_ip_cidr": [
-          "127.0.0.1"
-        ],
-        "ip_cidr": [
-          "127.0.0.1"
-        ],
-        "outbound": "direct"
-      },
-      {
         "process_path_regex": [
-          "^.*(wget|git|electron|firefox|firefox-bin|nix|nix-index|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|python3)$"
+          "^.*(wget|git|electron|firefox|firefox-bin|nix|nix-index|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|.spotify-wrappe|.spotify-wrapped)$"
         ],
         "outbound": "proxy"
       },
@@ -68,15 +60,6 @@
           "ggpht.com"
         ],
         "outbound": "proxy"
-      },
-      {
-        "source_ip_cidr": [
-          "127.0.0.1"
-        ],
-        "ip_cidr": [
-          "127.0.0.1"
-        ],
-        "outbound": "direct"
       },
       {
         "port": 53,

@@ -1,4 +1,10 @@
-{ config, pkgs, inputs, lib, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 with lib;
 let
   cfg = config.hyprland;
@@ -14,27 +20,43 @@ in
     hyprlock = mkEnableOption "Enable locking program";
     rofi = mkEnableOption "Enable rofi (used as applauncher and dmenu)";
   };
-  
-  
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ hyprshot pulseaudio hyprshot nemo-with-extensions nemo-fileroller file-roller cliphist libnotify swappy brightnessctl imv myxer ffmpegthumbnailer bun esbuild fd dart-sass swww hyprpicker wttrbar ];
+    home.packages = with pkgs; [
+      hyprshot
+      pulseaudio
+      hyprshot
+      file-roller
+      cliphist
+      libnotify
+      swappy
+      brightnessctl
+      imv
+      myxer
+      ffmpegthumbnailer
+      bun
+      esbuild
+      fd
+      dart-sass
+      hyprpicker
+      wttrbar
+    ];
     wayland.windowManager.hyprland = {
       package = mkIf (!cfg.stable) inputs.hyprland.packages.${pkgs.system}.hyprland;
-      plugins = lib.optionals (cfg.enable-plugins && cfg.stable) [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ] ++ lib.optionals (cfg.enable-plugins && !cfg.stable) [ inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors ];
+      plugins =
+        lib.optionals (cfg.enable-plugins && cfg.stable) [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ]
+        ++ lib.optionals (cfg.enable-plugins && !cfg.stable) [
+          inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
+        ];
       enable = true;
       settings = {
         monitor = [
-          "DP-1, 1920x1080@165, 1920x0, 1"
-	  "HDMI-A-1, 1920x1080, 0x0, 1"
+          "DP-1, 1920x1080@165, 0x0, 1"
         ];
-	workspace = [ 
-	  "w[tg1-5], monitor:DP-1"
-	  "w[tg6-10], monitor:HDMI-A-1"
-        ];
-
         "$mod" = "SUPER";
         bind = [
+          ", code:122, exec, pactl set-sink-volume @DEFAULT_SINK@ -4096"
+          ", code:123, exec, pactl set-sink-volume @DEFAULT_SINK@ +4096"
           ", Print, exec, hyprshot -m region"
           "SHIFT, Print, exec, hyprshot -m window"
           "ALT, Print, exec, hyprshot -m output"
@@ -51,12 +73,12 @@ in
           "$mod_ALT, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 - 1}')"
           "$mod_CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 100}')"
           "$mod_CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 - 100}')"
+          "$mod_CTRL, F, fullscreenstate, 0 2"
           "$mod, F1, exec, gamemode.sh"
           "$mod, F2, exec, sheesh.sh"
           "$mod, O, exec, killall -SIGUSR1 .waybar-wrapped"
           "$mod, Q, exec, kitty"
-          "$mod_CTRL, F, fullscreenstate, 0 2"
-	  "$mod, C, killactive,"
+          "$mod, C, killactive,"
           "$mod, M, exec, wlogout -b 2 -L 500px -R 500px -c 30px -r 30px,"
           "$mod, E, exec, nemo"
           "$mod, V, togglefloating,"
@@ -101,10 +123,14 @@ in
           "$mod, mouse:273, resizewindow"
         ];
         windowrule = [
-	  "nomaxsize, ^(polkit-mate-authentication-agent-1)$"
+          "nomaxsize, ^(polkit-mate-authentication-agent-1)$"
           "pin, ^(polkit-mate-authentication-agent-1)$"
           "opacity 0.99 override 0.99 override, title:^(MainPicker)$"
+          "opacity 0.99 override 0.99 override, ^(org.prismlauncher.PrismLauncher)$"
           "opacity 0.99 override 0.99 override, ^(org.qbittorrent.qBittorrent)$"
+        ];
+        windowrulev2 = [
+          "fullscreenstate 0 2, class:(firefox), title:^(.*Discord.* — Mozilla Firefox.*)$"
         ];
         layerrule = [
           "blur, waybar"
@@ -133,20 +159,23 @@ in
           "animation popin 90%, rofi"
           "animation popin 90%, logout_dialog"
           "animation slide left, swaync-control-center"
-        ];  
+        ];
         exec-once = [
-          "killall screen; ~/bot/start-bot.sh"
-	  "firefox --ozone-platform-hint=auto"
+          #"pactl load-module module-null-sink sink_name=audiorelay-virtual-mic-sink sink_properties=device.description=Virtual-Mic-Sink; pactl load-module module-remap-source master=audiorelay-virtual-mic-sink.monitor source_name=audiorelay-virtual-mic-sink source_properties=device.description=Virtual-Mic"
+          #"firefox & sleep 1; firefox --new-window https://discord.com/channels/@me"
+          "pactl load-module module-null-sink sink_name=custom_sink sink_properties=device.description='Custom_Sink'; pactl load-module module-loopback source=custom_sink.monitor sink=alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
           "hyprctl setcursor Bibata-Modern-Classic 24"
-        ]; 
+        ];
         input = {
           kb_layout = "us,ru";
           kb_options = "grp:alt_shift_toggle";
           repeat_delay = 200;
           follow_mouse = 1;
-          touchpad = { natural_scroll = false; };
+          touchpad = {
+            natural_scroll = false;
+          };
           sensitivity = 0.2;
           accel_profile = "flat";
         };
@@ -178,12 +207,12 @@ in
         };
         animations = {
           enabled = true;
-          first_launch_animation = true;
+          first_launch_animation = false;
           bezier = [
             "fade, 0.165, 0.84, 0.44, 1"
             "woosh, 0.445, 0.05, 0, 1"
           ];
-          animation = [ 
+          animation = [
             "windowsMove, 1, 5, default"
             "windowsIn, 1, 2, fade, popin 90%"
             "windows, 1, 7, default, slide"
@@ -206,9 +235,11 @@ in
           workspace_swipe = true;
         };
         misc = {
+          disable_hyprland_logo = true;
+          background_color = "0x000000";
           enable_swallow = true;
           animate_manual_resizes = false;
-    	  animate_mouse_windowdragging = false;
+          animate_mouse_windowdragging = false;
           swallow_regex = "^(kitty|lutris|bottles|alacritty)$";
           swallow_exception_regex = "^(ncspot)$";
           force_default_wallpaper = 2;
@@ -227,9 +258,8 @@ in
             gesture_positive = true;
           };
           dynamic-cursors = {
-            enabled = true;
-            mode = "rotate";
-	    rotate.length = 24;
+            enabled = false;
+            mode = "tilt";
             shake.enabled = false;
             stretch.function = "negative_quadratic";
           };
@@ -242,55 +272,64 @@ in
       '';
     };
     systemd.user.services.polkit_mate = {
-      Install= {
+      Install = {
         WantedBy = [ "hyprland-session.target" ];
       };
       Service = {
-	ExecStart = "${pkgs.mate.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
-	Restart = "always";
+        ExecStart = "${pkgs.mate.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
+        Restart = "always";
       };
     };
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal-hyprland
+        pkgs.xdg-desktop-portal-gtk
+      ];
       config.common.default = "*";
     };
     programs.hyprlock = mkIf cfg.hyprlock {
       enable = true;
       settings = {
-        background = [{
-          monitor = "";
-          color = "rgba(0, 0, 0, 0.7)";
-        }];
-        
-        input-field = [{
-          monitor = "";
-          size = "200, 50";
-          outline_thickness = 1;
-          dots_size = 0.2;
-          dots_spacing = 0.15;
-          dots_center = true;
-          outer_color = "rgb(000000)";
-          inner_color = "rgb(100, 100, 100)";
-          font_color = "rgb(10, 10, 10)";
-          fade_on_empty = true;
-          placeholder_text = "<i>Введите пароль...</i>";
-          hide_input = false;
-          position = "0, -20";
-          halign = "center";
-          valign = "center";
-        }];
-        
-        label = [{
-          monitor = "";
-          text = "Введите пароль от пользователя $USER $TIME $ATTEMPTS";
-          color = "rgba(200, 200, 200, 1.0)";
-          font_size = 25;
-          font_family = "Noto Sans";
-          position = "0, 200";
-          halign = "center";
-          valign = "center";
-        }];
+        background = [
+          {
+            monitor = "";
+            color = "rgba(0, 0, 0, 0.7)";
+          }
+        ];
+
+        input-field = [
+          {
+            monitor = "";
+            size = "200, 50";
+            outline_thickness = 1;
+            dots_size = 0.2;
+            dots_spacing = 0.15;
+            dots_center = true;
+            outer_color = "rgb(000000)";
+            inner_color = "rgb(100, 100, 100)";
+            font_color = "rgb(10, 10, 10)";
+            fade_on_empty = true;
+            placeholder_text = "<i>Введите пароль...</i>";
+            hide_input = false;
+            position = "0, -20";
+            halign = "center";
+            valign = "center";
+          }
+        ];
+
+        label = [
+          {
+            monitor = "";
+            text = "Введите пароль от пользователя $USER $TIME $ATTEMPTS";
+            color = "rgba(200, 200, 200, 1.0)";
+            font_size = 25;
+            font_family = "Noto Sans";
+            position = "0, 200";
+            halign = "center";
+            valign = "center";
+          }
+        ];
       };
     };
     services.hyprpaper = mkIf (cfg.hyprpaper && !cfg.mpvpaper) {
@@ -301,10 +340,10 @@ in
         preload = [ "${../../../stuff/wallpaper.png}" ];
         wallpaper = [
           "DP-1,${../../../stuff/wallpaper.png}"
-          "HDMI-A-1,${../../../stuff/wallpaper.png}"
         ];
       };
     };
+    #systemd.user.services.hyprpaper.Service.ExecStartPre = mkIf (cfg.hyprpaper && !cfg.mpvpaper) "${pkgs.coreutils-full}/bin/sleep 1.8";
     systemd.user.services.mpvpaper = mkIf (!cfg.hyprpaper && cfg.mpvpaper) {
       Unit = {
         Description = "Play video wallpaper.";
@@ -326,28 +365,28 @@ in
       enable = true;
       layout = [
         {
-            label = "lock";
-            action = "hyprlock";
-            text = "Lock";
-            keybind = "l";
+          label = "lock";
+          action = "hyprlock";
+          text = "Lock";
+          keybind = "l";
         }
         {
-            label = "logout";
-            action = "hyprctl dispatch exit";
-            text = "Logout";
-            keybind = "e";
+          label = "logout";
+          action = "hyprctl dispatch exit";
+          text = "Logout";
+          keybind = "e";
         }
         {
-            label = "shutdown";
-            action = "systemctl poweroff";
-            text = "Shutdown";
-            keybind = "s";
+          label = "shutdown";
+          action = "systemctl poweroff";
+          text = "Shutdown";
+          keybind = "s";
         }
         {
-            label = "reboot";
-            action = "systemctl reboot";
-            text = "Reboot";
-            keybind = "r";
+          label = "reboot";
+          action = "systemctl reboot";
+          text = "Reboot";
+          keybind = "r";
         }
       ];
       style = ''
@@ -369,28 +408,28 @@ in
         	background-position: center;
         	background-size: 25%;
         }
-        
+
         button:focus, button:active, button:hover {
         	background-color: rgba(0, 0, 0, 0);
         	color: #4470D2;
         }
-        
+
         #lock {
             background-image: image(url("${../../../stuff/lock.png}"));
         }
-        
+
         #logout {
             background-image: image(url("${../../../stuff/logout.png}"));
         }
-        
+
         #shutdown {
             background-image: image(url("${../../../stuff/shutdown.png}"));
         }
-        
+
         #reboot {
             background-image: image(url("${../../../stuff/reboot.png}"));
         }
       '';
-    };  
+    };
   };
 }

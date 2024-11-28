@@ -17,32 +17,86 @@
       url = "github:VirtCode/hypr-dynamic-cursors";
       inputs.hyprland.follows = "hyprland";
     };
-    pollymc.url = "github:fn2006/PollyMC";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.4.1";
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     pipewire-screenaudio.url = "github:IceDBorn/pipewire-screenaudio";
+    nix-alien.url = "github:thiagokokada/nix-alien";
+    nix-flatpak.url = "github:gmodena/nix-flatpak";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nix-search.url = "github:diamondburned/nix-search";
   };
 
-  outputs = { nixpkgs, pipewire-screenaudio, home-manager, ...} @ inputs: { 
-    nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./machines/nixos/configuration.nix
-          home-manager.nixosModules.home-manager
-	  { home-manager = {
-              extraSpecialArgs = { inherit inputs; }; 
-              useGlobalPkgs = true;
-              users.ehnis = import ./machines/nixos/home.nix;
-              useUserPackages = true;
-          }; }
-        ];
+  outputs =
+    { nixpkgs, home-manager, ... }@inputs:
+    let
+      system = "x86_64-linux";
+    in
+    {
+      nixosConfigurations = {
+        nixos = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs system;
+          };
+          modules = [
+            ./machines/nixos/configuration.nix
+            inputs.nix-index-database.nixosModules.nix-index
+            inputs.chaotic.nixosModules.default 
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                extraSpecialArgs = {
+                  inherit inputs system;
+                };
+                backupFileExtension = "backup";
+                useGlobalPkgs = true;
+                users.ehnis = import ./machines/nixos/home.nix;
+                useUserPackages = true;
+              };
+            }
+          ];
+        };
+        laptop = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs system;
+          };
+          modules = [
+            ./machines/laptop/configuration.nix
+            inputs.nix-index-database.nixosModules.nix-index
+            inputs.chaotic.nixosModules.default 
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                extraSpecialArgs = {
+                  inherit inputs system;
+                };
+                backupFileExtension = "backup";
+                useGlobalPkgs = true;
+                users.ehnis = import ./machines/laptop/home.nix;
+                useUserPackages = true;
+              };
+            }
+          ];
+        };
+        
+        iso = nixpkgs.lib.nixosSystem {
+          modules = [
+            ./machines/iso/configuration.nix
+          ];
+        };
       };
-      iso = nixpkgs.lib.nixosSystem {
-	modules = [
-	  ./machines/iso/configuration.nix
-	];
+      homeConfigurations = {
+        ehnis = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [
+            ./machines/nixos/home-options.nix
+          ];
+          extraSpecialArgs = {
+            inherit inputs system;
+          };
+        };
       };
     };
-  };
 }

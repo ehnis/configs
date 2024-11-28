@@ -4,7 +4,7 @@
     "useQuickCss": true,
     "themeLinks": [],
     "enabledThemes": [
-        "BasicBackground.theme.css"
+        "SoftX.theme.css"
     ],
     "enableReactDevtools": false,
     "frameless": false,
@@ -47,7 +47,7 @@
             "enabled": false
         },
         "AlwaysTrust": {
-            "enabled": true
+            "enabled": false
         },
         "AnonymiseFileNames": {
             "enabled": false
@@ -56,7 +56,7 @@
             "enabled": false
         },
         "WebRichPresence (arRPC)": {
-            "enabled": false
+            "enabled": true
         },
         "AutomodContext": {
             "enabled": false
@@ -71,7 +71,7 @@
             "enabled": false
         },
         "BetterGifPicker": {
-            "enabled": true
+            "enabled": false
         },
         "BetterNotesBox": {
             "enabled": false
@@ -155,7 +155,7 @@
             "enabled": false
         },
         "FakeNitro": {
-            "enabled": true
+            "enabled": false
         },
         "FakeProfileThemes": {
             "enabled": false
@@ -207,9 +207,9 @@
         },
         "ImageZoom": {
             "enabled": true,
-            "size": 1000,
+            "size": 590,
             "zoom": 1.9,
-            "nearestNeighbour": true,
+            "nearestNeighbour": false,
             "square": false,
             "invertScroll": true,
             "zoomSpeed": 0.5,
@@ -268,7 +268,7 @@
             "enabled": false
         },
         "MoreKaomoji": {
-            "enabled": true
+            "enabled": false
         },
         "MoreUserTags": {
             "enabled": false
@@ -336,6 +336,9 @@
         "oneko": {
             "enabled": false
         },
+	"VolumeBooster": {
+	    "enabled": true
+	},
         "OpenInApp": {
             "enabled": false
         },
@@ -412,10 +415,10 @@
             "enabled": false
         },
         "SecretRingToneEnabler": {
-            "enabled": true
+            "enabled": false
         },
         "Summaries": {
-            "enabled": true
+            "enabled": false
         },
         "SendTimestamps": {
             "enabled": false
@@ -532,10 +535,10 @@
             "enabled": false
         },
         "VoiceDownload": {
-            "enabled": true
+            "enabled": false
         },
         "VoiceMessages": {
-            "enabled": true
+            "enabled": false
         },
         "WebKeybinds": {
             "enabled": true
@@ -569,12 +572,7 @@
         },
         "NoMaskedUrlPaste": {
             "enabled": false
-        
-        },
-        "VolumeBooster": {
-            "enabled": true
-	}
-	
+        }
     },
     "notifications": {
         "timeout": 5000,

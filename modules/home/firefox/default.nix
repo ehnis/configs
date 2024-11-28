@@ -12,6 +12,7 @@ in
 
   config = mkIf cfg.enable {
     programs.firefox.enable = true;
+    programs.firefox.nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
     programs.firefox.profiles.kek = {
       userChrome = ''
         /* imports */
@@ -657,14 +658,17 @@ in
 	"browser.download.always_ask_before_handling_new_types" = false;
 	"browser.download.manager.addToRecentDocs" = false;
 	"browser.download.open_pdf_attachments_inline" = true;
+	"browser.download.alwaysOpenPanel" = true;
 	"browser.bookmarks.openInTabClosesMenu" = false;
 	"browser.menu.showViewImageInfo" = true;
 	"findbar.highlightAll" = true;
 	"layout.word_select.eat_space_to_next_word" = false;
 	"mousewheel.min_line_scroll_amount" = 10;
+	"extensions.webextensions.restrictedDomains" = "";
 	"general.smoothScroll.mouseWheel.durationMinMS" = 80;
 	"mousewheel.default.delta_multiplier_y" = 300;
 	"apz.overscroll.enabled" = true;
+	"privacy.resistFingerprinting.block_mozAddonManager" = true;
 	"general.smoothScroll" = true;
 	"general.smoothScroll.msdPhysics.continuousMotionMaxDeltaMS" = 12;
 	"general.smoothScroll.msdPhysics.enabled" = true;
@@ -699,6 +703,7 @@ in
 	{ url = "https://mail.google.com/mail/u/1/#inbox"; name = "second gmail"; }
 	{ url = "https://home-manager-options.extranix.com/"; name = "Home Manager - Option Search"; }
 	{ url = "https://search.nixos.org/options"; name = "NixOS Search - Options"; }
+	{ url = "https://nixpk.gs/pr-tracker.html"; name = "Nixpkgs PR status"; }
 	{ url = "https://youtube.com"; name = ""; }
 	{ url = "https://cartoonsub.com/"; name = ""; }
 	{ url = "https://diakov.net/"; name = ""; }

@@ -1,7 +1,11 @@
-{ config, ... }:
+{ ... }:
 {
+
   # Import other modules
   imports = [ ../../modules/home ];
+
+  # Enable rich presence
+  services.arrpc.enable = true;
 
   # Enable firefox customization
   firefox.enable = false; # Reminder for dumb me to change it later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -13,7 +17,7 @@
   nixpkgs.config.allowUnfree = true;
 
   # Enable Anime4K non-AI upscaler
-  home.file.".config/mpv".source = ../../stuff/mpv;
+  # home.file.".config/mpv".source = ../../stuff/mpv;
 
   # Enable neovim, console based text editor
   neovim.enable = true;
@@ -60,7 +64,7 @@
   flatpak = {
     
     # Enable user flatpak
-    enable = true;
+    enable = false;
 
     # Packages to install from flatpak
     packages = [];

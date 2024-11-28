@@ -18,7 +18,7 @@ in
   imports = [ inputs.spicetify-nix.nixosModules.default ];
   config = mkIf cfg.enable {
     programs.spicetify = {
-      enable = false;
+      enable = true;
       enabledExtensions = with spicePkgs.extensions; [
         adblock
         hidePodcasts
