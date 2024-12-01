@@ -356,6 +356,7 @@ in
     systemPackages =
       with pkgs;
       [
+        ncurses
         pyright
         lsd
         gamescope

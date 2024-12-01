@@ -51,15 +51,14 @@ in
     home.pointerCursor = {
       gtk.enable = true;
       x11.enable = true;
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
+      package = pkgs.oreo-cursors-plus;
+      name = "oreo_spark_black_bordered_cursors";
       size = 24;
     };
     gtk = {
       enable = true;
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
       gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
-      cursorTheme.name = "Bibata-Modern-Classic";
       iconTheme = {
         name = "Windows-Eleven";
         package = pkgs.morewaita-icon-theme;
