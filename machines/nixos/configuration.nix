@@ -4,7 +4,16 @@
   ...
 }:
 let
-  otd-package = (pkgs.opentabletdriver.overrideAttrs { src = pkgs.fetchFromGitHub { owner = "DADA30000"; repo = "OpenTabletDriver"; rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349"; hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc="; }; });
+  otd-package = (
+    pkgs.opentabletdriver.overrideAttrs {
+      src = pkgs.fetchFromGitHub {
+        owner = "DADA30000";
+        repo = "OpenTabletDriver";
+        rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349";
+        hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc=";
+      };
+    }
+  );
   user = "ehnis";
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
@@ -34,6 +43,20 @@ in
 
     };
 
+  };
+
+  services.snapper = {
+    persistentTimer = true;
+    configs.server = {
+      SUBVOLUME = "/home/${user}/server";
+      TIMELINE_LIMIT_YEARLY = 0;
+      TIMELINE_LIMIT_WEEKLY = 2;
+      TIMELINE_LIMIT_MONTHLY = 1;
+      TIMELINE_LIMIT_HOURLY = 24;
+      TIMELINE_LIMIT_DAILY = 7;
+      TIMELINE_CREATE = true;
+      TIMELINE_CLEANUP = true;
+    };
   };
 
   programs.ydotool.enable = true;
@@ -390,13 +413,13 @@ in
         osu-lazer-bin
         steam
         prismlauncher
-	rpcs3
-	krita
-	beatsabermodmanager
-	nemo-with-extensions
-	nemo-fileroller
-	alvr
-	kdenlive
+        rpcs3
+        krita
+        beatsabermodmanager
+        nemo-with-extensions
+        nemo-fileroller
+        alvr
+        kdenlive
         cached-nix-shell
         nvtopPackages.amd
         qbittorrent
