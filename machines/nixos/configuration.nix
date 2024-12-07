@@ -379,6 +379,7 @@ in
     systemPackages =
       with pkgs;
       [
+        filezilla
         ncurses
         pyright
         lsd

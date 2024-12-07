@@ -32,13 +32,9 @@ in
     };
     dconf.settings = {
       "org/nemo/preferences" = {
-        default-folder-viewer = "list-view";
+        default-folder-viewer = "icons-view";
         show-hidden-files = true;
         thumbnail-limit = lib.hm.gvariant.mkUint64 68719476736;
-      };
-      "org/gnome/nautilus/preferences" = {
-        default-folder-viewer = "list-view";
-        migrated-gtk-settings = true;
       };
       "org/gnome/desktop/interface" = { 
         color-scheme = "prefer-dark"; 
