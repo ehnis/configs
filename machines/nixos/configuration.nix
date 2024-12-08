@@ -77,8 +77,8 @@ in
   zramSwap.memoryPercent = 12;
 
   # Enable ALVR
-  programs.alvr.enable = true;
-  programs.alvr.openFirewall = true;
+  programs.alvr.enable = false;
+  programs.alvr.openFirewall = false;
 
   # Enable stuff in /bin and /usr/bin
   services.envfs.enable = true;
@@ -408,7 +408,6 @@ in
         jdk23
         mpv
         nix-index
-        remmina
         telegram-desktop
         adwaita-icon-theme
         osu-lazer-bin
@@ -416,10 +415,8 @@ in
         prismlauncher
         rpcs3
         krita
-        beatsabermodmanager
         nemo-with-extensions
         nemo-fileroller
-        alvr
         kdenlive
         cached-nix-shell
         nvtopPackages.amd
