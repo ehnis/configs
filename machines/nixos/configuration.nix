@@ -423,6 +423,7 @@ in
         qbittorrent
         pavucontrol
         wl-clipboard
+        godot_4
         bottles
         vesktop
         networkmanager_dmenu
