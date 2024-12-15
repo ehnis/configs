@@ -22,7 +22,7 @@ in
   config = mkIf cfg.enable {
     programs.zsh.initExtra = mkIf cfg.zsh-start ''
       if ! [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-        fastfetch --logo-color-1 'cyan' --logo-color-2 'blue'
+        fastfetch --logo-color-1 'black' --logo-color-2 'green'
       fi
     '';
     programs.fastfetch = {
@@ -47,93 +47,93 @@ in
           {
             type = "cpu";
             key = "╭─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "gpu";
             key = "├─󰢮";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "disk";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "memory";
             key = "├─󰑭";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "swap";
             key = "├─󰓡";
-            keyColor = "blue";
+            keyColor = "green";
           }
           #{
           #  type = "display";
           #  key = "├─󰍹";
-          #  keyColor = "blue";
+          #  keyColor = "green";
           #}
           {
             type = "brightness";
             key = "├─󰃞";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "battery";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "poweradapter";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "gamepad";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "bluetooth";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "sound";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "shell";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "de";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "wm";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "os";
             key = "├─";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "kernel";
             key = "├─";
             format = "{1} {2}";
-            keyColor = "blue";
+            keyColor = "green";
           }
           {
             type = "uptime";
             key = "╰─󰅐";
-            keyColor = "blue";
+            keyColor = "green";
           }
         ];
       };

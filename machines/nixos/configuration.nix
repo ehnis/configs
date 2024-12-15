@@ -4,23 +4,18 @@
   ...
 }:
 let
-  otd-package = (
-    pkgs.opentabletdriver.overrideAttrs {
-      src = pkgs.fetchFromGitHub {
-        owner = "DADA30000";
-        repo = "OpenTabletDriver";
-        rev = "5e59bf1ddb69cecf8df0e3c4be8013af9a51a349";
-        hash = "sha256-iZxfT7ANkkZPe3Y3SUXHuOdLzsnGz6OLn7O4df16Xgc=";
-      };
-    }
-  );
   user = "ehnis";
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
 {
+  services.sunshine = {
+    enable = false;
+    capSysAdmin = true;
+  };
   security.acme.acceptTerms = true;
   security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
+    ./hotspot.nix
     ./hardware-configuration.nix
     ../../modules/system
   ];
@@ -96,7 +91,6 @@ in
 
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
-  hardware.opentabletdriver.package = otd-package;
 
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
@@ -215,7 +209,7 @@ in
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      nerd-fonts.jetbrains-mono
     ];
 
   };
@@ -379,7 +373,7 @@ in
     systemPackages =
       with pkgs;
       [
-        filezilla
+        ffmpeg-full
         ncurses
         pyright
         lsd
@@ -423,7 +417,6 @@ in
         qbittorrent
         pavucontrol
         wl-clipboard
-        godot_4
         bottles
         vesktop
         networkmanager_dmenu
