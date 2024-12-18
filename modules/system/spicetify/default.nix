@@ -2,6 +2,11 @@
 with lib;
 let
   spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+  hazy = pkgs.fetchgit {
+    url = "https://github.com/Astromations/Hazy";
+    rev = "25e472cc4563918d794190e72cba6af8397d3a78";
+    sha256 = "sha256-zK17CWwYJNSyo5pbYdIDUMKyeqKkFbtghFoK9JBR/C8=";
+  };
   cfg = config.spicetify;
 in
 {
@@ -19,8 +24,14 @@ in
         hidePodcasts
         shuffle
       ];
-      theme = spicePkgs.themes.starryNight;
-      colorScheme = "base";
+      theme = {
+        name = "Hazy";
+        src = hazy;
+        injectCss = true;
+        replaceColors = true;
+        overwriteAssets = true;
+        sidebarConfig = true;
+      };
     };
   };
 }

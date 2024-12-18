@@ -193,10 +193,6 @@ in
 
     # Packages to install from flatpak
     packages = [
-      {
-        flatpakref = "https://vixalien.github.io/muzika/muzika.flatpakref";
-        sha256 = "0skzklwnaqqyqj0491dpf746hzzhhxi5gxl1fwb1gyy03li6cj9p";
-      }
     ];
 
   };
@@ -373,12 +369,12 @@ in
     systemPackages =
       with pkgs;
       [
+        rustdesk-flutter
         ffmpeg-full
         ncurses
         pyright
         lsd
         gamescope
-        kdiskmark
         nixfmt-rfc-style
         gdb
         gdu
