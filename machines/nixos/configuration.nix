@@ -15,7 +15,6 @@ in
   security.acme.acceptTerms = true;
   security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
-    ./hotspot.nix
     ./hardware-configuration.nix
     ../../modules/system
   ];
@@ -109,6 +108,8 @@ in
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
+
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [
