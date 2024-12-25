@@ -157,7 +157,7 @@ in
           "ignorezero, rofi"
           "ignorezero, waybar"
           "ignorezero, swaync-notification-window"
-          "animation popin 1%, rofi"
+          "animation popin 90%, rofi"
           "animation popin 90%, logout_dialog"
           "animation slide left, swaync-control-center"
         ];
@@ -200,8 +200,8 @@ in
             popups = true;
             popups_ignorealpha = 0;
             ignore_opacity = true;
-            size = 5;
-            brightness = 0.8;
+            size = 10;
+            brightness = 0.7;
             passes = 3;
             noise = 0;
             vibrancy = 0;

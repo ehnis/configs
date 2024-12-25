@@ -271,8 +271,8 @@ in
           border-radius: 8px;
         }
         
-        #language {
-          color: #7aa2f7;
+        language {
+          color: #ffffff;
           margin-top: 3px;
         }
         
