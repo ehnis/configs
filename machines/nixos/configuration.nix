@@ -19,6 +19,11 @@ in
     ../../modules/system
   ];
 
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+  };
+
   systemd.services.lactd = {
 
     enable = true;
@@ -371,6 +376,7 @@ in
       with pkgs;
       [
         rustdesk-flutter
+        libnss-mysql
         ffmpeg-full
         ncurses
         pyright
@@ -423,6 +429,7 @@ in
         libreoffice
         qalculate-gtk
         p7zip
+        distrobox
         inputs.nix-alien.packages.${system}.nix-alien
         inputs.nix-search.packages.${system}.default
       ]

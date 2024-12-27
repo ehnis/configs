@@ -57,7 +57,8 @@
           "youtu.be",
           "youtube.com",
           "ytimg.com",
-          "ggpht.com"
+          "ggpht.com",
+          "gstatic.com"
         ],
         "outbound": "proxy"
       },
