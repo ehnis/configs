@@ -18,7 +18,7 @@ in
     ./hardware-configuration.nix
     ../../modules/system
   ];
-
+  virtualisation.libvirtd.enable = true;
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
@@ -235,6 +235,7 @@ in
       "adbusers"
       "video"
       "corectrl"
+      "libvirtd"
     ];
 
   };
@@ -375,6 +376,7 @@ in
     systemPackages =
       with pkgs;
       [
+        virt-manager
         rustdesk-flutter
         libnss-mysql
         ffmpeg-full
@@ -410,7 +412,6 @@ in
         osu-lazer-bin
         steam
         prismlauncher
-        rpcs3
         krita
         nemo-with-extensions
         nemo-fileroller
