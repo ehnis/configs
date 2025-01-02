@@ -58,7 +58,8 @@
           "youtube.com",
           "ytimg.com",
           "ggpht.com",
-          "gstatic.com"
+          "gstatic.com",
+          "kinobar.ai"
         ],
         "outbound": "proxy"
       },
