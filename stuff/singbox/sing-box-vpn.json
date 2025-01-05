@@ -59,7 +59,11 @@
           "ytimg.com",
           "ggpht.com",
           "gstatic.com",
-          "kinobar.ai"
+          "kinobar.ai",
+          "discord.com",
+          "discord.gg",
+          "discordapp.com",
+          "discordapp.net"
         ],
         "outbound": "proxy"
       },
