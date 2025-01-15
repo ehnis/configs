@@ -18,8 +18,8 @@
       "domain_strategy":"",
       "flow":"xtls-rprx-vision",
       "packet_encoding":"xudp",
-      "server":"94.159.107.28",
-      "server_port":444,
+      "server":"AAA.AAA.AAA.AAA",
+      "server_port":AAA,
       "tag":"proxy",
       "tls":{
         "alpn":[
@@ -28,8 +28,8 @@
         "enabled":true,
         "reality":{
           "enabled":true,
-          "public_key":"0fvfeemlYBtgVGitDZQeBrp9HsV-GOVakUSuSC-JmkU",
-          "short_id":"e1456cc1bd9b8cc8"
+          "public_key":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "short_id":"AAAAAAAAAAAAAAAA"
         },
         "server_name":"yahoo.com",
         "utls":{
@@ -38,7 +38,7 @@
         }
       },
       "type":"vless",
-      "uuid":"db4aa36e-d8ae-4c1c-aaed-609b25e2f1a8"
+      "uuid":"AAAAAAA-AAAAAAAAA-AAAA-AAAAAAAAAA"
     },
     {
       "tag":"direct",
@@ -49,3 +49,4 @@
     "auto_detect_interface":true
   }
 }
+

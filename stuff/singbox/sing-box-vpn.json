@@ -46,8 +46,17 @@
     "auto_detect_interface": true,
     "rules": [
       {
+        "source_ip_cidr": [
+          "127.0.0.1"
+        ],
+        "ip_cidr": [
+          "127.0.0.1"
+        ],
+        "outbound": "direct"
+      },
+      {
         "process_path_regex": [
-          "^.*(wget|git|electron|firefox|firefox-bin|nix|nix-index|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|.spotify-wrappe|.spotify-wrapped)$"
+          "^.*(wget|git|electron|firefox|firefox-bin|nix|nix-index|flatpak|.flatpak-wrappe|.flatpak-wrapped|node)$"
         ],
         "outbound": "proxy"
       },
@@ -59,13 +68,21 @@
           "ytimg.com",
           "ggpht.com",
           "gstatic.com",
-          "kinobar.ai",
           "discord.com",
           "discord.gg",
           "discordapp.com",
           "discordapp.net"
         ],
         "outbound": "proxy"
+      },
+      {
+        "source_ip_cidr": [
+          "127.0.0.1"
+        ],
+        "ip_cidr": [
+          "127.0.0.1"
+        ],
+        "outbound": "direct"
       },
       {
         "port": 53,

@@ -5,24 +5,13 @@
 }:
 let
   user = "ehnis";
-  user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
+  user-hash = "$y$j9T$ZGyfFMAjqyzgWmB48Q02M1$lbwL4sulzNmxc1LEty5Ze4DjAkyGWNcXWcNQB.uVQi3";
 in
 {
-  services.sunshine = {
-    enable = false;
-    capSysAdmin = true;
-  };
-  security.acme.acceptTerms = true;
-  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
 
   systemd.services.lactd = {
 
@@ -44,27 +33,16 @@ in
 
   };
 
-  services.snapper = {
-    persistentTimer = true;
-    configs.server = {
-      SUBVOLUME = "/home/${user}/server";
-      TIMELINE_LIMIT_YEARLY = 0;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 1;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
-
   programs.ydotool.enable = true;
 
   # Disable annoying firewall
   networking.firewall.enable = false;
 
-  # Enable singbox proxy to my XRay vpn
-  singbox.enable = true;
+  # Enable singbox proxy to my VPS with WireGuard
+  singbox-wg.enable = true;
+
+  # Enable singbox proxy to my XRay vpn (uncomment in default.nix in ../../modules/system)
+  #singbox.enable = true;
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
@@ -73,11 +51,6 @@ in
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 12;
-
-  # Enable ALVR
-  programs.alvr.enable = false;
-  programs.alvr.openFirewall = false;
 
   # Enable stuff in /bin and /usr/bin
   services.envfs.enable = true;
@@ -96,17 +69,22 @@ in
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
 
+  # Enable PulseAudio
+  hardware.pulseaudio.enable = false;
+
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 
   # Use mainline (or latest stable) kernel instead of LTS kernel
   #boot.kernelPackages = pkgs.linuxPackages_testing;
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
-  #boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   #chaotic.scx.enable = true;
 
   # Enable SysRQ
   boot.kernel.sysctl."kernel.sysrq" = 1;
+
+  # Enable NAT
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Restrict amount of annoying cache
   boot.kernel.sysctl."vm.dirty_bytes" = 50000000;
@@ -114,8 +92,6 @@ in
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
-
-  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [
@@ -142,6 +118,7 @@ in
   #networking.dhcpcd.enable = true;
 
   # Enable NetworkManager
+  #systemd.services.NetworkManager-wait-online.enable = false;
   networking.networkmanager.enable = true;
 
   # Allow making users through useradd
@@ -154,7 +131,7 @@ in
   services.getty.autologinUser = user;
 
   # Enable russian anicli
-  anicli-ru.enable = false;
+  anicli-ru.enable = true;
 
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = false;
@@ -196,7 +173,7 @@ in
   flatpak = {
 
     # Enable system flatpak
-    enable = true;
+    enable = false;
 
     # Packages to install from flatpak
     packages = [
@@ -236,7 +213,6 @@ in
       "adbusers"
       "video"
       "corectrl"
-      "libvirtd"
     ];
 
   };
@@ -264,7 +240,7 @@ in
     enable = true;
 
     # Enable virtual camera
-    virt-cam = true;
+    virt-cam = false;
 
   };
 
@@ -292,7 +268,7 @@ in
       enable = false;
 
       # Enable my goofy website
-      website.enable = false;
+      website.enable = true;
 
       # Enable nextcloud
       nextcloud.enable = false;
@@ -315,7 +291,7 @@ in
     second-disk = {
 
       # Enable additional disk (must be btrfs)
-      enable = false;
+      enable = true;
 
       # Enable compression on additional disk
       compression = true;
@@ -342,7 +318,7 @@ in
         path = "/var/lib/swapfile";
 
         # Size of swapfile in MB
-        size = 16 * 1024;
+        size = 4 * 1024;
 
       };
 
@@ -377,7 +353,7 @@ in
     systemPackages =
       with pkgs;
       [
-        virt-manager
+       virt-manager
         rustdesk-flutter
         libnss-mysql
         ffmpeg-full
@@ -393,7 +369,7 @@ in
         nodejs
         yarn
         ccls
-        (firefox-bin.override {
+        (firefox.override {
           nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
         })
         wget
@@ -451,7 +427,7 @@ in
 
   };
 
-  #nix.package = pkgs.nixVersions.latest;
+  nix.package = pkgs.nixVersions.latest;
 
   services = {
 
@@ -463,6 +439,7 @@ in
 
     pipewire = {
       enable = true;
+      package = inputs.unstable.legacyPackages.${pkgs.system}.pipewire;
       alsa.enable = true;
       alsa.support32Bit = true;
       jack.enable = true;

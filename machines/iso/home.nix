@@ -8,13 +8,16 @@
   services.arrpc.enable = true;
 
   # Enable firefox customization
-  firefox.enable = false; # Reminder for dumb me to change it later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  firefox.enable = true; # Reminder for dumb me to change it later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   # Version at which home-manager was first configured (Don't change it)
   home.stateVersion = "24.05";
   
   # Allow installation of proprietary stuff
   nixpkgs.config.allowUnfree = true;
+
+  # Enable Anime4K non-AI upscaler
+  home.file.".config/mpv".source = ../../stuff/mpv;
 
   # Enable neovim, console based text editor
   neovim.enable = true;
@@ -77,7 +80,7 @@
     stable = false;
 
     # Enable Hyprland plugins
-    enable-plugins = false;
+    enable-plugins = true;
 
     # Enable video wallpapers with mpvpaper
     mpvpaper = false;

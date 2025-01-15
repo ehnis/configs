@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 with lib;
 let
   cfg = config.theming;
@@ -7,8 +12,6 @@ in
   options.theming = {
     enable = mkEnableOption "Enable theming stuff like cursor theme, icon theme and etc";
   };
-  
-
 
   config = mkIf cfg.enable {
     home.file = {
@@ -20,7 +23,7 @@ in
       ".config/vesktop/settings.json".source = ../../../stuff/vesktop/settings.json;
       ".config/vesktop/themes".source = ../../../stuff/vesktop/themes;
     };
-    xdg.desktopEntries.vesktop.settings= {
+    xdg.desktopEntries.vesktop.settings = {
       Exec = "vesktop --ozone-platform-hint=auto %U";
       Categories = "Network;InstantMessaging;Chat";
       GenericName = "Internet Messenger";
@@ -36,8 +39,8 @@ in
         show-hidden-files = true;
         thumbnail-limit = lib.hm.gvariant.mkUint64 68719476736;
       };
-      "org/gnome/desktop/interface" = { 
-        color-scheme = "prefer-dark"; 
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
       };
     };
     qt = {

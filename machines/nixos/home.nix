@@ -17,7 +17,7 @@
   nixpkgs.config.allowUnfree = true;
 
   # Enable Anime4K non-AI upscaler
-  # home.file.".config/mpv".source = ../../stuff/mpv;
+  home.file.".config/mpv".source = ../../stuff/mpv;
 
   # Enable neovim, console based text editor
   neovim.enable = true;
@@ -26,7 +26,7 @@
   theming.enable = true;
 
   # Enable cava audio visualizer
-  cava.enable = false;
+  cava.enable = true;
 
   # Enable swaync notification manager
   swaync.enable = true;
@@ -76,11 +76,14 @@
     # Enable base Hyprland configuration (required for options below)
     enable = true;
 
-    # Whether to use release from nixpkgs, or use latest git
-    stable = false;
+    # Use Hyprland package from UNSTABLE nixpkgs
+    from-unstable = false;
+
+    # Use Hyprland package from nixpkgs
+    stable = true;
 
     # Enable Hyprland plugins
-    enable-plugins = false;
+    enable-plugins = true;
 
     # Enable video wallpapers with mpvpaper
     mpvpaper = false;
