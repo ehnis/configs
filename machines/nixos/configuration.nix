@@ -39,10 +39,10 @@ in
   networking.firewall.enable = false;
 
   # Enable singbox proxy to my VPS with WireGuard
-  singbox-wg.enable = true;
+  #singbox-wg.enable = false;
 
   # Enable singbox proxy to my XRay vpn (uncomment in default.nix in ../../modules/system)
-  #singbox.enable = true;
+  singbox.enable = true;
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
@@ -131,7 +131,7 @@ in
   services.getty.autologinUser = user;
 
   # Enable russian anicli
-  anicli-ru.enable = true;
+  anicli-ru.enable = false;
 
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = false;
