@@ -8,21 +8,10 @@ let
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
 {
-  services.sunshine = {
-    enable = false;
-    capSysAdmin = true;
-  };
-  security.acme.acceptTerms = true;
-  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
 
   systemd.services.lactd = {
 
@@ -44,22 +33,6 @@ in
 
   };
 
-  services.snapper = {
-    persistentTimer = true;
-    configs.server = {
-      SUBVOLUME = "/home/${user}/server";
-      TIMELINE_LIMIT_YEARLY = 0;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 1;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
-
-  programs.ydotool.enable = true;
-
   # Disable annoying firewall
   networking.firewall.enable = false;
 
@@ -73,11 +46,7 @@ in
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 12;
-
-  # Enable ALVR
-  programs.alvr.enable = false;
-  programs.alvr.openFirewall = false;
+  zramSwap.memoryPercent = 33;
 
   # Enable stuff in /bin and /usr/bin
   services.envfs.enable = true;
@@ -93,15 +62,12 @@ in
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   xdg.portal.config.common.default = "*";
 
-  # Enable OpenTabletDriver
-  hardware.opentabletdriver.enable = true;
-
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 
   # Use mainline (or latest stable) kernel instead of LTS kernel
   #boot.kernelPackages = pkgs.linuxPackages_testing;
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
   #chaotic.scx.enable = true;
 
   # Enable SysRQ
@@ -113,8 +79,6 @@ in
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
-
-  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [
@@ -159,7 +123,7 @@ in
   zapret.enable = false;
 
   # Enable replays
-  replays.enable = true;
+  replays.enable = false;
 
   # Enable startup sound on PC speaker (also plays after rebuilds)
   startup-sound.enable = false;
@@ -195,10 +159,14 @@ in
   flatpak = {
 
     # Enable system flatpak
-    enable = true;
+    enable = false;
 
     # Packages to install from flatpak
     packages = [
+      {
+        flatpakref = "https://vixalien.github.io/muzika/muzika.flatpakref";
+        sha256 = "0skzklwnaqqyqj0491dpf746hzzhhxi5gxl1fwb1gyy03li6cj9p";
+      }
     ];
 
   };
@@ -211,7 +179,7 @@ in
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      nerd-fonts.jetbrains-mono
     ];
 
   };
@@ -235,7 +203,6 @@ in
       "adbusers"
       "video"
       "corectrl"
-      "libvirtd"
     ];
 
   };
@@ -260,10 +227,10 @@ in
   obs = {
 
     # Enable OBS
-    enable = true;
+    enable = false;
 
     # Enable virtual camera
-    virt-cam = true;
+    virt-cam = false;
 
   };
 
@@ -376,15 +343,10 @@ in
     systemPackages =
       with pkgs;
       [
-        davinci-resolve
-        virt-manager
-        rustdesk-flutter
-        libnss-mysql
-        ffmpeg-full
-        ncurses
         pyright
         lsd
         gamescope
+        kdiskmark
         nixfmt-rfc-style
         gdb
         gdu
@@ -408,22 +370,17 @@ in
         jdk23
         mpv
         nix-index
+        remmina
         telegram-desktop
         adwaita-icon-theme
         osu-lazer-bin
         steam
         prismlauncher
-        krita
         nemo-with-extensions
         nemo-fileroller
-        kdenlive
         cached-nix-shell
-        nvtopPackages.amd
-        qbittorrent
         pavucontrol
         wl-clipboard
-        bottles
-        vesktop
         networkmanager_dmenu
         neovide
         comma
@@ -431,7 +388,6 @@ in
         libreoffice
         qalculate-gtk
         p7zip
-        distrobox
         inputs.nix-alien.packages.${system}.nix-alien
         inputs.nix-search.packages.${system}.default
       ]

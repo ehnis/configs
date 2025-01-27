@@ -4,10 +4,6 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
-    };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,14 +16,13 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    hyprland.url = "github:hyprwm/Hyprland/v0.46.2";
-    #chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     pipewire-screenaudio.url = "github:IceDBorn/pipewire-screenaudio";
     nix-alien.url = "github:thiagokokada/nix-alien";
     nix-flatpak.url = "github:gmodena/nix-flatpak";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nix-search.url = "github:diamondburned/nix-search";
+    hyprland.url = "github:hyprwm/Hyprland/v0.46.2";
   };
 
   outputs =
@@ -44,7 +39,7 @@
           modules = [
             ./machines/nixos/configuration.nix
             inputs.nix-index-database.nixosModules.nix-index
-            #inputs.chaotic.nixosModules.default
+            inputs.chaotic.nixosModules.default 
             home-manager.nixosModules.home-manager
             {
               home-manager = {
@@ -81,27 +76,10 @@
             }
           ];
         };
+        
         iso = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs system;
-          };
           modules = [
             ./machines/iso/configuration.nix
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-            inputs.nix-index-database.nixosModules.nix-index
-            #inputs.chaotic.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                extraSpecialArgs = {
-                  inherit inputs system;
-                };
-                backupFileExtension = "backup";
-                useGlobalPkgs = true;
-                users.nixos = import ./machines/iso/home.nix;
-                useUserPackages = true;
-              };
-            }
           ];
         };
       };

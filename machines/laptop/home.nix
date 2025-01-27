@@ -16,9 +16,6 @@
   # Allow installation of proprietary stuff
   nixpkgs.config.allowUnfree = true;
 
-  # Enable Anime4K non-AI upscaler
-  # home.file.".config/mpv".source = ../../stuff/mpv;
-
   # Enable neovim, console based text editor
   neovim.enable = true;
 

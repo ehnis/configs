@@ -12,8 +12,7 @@ in
 {
   options.hyprland = {
     enable = mkEnableOption "Enable my Hyprland configuration";
-    from-unstable = mkEnableOption "Use Hyprland package from UNSTABLE nixpkgs";
-    stable = mkEnableOption "Use Hyprland from nixpkgs";
+    stable = mkEnableOption "Whether to use release from nixpkgs, or use latest git";
     enable-plugins = mkEnableOption "Enable Hyprland plugins";
     mpvpaper = mkEnableOption "Enable video wallpapers with mpvpaper";
     hyprpaper = mkEnableOption "Enable image wallpapers with hyprpaper";
@@ -39,20 +38,22 @@ in
       esbuild
       fd
       dart-sass
-      swww
       hyprpicker
       wttrbar
     ];
     wayland.windowManager.hyprland = {
-      package = mkMerge [
-        (mkIf (!cfg.stable && !cfg.from-unstable) inputs.hyprland.packages.${pkgs.system}.hyprland)
-        (mkIf (cfg.from-unstable && !cfg.stable) inputs.unstable.legacyPackages.${pkgs.system}.hyprland)];
+      package = mkIf (!cfg.stable) inputs.hyprland.packages.${pkgs.system}.hyprland;
+      plugins =
+        lib.optionals (cfg.enable-plugins && cfg.stable) [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ]
+        ++ lib.optionals (cfg.enable-plugins && !cfg.stable) [
+          inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
+        ];
       enable = true;
       settings = {
-          monitor = [
-             "DP-1, 1920x1080@165, 0x0, 1"
-             "LVDS-1, 1366x768@60, 0x0, 1"
-          ];
+        monitor = [
+          "DP-1, 1920x1080@165, 0x0, 1"
+          "LVDS-1, 1366x768@60, 0x0, 1" 
+        ];
         "$mod" = "SUPER";
         bind = [
           ", code:122, exec, pactl set-sink-volume @DEFAULT_SINK@ -4096"
@@ -74,7 +75,6 @@ in
           "$mod_CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 100}')"
           "$mod_CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 - 100}')"
           "$mod_CTRL, F, fullscreenstate, 0 2"
-          "$mod, I, exec, toggle-restriction"
           "$mod, F1, exec, gamemode.sh"
           "$mod, F2, exec, sheesh.sh"
           "$mod, O, exec, killall -SIGUSR1 .waybar-wrapped"
@@ -126,7 +126,6 @@ in
         windowrule = [
           "nomaxsize, ^(polkit-mate-authentication-agent-1)$"
           "pin, ^(polkit-mate-authentication-agent-1)$"
-          "opacity 0.99 override 0.99 override, title:^(QDiskInfo)$"
           "opacity 0.99 override 0.99 override, title:^(MainPicker)$"
           "opacity 0.99 override 0.99 override, ^(org.prismlauncher.PrismLauncher)$"
           "opacity 0.99 override 0.99 override, ^(org.qbittorrent.qBittorrent)$"
@@ -165,8 +164,8 @@ in
         exec-once = [
           #"pactl load-module module-null-sink sink_name=audiorelay-virtual-mic-sink sink_properties=device.description=Virtual-Mic-Sink; pactl load-module module-remap-source master=audiorelay-virtual-mic-sink.monitor source_name=audiorelay-virtual-mic-sink source_properties=device.description=Virtual-Mic"
           #"firefox & sleep 1; firefox --new-window https://discord.com/channels/@me"
-          "pidof -q SCREEN || ~/bot/start-bot.sh"
-          "pactl load-module module-null-sink sink_name=custom_sink sink_properties=device.description='Custom_Sink'; pactl load-module module-loopback source=custom_sink.monitor sink=alsa_output.usb-3142_fifine_Headset-00.analog-stereo"
+          "pactl load-module module-null-sink sink_name=custom_sink sink_properties=device.description='Custom_Sink'; pactl load-module module-loopback source=custom_sink.monitor sink=alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo"
+          "killall screen; ~/bot/start-bot.sh"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
           "hyprctl setcursor Bibata-Modern-Classic 24"
@@ -199,10 +198,10 @@ in
           blur = {
             enabled = true;
             popups = true;
-            popups_ignorealpha = 0.09;
+            popups_ignorealpha = 0;
             ignore_opacity = true;
             size = 10;
-            brightness = 0.8;
+            brightness = 0.7;
             passes = 3;
             noise = 0;
             vibrancy = 0;
@@ -250,6 +249,23 @@ in
         binds = {
           scroll_event_delay = 50;
         };
+        plugin = mkIf cfg.enable-plugins {
+          hyprexpo = {
+            columns = 3;
+            gap_size = 5;
+            bg_col = "rgb(111111)";
+            workspace_method = "first 1";
+            enable_gesture = true;
+            gesture_distance = 300;
+            gesture_positive = true;
+          };
+          dynamic-cursors = {
+            enabled = false;
+            mode = "tilt";
+            shake.enabled = false;
+            stretch.function = "negative_quadratic";
+          };
+        };
       };
       extraConfig = ''
         submap=passthrough
@@ -264,7 +280,6 @@ in
       Service = {
         ExecStart = "${pkgs.mate.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
         Restart = "always";
-        StartLimitInterval = 0;
       };
     };
     xdg.portal = {
@@ -327,6 +342,7 @@ in
         preload = [ "${../../../stuff/wallpaper.png}" ];
         wallpaper = [
           "DP-1,${../../../stuff/wallpaper.png}"
+          "LVDS-1,${../../../stuff/wallpaper.png}"
         ];
       };
     };
