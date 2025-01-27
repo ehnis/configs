@@ -8,10 +8,21 @@ let
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
 {
+  services.sunshine = {
+    enable = false;
+    capSysAdmin = true;
+  };
+  security.acme.acceptTerms = true;
+  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
+  virtualisation.libvirtd.enable = true;
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+  };
 
   systemd.services.lactd = {
 
@@ -33,6 +44,22 @@ in
 
   };
 
+  services.snapper = {
+    persistentTimer = true;
+    configs.server = {
+      SUBVOLUME = "/home/${user}/server";
+      TIMELINE_LIMIT_YEARLY = 0;
+      TIMELINE_LIMIT_WEEKLY = 2;
+      TIMELINE_LIMIT_MONTHLY = 1;
+      TIMELINE_LIMIT_HOURLY = 24;
+      TIMELINE_LIMIT_DAILY = 7;
+      TIMELINE_CREATE = true;
+      TIMELINE_CLEANUP = true;
+    };
+  };
+
+  programs.ydotool.enable = true;
+
   # Disable annoying firewall
   networking.firewall.enable = false;
 
@@ -46,7 +73,11 @@ in
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 33;
+  zramSwap.memoryPercent = 12;
+
+  # Enable ALVR
+  programs.alvr.enable = false;
+  programs.alvr.openFirewall = false;
 
   # Enable stuff in /bin and /usr/bin
   services.envfs.enable = true;
@@ -62,12 +93,15 @@ in
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   xdg.portal.config.common.default = "*";
 
+  # Enable OpenTabletDriver
+  hardware.opentabletdriver.enable = true;
+
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 
   # Use mainline (or latest stable) kernel instead of LTS kernel
   #boot.kernelPackages = pkgs.linuxPackages_testing;
-  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  #boot.kernelPackages = pkgs.linuxPackages_latest;
   #chaotic.scx.enable = true;
 
   # Enable SysRQ
@@ -79,6 +113,8 @@ in
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
+
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [
@@ -123,7 +159,7 @@ in
   zapret.enable = false;
 
   # Enable replays
-  replays.enable = false;
+  replays.enable = true;
 
   # Enable startup sound on PC speaker (also plays after rebuilds)
   startup-sound.enable = false;
@@ -159,14 +195,10 @@ in
   flatpak = {
 
     # Enable system flatpak
-    enable = false;
+    enable = true;
 
     # Packages to install from flatpak
     packages = [
-      {
-        flatpakref = "https://vixalien.github.io/muzika/muzika.flatpakref";
-        sha256 = "0skzklwnaqqyqj0491dpf746hzzhhxi5gxl1fwb1gyy03li6cj9p";
-      }
     ];
 
   };
@@ -179,7 +211,7 @@ in
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      nerd-fonts.jetbrains-mono
+      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
 
   };
@@ -203,6 +235,7 @@ in
       "adbusers"
       "video"
       "corectrl"
+      "libvirtd"
     ];
 
   };
@@ -227,10 +260,10 @@ in
   obs = {
 
     # Enable OBS
-    enable = false;
+    enable = true;
 
     # Enable virtual camera
-    virt-cam = false;
+    virt-cam = true;
 
   };
 
@@ -343,10 +376,11 @@ in
     systemPackages =
       with pkgs;
       [
+        libnss-mysql
+        ffmpeg-full
+        ncurses
         pyright
         lsd
-        gamescope
-        kdiskmark
         nixfmt-rfc-style
         gdb
         gdu
@@ -370,11 +404,8 @@ in
         jdk23
         mpv
         nix-index
-        remmina
         telegram-desktop
         adwaita-icon-theme
-        osu-lazer-bin
-        steam
         prismlauncher
         nemo-with-extensions
         nemo-fileroller
@@ -492,3 +523,4 @@ in
   system.stateVersion = "23.11";
 
 }
+
