@@ -138,7 +138,7 @@ in
   #networking.useNetworkd = true;
 
   # Enable dhcpcd for using internet using ethernet cable
-  #networking.dhcpcd.enable = true;
+  #networking.interfaces.enp4s0.useDHCP = true;
 
   # Enable NetworkManager
   networking.networkmanager.enable = true;
@@ -376,7 +376,6 @@ in
     systemPackages =
       with pkgs;
       [
-        davinci-resolve
         virt-manager
         rustdesk-flutter
         libnss-mysql
@@ -393,7 +392,7 @@ in
         nodejs
         yarn
         ccls
-        (firefox-bin.override {
+        (firefox.override {
           nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
         })
         wget
