@@ -27,6 +27,12 @@ in
           min-height: 0px;
           min-width: 0px;
         }
+        #custom-keyboard {
+        font-size: 16px;
+        margin: 2px 5px 2px 0;
+        padding: 0 3px;
+        font-family: "Noto Color Emoji", monospace;
+      }
         tooltip {
           background-color: rgba(0,0,0,0.1);
           text-shadow: none;
@@ -383,8 +389,14 @@ in
             "group/scroll"
             "group/hardware"
           ];
+          "custom/keyboard" = {
+          exec = "~/.config/waybar/keyboard-layout.sh";
+          interval = 2;
+          format = "{}";
+          return-type = "json";
+        };
           "cava" = {
-            framerate = 60;
+            framerate = 165;
             format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▆" "▇" "█"];
             bar_delimiter = 0;
             bars = 30;
@@ -397,7 +409,6 @@ in
             icon-size = 18;
             rewrite = {
                 "(.*)Mozilla Firefox" = "Mozilla Firefox";
-                "(.*)Ablaze Floorp" = "Ablaze Floorp";
             };
           };
           "group/powermenu" = {
@@ -471,6 +482,7 @@ in
           "group/scroll" = {
             orientation = "horizontal";
             modules = [
+              "custom/keyboard"
               "pulseaudio#mic"
               "pulseaudio"
               "backlight"
@@ -504,7 +516,8 @@ in
             "modules" = [
               "custom/cog"
               "custom/vpn"
-  	    "custom/weather"
+  	          "custom/weather"
+              "custom/keyboard"
               "network"
               "memory"
               "cpu"

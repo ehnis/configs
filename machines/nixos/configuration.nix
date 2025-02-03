@@ -204,6 +204,11 @@ in
   };
 
   fonts = {
+    fontconfig = {
+    defaultFonts = {
+      emoji = [ "Noto Color Emoji" ];
+    };
+  };
 
     # Enable some default fonts
     enableDefaultPackages = true;
@@ -376,6 +381,9 @@ in
     systemPackages =
       with pkgs;
       [
+        xkb-switch
+        libnotify
+        noto-fonts-emoji 
         virt-manager
         rustdesk-flutter
         libnss-mysql
