@@ -49,6 +49,7 @@
                 backupFileExtension = "backup";
                 useGlobalPkgs = true;
                 users.ehnis = import ./machines/nixos/home.nix;
+                users.l0lk3k = import ./machines/nixos/home.nix;
                 useUserPackages = true;
               };
             }
