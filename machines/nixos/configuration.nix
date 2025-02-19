@@ -112,7 +112,7 @@ system.activationScripts.home = {
 
   # Use mainline (or latest stable) kernel instead of LTS kernel
   #boot.kernelPackages = pkgs.linuxPackages_testing;
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   #chaotic.scx.enable = true;
 
   # Enable SysRQ
@@ -416,7 +416,6 @@ users.users."${user2}" = {
     systemPackages =
       with pkgs;
       [
-        koreader
         obsidian
         xkb-switch
         virt-manager
@@ -532,6 +531,8 @@ security.wrappers.screen = {
     dconf.enable = true;
 
     adb.enable = true;
+
+    gnome-terminal.enable = true;
 
     nh.enable = true;
 
