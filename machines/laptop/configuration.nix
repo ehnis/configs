@@ -12,8 +12,6 @@ in
     enable = false;
     capSysAdmin = true;
   };
-  security.acme.acceptTerms = true;
-  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
@@ -94,14 +92,14 @@ in
   xdg.portal.config.common.default = "*";
 
   # Enable OpenTabletDriver
-  hardware.opentabletdriver.enable = true;
+  hardware.opentabletdriver.enable = false;
 
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 
   # Use mainline (or latest stable) kernel instead of LTS kernel
   #boot.kernelPackages = pkgs.linuxPackages_testing;
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   #chaotic.scx.enable = true;
 
   # Enable SysRQ
@@ -152,14 +150,11 @@ in
   # Autologin
   services.getty.autologinUser = user;
 
-  # Enable russian anicli
-  anicli-ru.enable = false;
-
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = false;
 
   # Enable replays
-  replays.enable = true;
+  replays.enable = false;
 
   # Enable startup sound on PC speaker (also plays after rebuilds)
   startup-sound.enable = false;
@@ -305,7 +300,7 @@ in
 
   disks = {
 
-    # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL NUKE THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
+    # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL BOOM THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
     enable = true;
 
     # Enable system compression
@@ -442,7 +437,7 @@ in
 
   services = {
 
-    printing.enable = true;
+    printing.enable = false;
 
     gvfs.enable = true;
 
