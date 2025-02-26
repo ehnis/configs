@@ -71,7 +71,7 @@ in
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 12;
+  zramSwap.memoryPercent = 50;
 
   # Enable ALVR
   programs.alvr.enable = false;

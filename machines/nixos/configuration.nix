@@ -84,7 +84,7 @@ system.activationScripts.home = {
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 12;
+  zramSwap.memoryPercent = 50;
 
   # Enable ALVR
   programs.alvr.enable = false;
@@ -416,6 +416,7 @@ users.users."${user2}" = {
     systemPackages =
       with pkgs;
       [
+        koreader
         obsidian
         xkb-switch
         virt-manager
