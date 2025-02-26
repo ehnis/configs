@@ -42,20 +42,6 @@ in
 
   };
 
-  services.snapper = {
-    persistentTimer = true;
-    configs.server = {
-      SUBVOLUME = "/home/${user}/server";
-      TIMELINE_LIMIT_YEARLY = 0;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 1;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
-
   programs.ydotool.enable = true;
 
   # Disable annoying firewall
@@ -167,25 +153,6 @@ in
 
   # Enable mlocate (find files on system quickly)
   mlocate.enable = true;
-
-  virtualisation.vmVariant = {
-
-    # Set options for vm that is built using nixos-rebuild build-vm
-    systemd.user.services.mpvpaper.enable = false;
-    virtualisation = {
-      qemu.options = [
-        "-display sdl,gl=on"
-        "-device virtio-vga-gl"
-        "-enable-kvm"
-        "-audio driver=sdl,model=virtio"
-      ];
-      cores = 6;
-      diskSize = 1024 * 8;
-      msize = 16384 * 16;
-      memorySize = 1024 * 4;
-    };
-
-  };
 
   flatpak = {
 
