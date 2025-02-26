@@ -8,19 +8,10 @@ let
   user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
 in
 {
-  services.sunshine = {
-    enable = false;
-    capSysAdmin = true;
-  };
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
 
   systemd.services.lactd = {
 
@@ -42,8 +33,6 @@ in
 
   };
 
-  programs.ydotool.enable = true;
-
   # Disable annoying firewall
   networking.firewall.enable = false;
 
@@ -52,8 +41,6 @@ in
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
-
-  #boot.crashDump.enable = true;
 
   # Enable RAM compression
   zramSwap.enable = true;
@@ -142,9 +129,6 @@ in
   # Enable replays
   replays.enable = false;
 
-  # Enable startup sound on PC speaker (also plays after rebuilds)
-  startup-sound.enable = false;
-
   # Enable zerotier
   zerotier.enable = false;
 
@@ -193,7 +177,6 @@ in
       "nginx"
       "input"
       "kvm"
-      "ydotool"
       "adbusers"
       "video"
       "corectrl"
@@ -228,9 +211,6 @@ in
     virt-cam = true;
 
   };
-
-  # Enable nvidia stuff
-  nvidia.enable = false;
 
   amdgpu = {
 
@@ -293,19 +273,6 @@ in
     };
 
     swap = {
-
-      file = {
-
-        # Enable swapfile
-        enable = false;
-
-        # Path to swapfile
-        path = "/var/lib/swapfile";
-
-        # Size of swapfile in MB
-        size = 16 * 1024;
-
-      };
 
       partition = {
 
