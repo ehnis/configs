@@ -461,7 +461,7 @@ security.wrappers.screen = {
 
   services = {
 
-    printing.enable = true;
+    printing.enable = false;
 
     gvfs.enable = true;
 
