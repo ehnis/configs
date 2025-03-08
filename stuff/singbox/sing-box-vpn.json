@@ -30,7 +30,7 @@
       "tag": "proxy",
       "udp_fragment": true,
       "server": "127.0.0.1",
-      "server_port": 2080
+      "server_port": 25546
     },
     {
       "type": "direct",

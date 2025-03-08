@@ -44,27 +44,13 @@ in
 
   };
 
-  services.snapper = {
-    persistentTimer = true;
-    configs.server = {
-      SUBVOLUME = "/home/${user}/server";
-      TIMELINE_LIMIT_YEARLY = 0;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 1;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-    };
-  };
-
   programs.ydotool.enable = true;
 
   # Disable annoying firewall
   networking.firewall.enable = false;
 
   # Enable singbox proxy to my XRay vpn
-  singbox.enable = false;
+  singbox.enable = true;
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
