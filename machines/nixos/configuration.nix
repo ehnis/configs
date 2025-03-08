@@ -376,6 +376,7 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        gh
         obsidian
         xkb-switch
         virt-manager
