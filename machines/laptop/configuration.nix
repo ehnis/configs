@@ -67,6 +67,9 @@ in
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = false;
 
+  # Enable bluetooth support
+  hardware.bluetooth.enable = true;
+
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
 

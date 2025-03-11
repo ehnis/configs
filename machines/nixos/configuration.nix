@@ -134,6 +134,9 @@ system.activationScripts.home = {
 
   # Enable dhcpcd for using internet using ethernet cable
   #networking.interfaces.enp4s0.useDHCP = true;
+  
+  # Enable bluetooth support
+  hardware.bluetooth.enable = true;
 
   # Enable NetworkManager
   networking.networkmanager.enable = true;
