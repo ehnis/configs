@@ -308,6 +308,7 @@ in
     systemPackages =
       with pkgs;
       [
+        steam
         libnss-mysql
         ffmpeg-full
         ncurses

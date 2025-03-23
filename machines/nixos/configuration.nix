@@ -197,6 +197,7 @@ system.activationScripts.home = {
 
     # Packages to install from flatpak
     packages = [
+    
     ];
 
   };
@@ -379,6 +380,7 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        youtube-music
         gh
         obsidian
         xkb-switch
