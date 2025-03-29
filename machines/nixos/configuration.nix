@@ -215,7 +215,8 @@ system.activationScripts.home = {
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      #(nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      nerd-fonts.jetbrains-mono
     ];
 
   };
@@ -380,6 +381,9 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        r2modman
+        vdhcoapp
+        gimp
         youtube-music
         gh
         obsidian
@@ -422,7 +426,7 @@ system.activationScripts.home = {
         krita
         nemo-with-extensions
         nemo-fileroller
-        kdenlive
+        kdePackages.kdenlive
         cached-nix-shell
         nvtopPackages.amd
         qbittorrent

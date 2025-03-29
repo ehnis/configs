@@ -15,7 +15,6 @@ in
       enable = true;
       package = pkgs.mlocate;
       interval = "hourly";
-      localuser = null;
     };
     environment.systemPackages = [ pkgs.mlocate ];
   };
