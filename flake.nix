@@ -22,7 +22,8 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-search.url = "github:diamondburned/nix-search";
-    hyprland.url = "github:hyprwm/Hyprland/v0.46.2";
+    #hyprland.url = "github:hyprwm/Hyprland/v0.46.2";
+    hyprland.url = "github:hyprwm/Hyprland";
   };
 
   outputs =
