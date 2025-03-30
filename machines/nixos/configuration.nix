@@ -215,8 +215,8 @@ system.activationScripts.home = {
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      #(nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-      nerd-fonts.jetbrains-mono
+      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      #nerd-fonts.jetbrains-mono
     ];
 
   };
@@ -389,7 +389,6 @@ system.activationScripts.home = {
         obsidian
         xkb-switch
         virt-manager
-        rustdesk-flutter
         libnss-mysql
         ffmpeg-full
         ncurses
