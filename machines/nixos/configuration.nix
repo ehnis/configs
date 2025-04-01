@@ -381,6 +381,7 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        rustdesk-flutter
         r2modman
         vdhcoapp
         gimp

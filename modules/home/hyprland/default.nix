@@ -171,7 +171,7 @@ in
           "hyprctl setcursor Bibata-Modern-Classic 24"
         ];
         input = {
-          kb_layout = "us,ru,ge";
+          kb_layout = "us,ru";
           kb_options = "grp:alt_shift_toggle";
           repeat_delay = 200;
           follow_mouse = 1;
