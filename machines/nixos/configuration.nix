@@ -381,6 +381,7 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        filezilla
         gnome-disk-utility
         rustdesk-flutter
         r2modman

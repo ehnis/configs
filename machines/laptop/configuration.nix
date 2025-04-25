@@ -308,6 +308,7 @@ in
     systemPackages =
       with pkgs;
       [
+        filezilla
         steam
         libnss-mysql
         ffmpeg-full
