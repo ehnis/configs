@@ -308,6 +308,7 @@ in
     systemPackages =
       with pkgs;
       [
+        moonlight-qt
         filezilla
         steam
         libnss-mysql

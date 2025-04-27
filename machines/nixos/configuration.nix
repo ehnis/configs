@@ -9,7 +9,7 @@ let
 in
 {
   services.sunshine = {
-    enable = false;
+    enable = true;
     capSysAdmin = true;
   };
   security.acme.acceptTerms = true;
