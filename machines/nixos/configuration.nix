@@ -9,7 +9,7 @@ let
 in
 {
   services.sunshine = {
-    enable = true;
+    enable = false;
     capSysAdmin = true;
   };
   security.acme.acceptTerms = true;
@@ -381,6 +381,8 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        OVMF
+        discord
         filezilla
         gnome-disk-utility
         rustdesk-flutter

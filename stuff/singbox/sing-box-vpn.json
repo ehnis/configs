@@ -47,7 +47,7 @@
     "rules": [
       {
         "process_path_regex": [
-          "^.*(electron|firefox|firefox-bin|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|.spotify-wrappe|.spotify-wrapped|VRChat.exe)$"
+          "^.*(.Discord-wrapped|electron|firefox|firefox-bin|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|.spotify-wrappe|.spotify-wrapped|VRChat.exe)$"
         ],
         "outbound": "proxy"
       },

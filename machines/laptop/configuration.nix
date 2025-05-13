@@ -308,6 +308,7 @@ in
     systemPackages =
       with pkgs;
       [
+        krita
         moonlight-qt
         filezilla
         steam
