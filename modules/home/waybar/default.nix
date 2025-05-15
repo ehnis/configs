@@ -387,14 +387,12 @@ in
           modules-right = [
             "tray"
             "group/scroll"
+            "hyprland/language"
+            "format" "{}"
+            "format-ru" "RU"
+            "format-en" "US"
             "group/hardware"
           ];
-          "custom/keyboard" = {
-          exec = "~/.config/waybar/keyboard-layout.sh";
-          interval = 2;
-          format = "{}";
-          return-type = "json";
-        };
           "cava" = {
             framerate = 165;
             format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▆" "▇" "█"];
