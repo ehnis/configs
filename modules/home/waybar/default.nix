@@ -27,12 +27,6 @@ in
           min-height: 0px;
           min-width: 0px;
         }
-        #custom-keyboard {
-        font-size: 16px;
-        margin: 2px 5px 2px 0;
-        padding: 0 3px;
-        font-family: "Noto Color Emoji", monospace;
-      }
         tooltip {
           background-color: rgba(0,0,0,0.1);
           text-shadow: none;
@@ -388,7 +382,7 @@ in
             "tray"
             "group/scroll"
             "hyprland/language"
-            "format" "{}"
+            "format" "Lang {short}"
             "format-ru" "RU"
             "format-en" "US"
             "group/hardware"
@@ -480,7 +474,6 @@ in
           "group/scroll" = {
             orientation = "horizontal";
             modules = [
-              "custom/keyboard"
               "pulseaudio#mic"
               "pulseaudio"
               "backlight"
