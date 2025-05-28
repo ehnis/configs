@@ -189,7 +189,10 @@ in
   networking.firewall.enable = false;
 
   # Enable singbox proxy to my XRay vpn
-  singbox.enable = true;
+  singbox.enable = false;
+
+  # Enable singbox proxy to my VPS with WireGuard
+  singbox-wg.enable = true;
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
@@ -354,8 +357,8 @@ system.activationScripts.home = {
     # Add some fonts
     packages = with pkgs; [
       noto-fonts
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-      #nerd-fonts.jetbrains-mono
+      #(nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      nerd-fonts.jetbrains-mono
     ];
 
   };
@@ -520,8 +523,8 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        whatsapp-for-linux
         krisp-patcher
-        legendary-gl
         discord
         filezilla
         gnome-disk-utility

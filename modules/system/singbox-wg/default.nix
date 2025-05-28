@@ -6,20 +6,11 @@
 }:
 with lib;
 let
-  sing-box = pkgs.sing-box.overrideAttrs {
-    vendorHash = "sha256-nauD1ynX+sjtWTtgjBKob9thaeVfZAk4+g/JuCUbNOU=";
-    src = pkgs.fetchFromGitHub {
-      owner = "SagerNet";
-      repo = "sing-box";
-      rev = "v1.11.0-beta.3";
-      hash = "sha256-9iqPqP4gmhjnkpEYCF/iNUnT1wRF9cRnEb8QbwnjsQI=";
-    };
-  };
-  cfg = config.singbox-wg;
+  cfg = config.singbox;
 in
 {
-  options.singbox-wg = {
-    enable = mkEnableOption "Enable singbox proxy to my VPS with WireGuard";
+  options.singbox = {
+    enable = mkEnableOption "Enable singbox proxy to my XRay vpn";
   };
 
   config = mkIf cfg.enable {
@@ -28,7 +19,21 @@ in
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = "${sing-box}/bin/sing-box -c ${../../../stuff/singbox/config.json} run";
+        ExecStart = "${pkgs.sing-box}/bin/sing-box -c ${../../../stuff/singbox/config.json} run";
+      };
+    };
+    systemd.services.singbox-tun = {
+      wantedBy = [ "singbox.service" ];
+      partOf = [ "singbox.service" ];
+      path = with pkgs; [
+        iptables
+        iproute2
+        procps
+        sing-box
+      ];
+      serviceConfig = {
+        ExecStart = "${pkgs.bash}/bin/bash ${../../../stuff/singbox/vpn-run-root.sh} start ${../../../stuff/singbox/sing-box-vpn.json}";
+        ExecStop = "${pkgs.bash}/bin/bash ${../../../stuff/singbox/vpn-run-root.sh} stop ${../../../stuff/singbox/sing-box-vpn.json}";
       };
     };
     services = {

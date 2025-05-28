@@ -350,7 +350,7 @@ in
       extraConfig = ''
         if exists("g:neovide")
             let g:neovide_padding_top = 15
-            let g:neovide_transparency = 0.2
+            let g:neovide_transparency = 1
         endif
       '';
     };

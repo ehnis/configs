@@ -16,7 +16,7 @@ in
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = "${pkgs.sing-box}/bin/sing-box -c ${../../../stuff/singbox/config} run";
+        ExecStart = "${pkgs.sing-box}/bin/sing-box -c ${../../../stuff/singbox/config.json} run";
       };
     };
     systemd.services.singbox-tun = {

@@ -83,6 +83,7 @@ in
           "$mod, M, exec, wlogout -b 2 -L 500px -R 500px -c 30px -r 30px,"
           "$mod, E, exec, nemo"
           "$mod, D, exec, firefox"
+          "$mod, W, exec, discord"
           "$mod, V, togglefloating,"
           "$mod, P, pseudo,"
           "$mod, J, togglesplit,"

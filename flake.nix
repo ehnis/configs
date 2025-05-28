@@ -20,7 +20,7 @@
     pipewire-screenaudio.url = "github:IceDBorn/pipewire-screenaudio";
     nix-alien.url = "github:thiagokokada/nix-alien";
     nix-flatpak.url = "github:gmodena/nix-flatpak";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nix-search.url = "github:diamondburned/nix-search";
     hyprland.url = "github:hyprwm/Hyprland/v0.46.2";
     #hyprland.url = "github:hyprwm/Hyprland";
