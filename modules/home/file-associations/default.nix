@@ -40,6 +40,7 @@ in
         "application/x-lzip-compressed-tar" = "org.gnome.FileRoller.desktop";
         "application/x-tarz " = "org.gnome.FileRoller.desktop";
         "application/zip" = "org.gnome.FileRoller.desktop";
+        #"inode/directory" = "nemo.desktop";
         "inode/directory" = "nemo.desktop";
         "text/html" = "firefox.desktop";
         "video/mp4" = "mpv.desktop";

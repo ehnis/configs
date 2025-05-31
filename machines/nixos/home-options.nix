@@ -1,6 +1,6 @@
-{ ... }:
+{ user, config, ... }:
 {
-  home.homeDirectory = "/home/ehnis";
-  home.username = "ehnis";
+  home.username = user;
+  home.homeDirectory = "/home/${config.home.username}";
   imports = [ ./home.nix ];
 }

@@ -23,16 +23,22 @@ in
       vimdiffAlias = true;
       plugins = with pkgs.vimPlugins; [
         onedark-nvim
+        indent-blankline-nvim
         nvim-web-devicons
         nvim-treesitter-parsers.cpp
         nvim-treesitter-parsers.nix
+        nvim-treesitter-parsers.javascript
         nvim-treesitter
         coc-ultisnips
         coc-snippets
         vim-snippets
         coc-json
-        cord-nvim
-        coc-pyright
+        presence-nvim
+        coc-basedpyright
+        coc-css
+        coc-html
+        coc-tsserver
+        coc-rust-analyzer
       ];
       coc.settings = {
         languageserver = {
@@ -75,7 +81,7 @@ in
                     expr = "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.nixos.options";
                   };
                   home_manager = {
-                    expr = "(builtins.getFlake \"/etc/nixos\").homeConfigurations.\"l0lk3k\".options";
+                    expr = "(builtins.getFlake \"/etc/nixos\").homeConfigurations.\"${config.home.username}\".options";
                   };
                 };
               };
@@ -94,6 +100,7 @@ in
             highlight Normal guifg=#bbddff
             map! <S-Insert> <C-R>+
             map !aa :tabnew +Ex /etc/nixos<cr>
+            nnoremap <silent> <C-h> :CocCommand document.toggleInlayHint<CR>
             set number
             highlight EndOfBuffer ctermbg=none guibg=none
             highlight SignColumn ctermbg=none guibg=none
@@ -108,8 +115,11 @@ in
             set expandtab
             set autoindent
             set smartindent
-            packadd termdebug
           ]])
+        }
+        require("ibl").setup {
+          indent = { char = "│" },  -- Vertical indentation line
+          scope = { enabled = true, show_start = true, show_end = true }, -- Enable scope guides
         }
         -- https://raw.githubusercontent.com/neoclide/coc.nvim/master/doc/coc-example-config.lua
 
@@ -287,70 +297,38 @@ in
         keyset("n", "<space>j", ":<C-u>CocNext<cr>", opts)
         keyset("n", "<space>k", ":<C-u>CocPrev<cr>", opts)
         keyset("n", "<space>p", ":<C-u>CocListResume<cr>", opts)
-        require('cord').setup {
-          usercmds = true,
-          log_level = 'error',
-          timer = {
-            interval = 1500,
-            reset_on_idle = false,
-            reset_on_change = false,
-          },
-          editor = {
-            image = nil,
-            client = 'neovim',
-            tooltip = 'мяу',
-          },
-          display = {
-            show_time = true,
-            show_repository = true,
-            show_cursor_position = false,
-            swap_fields = false,
-            swap_icons = false,
-            workspace_blacklist = {},
-          },
-          lsp = {
-            show_problem_count = false,
-            severity = 1,
-            scope = 'workspace',
-          },
-          idle = {
-            enable = true,
-            show_status = true,
-            timeout = 300000,
-            disable_on_focus = false,
-            text = 'Бездельничает',
-            tooltip = '💤',
-          },
-          text = {
-            viewing = 'Просматривает {}',
-            editing = 'Редактирует {}',
-            file_browser = 'Просматривает файлы в {}',
-            plugin_manager = 'Настраивает плагины в {}',
-            lsp_manager = 'Настраивает LSP в {}',
-            vcs = 'Коммитит изменения в {}',
-            workspace = 'В {}',
-          },
-          buttons = {
-            {
-              label = 'Мой GitHub профиль',
-              url = 'https://github.com/DADA30000',
-            },
-            {
-              label = "Мои файлы конфигурации",
-              url = 'https://github.com/DADA30000/dotfiles',
-            },
-            {
-              label = 'Текущий репозиторий',
-              url = 'git',
-            },
-          },
-          assets = nil,
-        }
+        require("presence").setup({
+          -- General options
+          auto_update         = true,                       -- Update activity based on autocmd events (if `false`, map or manually execute `:lua package.loaded.presence:update()`)
+          neovim_image_text   = "The One True Text Editor", -- Text displayed when hovered over the Neovim image
+          main_image          = "neovim",                   -- Main image display (either "neovim" or "file")
+          client_id           = "793271441293967371",       -- Use your own Discord application client id (not recommended)
+          log_level           = nil,                        -- Log messages at or above this level (one of the following: "debug", "info", "warn", "error")
+          debounce_timeout    = 10,                         -- Number of seconds to debounce events (or calls to `:lua package.loaded.presence:update(<filename>, true)`)
+          enable_line_number  = false,                      -- Displays the current line number instead of the current project
+          blacklist           = {},                         -- A list of strings or Lua patterns that disable Rich Presence if the current file name, path, or workspace matches
+          buttons             = true,                       -- Configure Rich Presence button(s), either a boolean to enable/disable, a static table (`{{ label = "<label>", url = "<url>" }, ...}`, or a function(buffer: string, repo_url: string|nil): table)
+          file_assets         = {},                         -- Custom file asset definitions keyed by file names and extensions (see default config at `lua/presence/file_assets.lua` for reference)
+          show_time           = true,                       -- Show the timer
+
+          -- Rich Presence text options
+          editing_text        = "Editing %s",               -- Format string rendered when an editable file is loaded in the buffer (either string or function(filename: string): string)
+          file_explorer_text  = "Browsing %s",              -- Format string rendered when browsing a file explorer (either string or function(file_explorer_name: string): string)
+          git_commit_text     = "Committing changes",       -- Format string rendered when committing changes in git (either string or function(filename: string): string)
+          plugin_manager_text = "Managing plugins",         -- Format string rendered when managing plugins (either string or function(plugin_manager_name: string): string)
+          reading_text        = "Reading %s",               -- Format string rendered when a read-only or unmodifiable file is loaded in the buffer (either string or function(filename: string): string)
+          workspace_text      = "Working on %s",            -- Format string rendered when in a git repository (either string or function(project_name: string|nil, filename: string): string)
+          line_number_text    = "Line %s out of %s",        -- Format string rendered when `enable_line_number` is set to true (either string or function(line_number: number, line_count: number): string)
+        })
+      if vim.g.neovide == true then
+        vim.keymap.set({ "n", "x" }, "<C-S-C>", '"+y', { desc = "Copy system clipboard" })
+        vim.keymap.set({ "n", "x" }, "<C-S-V>", '"+p', { desc = "Paste system clipboard" })
+      end
       '';
       extraConfig = ''
         if exists("g:neovide")
             let g:neovide_padding_top = 15
-            let g:neovide_transparency = 1
+            let g:neovide_opacity = 0.2
         endif
       '';
     };

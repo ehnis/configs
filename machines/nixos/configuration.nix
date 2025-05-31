@@ -1,10 +1,12 @@
 {
   pkgs,
   inputs,
+  user-hash,
+  user,
   ...
 }:
 let
-krisp-patcher =
+  krisp-patcher =
     pkgs.writers.writePython3Bin "krisp-patcher"
       {
         libraries = with pkgs.python3Packages; [
@@ -142,26 +144,13 @@ krisp-patcher =
   #      ];
   #    };
   #  };
-  #};  
-  user = "ehnis";
-  user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
+  #};
 in
 {
-  services.sunshine = {
-    enable = false;
-    capSysAdmin = true;
-  };
-  security.acme.acceptTerms = true;
-  security.acme.defaults.email = "lublujisn78@gmail.com";
   imports = [
     ./hardware-configuration.nix
     ../../modules/system
   ];
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
 
   systemd.services.lactd = {
 
@@ -183,44 +172,63 @@ in
 
   };
 
+  services.preload.enable = true;
+
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+  };
+
+  virtualisation.libvirtd.enable = true;
+
+  # Enable TPM emulation (optional)
+  virtualisation.libvirtd.qemu = {
+    swtpm.enable = true;
+    ovmf.packages = [ pkgs.OVMFFull.fd ];
+  };
+
+  programs.git.enable = true;
+
+  programs.git.lfs.enable = true;
+
+  # Enable USB redirection (optional)
+  virtualisation.spiceUSBRedirection.enable = true;
+
+  programs.virt-manager.enable = true;
+
   programs.ydotool.enable = true;
 
   # Disable annoying firewall
   networking.firewall.enable = false;
 
-  # Enable singbox proxy to my XRay vpn
-  singbox.enable = false;
-
   # Enable singbox proxy to my VPS with WireGuard
   singbox-wg.enable = true;
+
+  # Enable singbox proxy to my XRay vpn (uncomment in default.nix in ../../modules/system)
+  #singbox.enable = true;
+
+  # Enable AmneziaVPN client
+  programs.amnezia-vpn.enable = false;
 
   # Run non-nix apps
   programs.nix-ld.enable = true;
 
-system.activationScripts.home = {
-    deps = [ "specialfs" ];
-    text =
-      ''
-        sleep 5
-        chmod g+x /home/ehnis
-      '';
-  };  
-
   #boot.crashDump.enable = true;
+
+  # Enable plymouth (boot animation)
+  plymouth.enable = true;
 
   # Enable RAM compression
   zramSwap.enable = true;
-  zramSwap.memoryPercent = 50;
-
-  # Enable ALVR
-  programs.alvr.enable = false;
-  programs.alvr.openFirewall = false;
 
   # Enable stuff in /bin and /usr/bin
-  services.envfs.enable = true;
+  services.envfs.enable = false;
 
   # Enable IOMMU
-  boot.kernelParams = [ "iommu=pt" ];
+  boot.kernelParams = [
+    "iommu=pt"
+    "quiet"
+  ];
 
   # Enable some important system zsh stuff
   programs.zsh.enable = true;
@@ -232,6 +240,9 @@ system.activationScripts.home = {
 
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
+
+  # Enable PulseAudio
+  services.pulseaudio.enable = false;
 
   # Places /tmp in RAM
   boot.tmp.useTmpfs = true;
@@ -250,8 +261,6 @@ system.activationScripts.home = {
 
   # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
   boot.initrd.systemd.enable = true;
-
-  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
   # Disable usual coredumps (I hate them)
   security.pam.loginLimits = [
@@ -275,25 +284,22 @@ system.activationScripts.home = {
   #networking.useNetworkd = true;
 
   # Enable dhcpcd for using internet using ethernet cable
-  #networking.interfaces.enp4s0.useDHCP = true;
-  
-  # Enable bluetooth support
-  hardware.bluetooth.enable = true;
+  #networking.dhcpcd.enable = true;
 
   # Enable NetworkManager
+  #systemd.services.NetworkManager-wait-online.enable = false;
   networking.networkmanager.enable = true;
 
   # Allow making users through useradd
   users.mutableUsers = true;
+
+  virtualisation.vmware.host.enable = false;
 
   # Enable WayDroid
   virtualisation.waydroid.enable = false;
 
   # Autologin
   services.getty.autologinUser = user;
-
-  # Enable russian anicli
-  anicli-ru.enable = false;
 
   # Enable DPI (Deep packet inspection) bypass
   zapret.enable = false;
@@ -307,11 +313,11 @@ system.activationScripts.home = {
   # Enable zerotier
   zerotier.enable = false;
 
-  # Enable spotify with theme
-  spicetify.enable = true;
+  # Enable mlocate (find files on system quickly) (Deprecated, will be removed soon)
+  #mlocate.enable = true;
 
-  # Enable mlocate (find files on system quickly)
-  mlocate.enable = true;
+  # Enable locate (find files on system quickly)
+  services.locate.enable = true;
 
   virtualisation.vmVariant = {
 
@@ -339,17 +345,12 @@ system.activationScripts.home = {
 
     # Packages to install from flatpak
     packages = [
-    
+      "io.github.Soundux"
     ];
 
   };
 
   fonts = {
-    fontconfig = {
-    defaultFonts = {
-      emoji = [ "Noto Color Emoji" ];
-    };
-  };
 
     # Enable some default fonts
     enableDefaultPackages = true;
@@ -383,11 +384,16 @@ system.activationScripts.home = {
       "video"
       "corectrl"
       "libvirtd"
+      "libvirt"
+      "uccp"
     ];
 
   };
 
   nix.settings = {
+
+    # Disable IFD to speed up evaluation
+    allow-import-from-derivation = false;
 
     # Deduplicates stuff in /nix/store
     auto-optimise-store = true;
@@ -410,27 +416,30 @@ system.activationScripts.home = {
     enable = true;
 
     # Enable virtual camera
-    virt-cam = true;
+    virt-cam = false;
 
   };
 
-  # Enable nvidia stuff
-  nvidia.enable = false;
+  graphics = {
 
-  amdgpu = {
-
-    # Enable AMDGPU stuff
     enable = true;
 
-    # Enable OpenCL and ROCm
-    pro = false;
+    nvidia.enable = false;
+
+    amdgpu = {
+
+      enable = true;
+
+      pro = false;
+
+    };
 
   };
 
   my-services = {
 
     # Enable automatic Cloudflare DDNS
-    cloudflare-ddns.enable = false;
+    cloudflare-ddns.enable = true;
 
     nginx = {
 
@@ -455,13 +464,15 @@ system.activationScripts.home = {
     # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL NUKE THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
     enable = true;
 
+    impermanence = false;
+
     # Enable system compression
     compression = true;
 
     second-disk = {
 
       # Enable additional disk (must be btrfs)
-      enable = false;
+      enable = true;
 
       # Enable compression on additional disk
       compression = true;
@@ -523,22 +534,18 @@ system.activationScripts.home = {
     systemPackages =
       with pkgs;
       [
+        easyeffects
+        teamspeak6-client
+        kdePackages.kdenlive
         whatsapp-for-linux
-        krisp-patcher
-        discord
-        filezilla
-        gnome-disk-utility
-        gimp
-        youtube-music
-        gh
-        xkb-switch
-        virt-manager
-        libnss-mysql
-        ffmpeg-full
-        ncurses
-        pyright
+        krita
+        nemo-fileroller
+        nemo-with-extensions
+        nemo
+        gimp3-with-plugins
         lsd
         gamescope
+        kdiskmark
         nixfmt-rfc-style
         gdb
         gdu
@@ -548,55 +555,73 @@ system.activationScripts.home = {
         yarn
         ccls
         (firefox.override {
-          nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
+          nativeMessagingHosts = [
+            (inputs.pipewire-screenaudio.packages.${pkgs.system}.default.overrideAttrs (
+              finalAttrs: previousAttrs: { cargoHash = "sha256-H/Uf6Yo8z6tZduXh1zKxiOqFP8hW7Vtqc7p5GM8QDws="; }
+            ))
+          ];
         })
         wget
-        git-lfs
-        git
         killall
         gamemode
+        screen
         unrar
         android-tools
         zip
         jdk23
         mpv
-        nix-index
-        telegram-desktop
+        remmina
+        ayugram-desktop
         adwaita-icon-theme
         osu-lazer-bin
         steam
+        moonlight-qt
         prismlauncher
-        krita
-        nemo-with-extensions
-        nemo-fileroller
-        kdePackages.kdenlive
-        cached-nix-shell
         nvtopPackages.amd
         qbittorrent
         pavucontrol
+        any-nix-shell
         wl-clipboard
         bottles
-        vesktop
         networkmanager_dmenu
         neovide
         comma
         lact
         libreoffice
+        distrobox
         qalculate-gtk
         p7zip
+        krisp-patcher
         inputs.nix-alien.packages.${system}.nix-alien
         inputs.nix-search.packages.${system}.default
+        (discord.override {
+          withOpenASAR = true;
+          withVencord = true;
+        })
+        inputs.fabric.packages.${system}.default
+        inputs.fabric-cli.packages.${system}.default
+        (inputs.fabric.packages.${system}.run-widget.override {
+          extraPythonPackages = with python3Packages; [
+            ijson
+            numpy
+            pillow
+            psutil
+            requests
+            setproctitle
+            toml
+            watchdog
+          ];
+          extraBuildInputs = [
+            inputs.fabric-gray.packages.${system}.default
+            networkmanager
+            networkmanager.dev
+            playerctl
+          ];
+        })
       ]
       ++ (import ../../modules/system/stuff pkgs).scripts;
 
   };
-
-security.wrappers.screen = {
-      owner = "root";
-      group = "root";
-      setuid = true;
-      source = "${pkgs.screen}/bin/screen";
-    };
 
   boot.loader = {
 
@@ -610,11 +635,11 @@ security.wrappers.screen = {
 
   };
 
-  #nix.package = pkgs.nixVersions.latest;
+  nix.package = pkgs.nixVersions.git;
 
   services = {
 
-    printing.enable = false;
+    printing.enable = true;
 
     gvfs.enable = true;
 
@@ -622,6 +647,16 @@ security.wrappers.screen = {
 
     pipewire = {
       enable = true;
+      #package = pkgs.pipewire.overrideAttrs (finalAttrs: previousAttrs: {
+      #  src = pkgs.fetchFromGitLab {
+      #    domain = "gitlab.freedesktop.org";
+      #    owner = "pipewire";
+      #    repo = "pipewire";
+      #    rev = "fb4475b5dabf853290d8f682649818649621d973";
+      #    sha256 = "sha256-R++9vtrDgTbfeQgauC+wlRBQLaYaIHOanBKXJGqTLg8=";
+      #  };
+      #  buildInputs = previousAttrs.buildInputs ++ [ pkgs.libebur128 ];
+      #});
       alsa.enable = true;
       alsa.support32Bit = true;
       jack.enable = true;
@@ -643,8 +678,6 @@ security.wrappers.screen = {
     dconf.enable = true;
 
     adb.enable = true;
-
-    gnome-terminal.enable = true;
 
     nh.enable = true;
 
@@ -684,16 +717,8 @@ security.wrappers.screen = {
 
   i18n.defaultLocale = "ru_RU.UTF-8";
 
-  console = {
+  console.keyMap = "ru";
 
-    earlySetup = true;
-
-    font = "${pkgs.terminus_font}/share/consolefonts/ter-k16n.psf.gz";
-
-    keyMap = "ru";
-
-  };
-
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.11";
 
 }

@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 with lib;
 let
   cfg = config.flatpak;
@@ -13,7 +19,6 @@ in
       description = "Packages to install from flatpak";
     };
   };
-  
 
   imports = [
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
@@ -24,6 +29,7 @@ in
       extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
       config.common.default = "*";
     };
+    home.packages = [ pkgs.flatpak ];
     services.flatpak = {
       enable = true;
       uninstallUnmanaged = true;

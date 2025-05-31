@@ -1,18 +1,17 @@
 {
   imports = [
     ./disks
-    ./anicli-ru
     ./zapret
     ./my-services
-    ./amdgpu
+    ./graphics
     ./replays
     ./startup-sound
     ./zerotier
-    ./spicetify
     ./obs
     ./flatpak
     ./mlocate
-    ./nvidia
-    ./singbox
+    ./singbox-wg
+    ./plymouth
+    #./singbox
   ];
 }

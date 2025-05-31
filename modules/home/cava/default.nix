@@ -17,7 +17,7 @@ in
       enable = true;
       settings = {
         general = {
-          framerate = 165;
+          framerate = 60;
           bar_width = 4;
         };
         color = {

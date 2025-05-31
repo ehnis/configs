@@ -30,7 +30,7 @@
       "tag": "proxy",
       "udp_fragment": true,
       "server": "127.0.0.1",
-      "server_port": 25546
+      "server_port": 2080
     },
     {
       "type": "direct",
@@ -46,8 +46,17 @@
     "auto_detect_interface": true,
     "rules": [
       {
+        "source_ip_cidr": [
+          "127.0.0.1"
+        ],
+        "ip_cidr": [
+          "127.0.0.1"
+        ],
+        "outbound": "direct"
+      },
+      {
         "process_path_regex": [
-          "^.*(.Discord-wrapped|electron|firefox|firefox-bin|flatpak|.flatpak-wrappe|.flatpak-wrapped|node|.spotify-wrappe|.spotify-wrapped|VRChat.exe|prismlauncher|prismlauncher-)$"
+          "^.*(wget|git|electron|firefox|firefox-bin|nix|nix-index|flatpak|.flatpak-wrappe|.flatpak-wrapped|node)$"
         ],
         "outbound": "proxy"
       },
@@ -57,14 +66,18 @@
           "youtu.be",
           "youtube.com",
           "ytimg.com",
-          "ggpht.com",
-          "gstatic.com",
-          "discord.com",
-          "discord.gg",
-          "discordapp.com",
-          "discordapp.net"
+          "ggpht.com"
         ],
         "outbound": "proxy"
+      },
+      {
+        "source_ip_cidr": [
+          "127.0.0.1"
+        ],
+        "ip_cidr": [
+          "127.0.0.1"
+        ],
+        "outbound": "direct"
       },
       {
         "port": 53,

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 with lib;
 let
   cfg = config.theming;
@@ -7,10 +12,22 @@ in
   options.theming = {
     enable = mkEnableOption "Enable theming stuff like cursor theme, icon theme and etc";
   };
-  
-
 
   config = mkIf cfg.enable {
+
+    home.activation = {
+      gimpTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        if [[ ! -z DRY_RUN ]]; then
+          if [[ ! -d ${config.xdg.configHome}/GIMP ]]; then 
+              mkdir -p $VERBOSE_ARG "${config.xdg.configHome}/GIMP"
+              cp -r $VERBOSE_ARG ${builtins.toPath ../../../stuff/GIMP/3.0} "${config.xdg.configHome}/GIMP/3.0"
+              find ${config.xdg.configHome}/GIMP -type f -exec chmod 644 {} \;
+              find ${config.xdg.configHome}/GIMP -type d -exec chmod 755 {} \;
+          fi
+        fi
+      '';
+    };
+
     home.file = {
       ".themes".source = ../../../stuff/.themes;
       ".config/gtk-4.0/assets".source = ../../../stuff/.themes/Fluent-Dark/gtk-4.0/assets;
@@ -19,15 +36,18 @@ in
       ".config/vesktop/settings".source = ../../../stuff/vesktop/settings;
       ".config/vesktop/settings.json".source = ../../../stuff/vesktop/settings.json;
       ".config/vesktop/themes".source = ../../../stuff/vesktop/themes;
+      ".config/Vencord/settings".source = ../../../stuff/vesktop/settings;
+      ".config/Vencord/themes".source = ../../../stuff/vesktop/themes;
     };
-    xdg.desktopEntries.vesktop.settings= {
-      Exec = "vesktop --ozone-platform-hint=auto %U";
+    xdg.desktopEntries.discord.settings = {
+      Exec = "discord --ozone-platform-hint=auto %U";
       Categories = "Network;InstantMessaging;Chat";
-      GenericName = "Internet Messenger";
-      Icon = "vesktop";
+      GenericName = "All-in-one cross-platform voice and text chat for gamers";
+      Icon = "discord";
+      MimeType = "x-scheme-handler/discord";
       Keywords = "discord;vencord;electron;chat";
-      Name = "Vesktop";
-      StartupWMClass = "Vesktop";
+      Name = "Discord";
+      StartupWMClass = "discord";
       Type = "Application";
     };
     dconf.settings = {
@@ -36,8 +56,12 @@ in
         show-hidden-files = true;
         thumbnail-limit = lib.hm.gvariant.mkUint64 68719476736;
       };
-      "org/gnome/desktop/interface" = { 
-        color-scheme = "prefer-dark"; 
+      "org/gnome/nautilus/preferences" = {
+        default-folder-viewer = "list-view";
+        migrated-gtk-settings = true;
+      };
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
       };
     };
     qt = {
