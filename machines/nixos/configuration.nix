@@ -534,6 +534,7 @@ in
     systemPackages =
       with pkgs;
       [
+        youtube-music
         easyeffects
         teamspeak6-client
         kdePackages.kdenlive

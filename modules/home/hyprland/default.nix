@@ -216,7 +216,7 @@ in
             popups_ignorealpha = 0.09;
             ignore_opacity = true;
             size = 10;
-            brightness = 0;
+            brightness = 0.7;
             passes = 4;
             noise = 0;
             vibrancy = 0;
