@@ -188,6 +188,7 @@ in
   };
 
   programs.git.enable = true;
+   
 
   programs.git.lfs.enable = true;
 
@@ -214,7 +215,10 @@ in
   programs.nix-ld.enable = true;
 
   #boot.crashDump.enable = true;
-
+  services.sunshine = {
+     enable = false;
+     capSysAdmin = true;
+    };
   # Enable plymouth (boot animation)
   plymouth.enable = true;
 
@@ -534,6 +538,7 @@ in
     systemPackages =
       with pkgs;
       [
+        wayvnc
         youtube-music
         easyeffects
         teamspeak6-client
