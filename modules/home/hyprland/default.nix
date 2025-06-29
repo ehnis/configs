@@ -62,7 +62,6 @@ in
       settings = {
          monitor = [
           "DP-1, 1920x1080@165, 0x0, 1"
-          "LVDS-1, 1366x768@60, 0x0, 1"
         ];
         
         "$mod" = "SUPER";
@@ -197,8 +196,8 @@ in
           accel_profile = "flat";
         };
         general = {
-          gaps_in = 0;
-          gaps_out = 0;
+          gaps_in = 1;
+          gaps_out = 1;
           border_size = 0;
           "col.active_border" = "rgb(4575da) rgb(6804b5)";
           "col.inactive_border" = "rgb(595959)";
@@ -377,9 +376,10 @@ in
       settings = {
         ipc = "on";
         splash = false;
-        preload = [ "${../../../stuff/wallpaper.png}" ];
+        preload = [ "${../../../stuff/wallpaper.png}" "${../../../stuff/1wallpaper.png}" ];
         wallpaper = [
-          "DP-1,${../../../stuff/wallpaper.png}"
+          "DP-1,${../../../stuff/1wallpaper.png}"
+          "HDMI-A-2,${../../../stuff/wallpaper.png}"
         ];
       };
     };

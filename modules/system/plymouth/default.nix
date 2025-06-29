@@ -24,7 +24,7 @@ in
     systemd.services.plymouth-quit-wait.enable = false;
 
     boot.plymouth = {
-      enable = true;
+      enable = false;
       theme = "logo";
       themePackages = [ (pkgs.callPackage ./logo.nix { }) ];
     };

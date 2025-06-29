@@ -420,7 +420,7 @@ in
     enable = true;
 
     # Enable virtual camera
-    virt-cam = false;
+    virt-cam = true;
 
   };
 
@@ -538,6 +538,7 @@ in
     systemPackages =
       with pkgs;
       [
+        oscavmgr
         wayvnc
         youtube-music
         easyeffects
