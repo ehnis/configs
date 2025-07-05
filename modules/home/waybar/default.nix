@@ -271,9 +271,11 @@ in
           border-radius: 8px;
         }
         
-        language {
-          color: #ffffff;
+        #language, format {
+          color: #f067b9;
           margin-top: 3px;
+          text-shadow: 0 0 2px rgba(166, 227, 161, 0.8);
+          transition: color 0.3s ease;
         }
         
         #idle_inhibitor,
@@ -328,6 +330,15 @@ in
             color: @foreground;
           }
         }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+          #language {
+            animation: pulse 0.5s ease-in-out;
+          } 
         @keyframes blink-blue {
           to {
             background-color: alpha(#7aa2f7, 0.6);
