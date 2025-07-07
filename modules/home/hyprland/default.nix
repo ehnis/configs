@@ -145,7 +145,6 @@ in
         ];
         windowrulev2 = [
           "fullscreenstate 0 2, class:(firefox), title:^(.*Discord.* — Mozilla Firefox.*)$"
-          "workspace 0, class:^(discord)$"
         ];
         layerrule = [
           "blur, waybar"
