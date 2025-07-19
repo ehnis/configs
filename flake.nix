@@ -41,7 +41,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     anicli-ru.url = "github:vypivshiy/ani-cli-ru";
-    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?shallow=1&ref=nixos-25.05";
+    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?shallow=1&ref=nixos-unstable";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?shallow=1";
     #chaotic.url = "git+https://github.com/chaotic-cx/nyx/nyxpkgs-unstable";
     pipewire-screenaudio.url = "git+https://github.com/IceDBorn/pipewire-screenaudio?shallow=1";

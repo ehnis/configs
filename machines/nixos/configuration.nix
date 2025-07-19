@@ -245,6 +245,8 @@ in
   # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
 
+  hardware.sane.enable = true; # enables support for SANE scanners
+
   # Enable PulseAudio
   services.pulseaudio.enable = false;
 
@@ -323,6 +325,14 @@ in
   # Enable locate (find files on system quickly)
   services.locate.enable = true;
 
+  services.ollama = {
+    enable = true;
+    host = "0.0.0.0";
+    environmentVariables = {
+      OLLAMA_ORIGINS="*";
+    };
+  };
+
   virtualisation.vmVariant = {
 
     # Set options for vm that is built using nixos-rebuild build-vm
@@ -390,6 +400,8 @@ in
       "libvirtd"
       "libvirt"
       "uccp"
+      "lp"
+      "scanner"
     ];
 
   };
@@ -538,11 +550,13 @@ in
     systemPackages =
       with pkgs;
       [
+        xsane
+        (pkgs.xsane.override { gimpSupport = true; })
+        simple-scan
+        obsidian
         oscavmgr
-        wayvnc
         youtube-music
         easyeffects
-        teamspeak6-client
         kdePackages.kdenlive
         whatsapp-for-linux
         krita
@@ -604,26 +618,6 @@ in
         (discord.override {
           withOpenASAR = true;
           withVencord = true;
-        })
-        inputs.fabric.packages.${system}.default
-        inputs.fabric-cli.packages.${system}.default
-        (inputs.fabric.packages.${system}.run-widget.override {
-          extraPythonPackages = with python3Packages; [
-            ijson
-            numpy
-            pillow
-            psutil
-            requests
-            setproctitle
-            toml
-            watchdog
-          ];
-          extraBuildInputs = [
-            inputs.fabric-gray.packages.${system}.default
-            networkmanager
-            networkmanager.dev
-            playerctl
-          ];
         })
       ]
       ++ (import ../../modules/system/stuff pkgs).scripts;

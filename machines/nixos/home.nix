@@ -8,7 +8,7 @@
   # Import other modules
   imports = [
     ../../modules/home
-    inputs.nix-index-database.hmModules.nix-index
+    inputs.nix-index-database.homeModules.nix-index
   ];
 
   # Enable rich presence

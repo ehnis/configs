@@ -183,7 +183,6 @@ in
           "wl-paste --type image --watch cliphist store"
           "hyprctl setcursor Bibata-Modern-Classic 24"
           "killall screen; ~/bot/start-bot.sh"
-          "sleep 1 && hyprctl dispatch workspace 10 && discord"
         ];
         input = {
           kb_layout = "us,ru";

@@ -271,13 +271,6 @@ in
           border-radius: 8px;
         }
         
-        #language, format {
-          color: #f067b9;
-          margin-top: 3px;
-          text-shadow: 0 0 2px rgba(166, 227, 161, 0.8);
-          transition: color 0.3s ease;
-        }
-        
         #idle_inhibitor,
         #pulseaudio,
         #pulseaudio.mic {
@@ -393,9 +386,6 @@ in
             "tray"
             "group/scroll"
             "hyprland/language"
-            "format" "Lang {short}"
-            "format-ru" "RU"
-            "format-en" "US"
             "group/hardware"
           ];
           "cava" = {
@@ -440,6 +430,12 @@ in
           "custom/shutdown" = {
             format = "<span color='#ff5e5e'></span>";
             on-click = "systemctl poweroff";
+            tooltip = false;
+          };
+           "hyprland/language" = {
+            format = "{}";
+            format-en = "🇺🇸";
+            format-ru = "🇷🇺";
             tooltip = false;
           };
           "custom/reboot" = {
@@ -487,7 +483,6 @@ in
             modules = [
               "pulseaudio#mic"
               "pulseaudio"
-              "backlight"
             ];
           };
           "group/batteries" = {
