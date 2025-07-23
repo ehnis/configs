@@ -13,7 +13,7 @@
 
 window {
     location:       center;
-    width:          666;
+    width:          1180;
     border-radius:  12px;
     
     background-color:   @bg0;
@@ -39,7 +39,7 @@ prompt {
 }
 
 entry {
-    placeholder:        "Поиск...";
+    placeholder:        "Пошук...";
     placeholder-color:  @fg3;
 }
 
@@ -58,8 +58,8 @@ listview {
     background-color:   transparent;
 
     margin:     12px 0 0;
-    lines:      12;
-    columns:    1;
+    lines:      15;
+    columns:    3;
 
     scrollbar-width: 2px;
 

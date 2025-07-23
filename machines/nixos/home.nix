@@ -87,16 +87,6 @@
 
   };
 
-  mpd = {
-
-    # Enable mpd music daemon
-    enable = false;
-
-    # Enable ncmpcpp, program to access and control mpd daemon
-    ncmpcpp = false;
-
-  };
-
   flatpak = {
 
     # Enable user flatpak

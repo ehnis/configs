@@ -12,7 +12,6 @@
     ./cava
     ./flatpak
     ./theming
-    ./mpd
     ./neovim
     ./firefox
   ];

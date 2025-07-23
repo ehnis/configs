@@ -388,14 +388,6 @@ in
             "hyprland/language"
             "group/hardware"
           ];
-          "cava" = {
-            framerate = 165;
-            format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▆" "▇" "█"];
-            bar_delimiter = 0;
-            bars = 30;
-            input_delay = 0;
-            sleep_timer = 300;
-            };
           "hyprland/window" = {
             format = "{}";
             icon = true;
