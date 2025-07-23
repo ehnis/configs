@@ -325,14 +325,6 @@ in
   # Enable locate (find files on system quickly)
   services.locate.enable = true;
 
-  services.ollama = {
-    enable = true;
-    host = "0.0.0.0";
-    environmentVariables = {
-      OLLAMA_ORIGINS="*";
-    };
-  };
-
   virtualisation.vmVariant = {
 
     # Set options for vm that is built using nixos-rebuild build-vm
@@ -552,11 +544,8 @@ in
       [
         xsane
         (pkgs.xsane.override { gimpSupport = true; })
-        simple-scan
         obsidian
-        oscavmgr
         youtube-music
-        easyeffects
         kdePackages.kdenlive
         whatsapp-for-linux
         krita
