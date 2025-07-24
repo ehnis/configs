@@ -18,7 +18,7 @@ in
       enable = true;
       settings = {
         color_theme = "${pkgs.btop}/share/btop/themes/dracula.theme";
-        update_ms = 200;
+        update_ms = 100;
         theme_background = false;
       };
     };

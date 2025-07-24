@@ -169,7 +169,7 @@ in
           #"firefox & sleep 1; firefox --new-window https://discord.com/channels/@me"
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
-          "hyprctl setcursor Bibata-Modern-Classic 24"
+          "hyprctl setcursor oreo_spark_black_bordered_cursors 24"
           "killall screen; ~/bot/start-bot.sh"
         ];
         input = {
