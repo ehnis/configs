@@ -39,8 +39,6 @@ in
       esbuild
       fd
       dart-sass
-      swww
-      hyprpicker
       wttrbar
     ];
     wayland.windowManager.hyprland = {
@@ -48,16 +46,6 @@ in
         (mkIf (!cfg.stable && !cfg.from-unstable) inputs.hyprland.packages.${pkgs.system}.hyprland)
         (mkIf (cfg.from-unstable && !cfg.stable) inputs.unstable.legacyPackages.${pkgs.system}.hyprland)
       ];
-      plugins =
-        lib.optionals (cfg.enable-plugins && cfg.stable && !cfg.from-unstable) [
-          pkgs.hyprlandPlugins.hyprtrails
-        ]
-        ++ lib.optionals (cfg.enable-plugins && !cfg.stable && !cfg.from-unstable) [
-          inputs.hyprland-plugins.packages.${pkgs.system}.hyprtrails
-        ]
-        ++ lib.optionals (cfg.enable-plugins && !cfg.stable && cfg.from-unstable) [
-          inputs.unstable.legacyPackages.${pkgs.system}.hyprlandPlugins.hyprtrails
-        ];
       enable = true;
       settings = {
          monitor = [
@@ -263,30 +251,6 @@ in
         binds = {
           scroll_event_delay = 50;
         };
-        plugin = mkIf cfg.enable-plugins {
-          hyprexpo = {
-            columns = 3;
-            gap_size = 5;
-            bg_col = "rgb(111111)";
-            workspace_method = "first 1";
-            enable_gesture = true;
-            gesture_distance = 300;
-            gesture_positive = true;
-          };
-          dynamic-cursors = {
-            enabled = false;
-            mode = "tilt";
-            shake.enabled = false;
-            stretch.function = "negative_quadratic";
-          };
-          hyprtrails = {
-            color = "rgba(bbddffff)";
-            bezier_step = 0.001;
-            history_points = 6;
-            points_per_step = 4;
-            histoty_step = 1;
-          };
-        };
       };
       extraConfig = ''
         submap=passthrough
@@ -379,7 +343,7 @@ in
         preload = [ "${../../../stuff/wallpaper.png}" "${../../../stuff/1wallpaper.png}" ];
         wallpaper = [
           "DP-1,${../../../stuff/1wallpaper.png}"
-          "HDMI-A-2,${../../../stuff/wallpaper.png}"
+          "HDMI-A-1,${../../../stuff/wallpaper.png}"
         ];
       };
     };

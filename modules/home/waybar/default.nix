@@ -64,7 +64,6 @@ in
         }
         
         #scroll,
-        #cava,
         #clock,
         #hardware,
         #scripts,
@@ -111,10 +110,6 @@ in
         	100% {
         		background-position: 15% 100%;
         	}
-        }
-        #cava {
-          padding: 5px 10px 0px 10px;
-          color: #4575DA;
         }
         #custom-notification {
           padding: 0px 10px 0px 8px;

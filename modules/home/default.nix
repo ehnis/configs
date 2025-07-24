@@ -9,7 +9,6 @@
     ./spicetify
     ./zsh
     ./btop
-    ./cava
     ./flatpak
     ./theming
     ./neovim

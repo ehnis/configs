@@ -48,9 +48,6 @@
   # Enable theming stuff like cursor theme, icon theme and etc
   theming.enable = true;
 
-  # Enable cava audio visualizer
-  cava.enable = true;
-
   # Enable swaync notification manager
   swaync.enable = true;
 
