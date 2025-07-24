@@ -61,7 +61,7 @@ listview {
     lines:      15;
     columns:    3;
 
-    scrollbar-width: 2px;
+    scrollbar-width: 30px;
 
     scrollbar:  true;
 
