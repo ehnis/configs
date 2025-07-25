@@ -219,8 +219,6 @@ in
      enable = false;
      capSysAdmin = true;
     };
-  # Enable plymouth (boot animation)
-  plymouth.enable = true;
 
   # Enable RAM compression
   zramSwap.enable = true;
@@ -312,9 +310,6 @@ in
 
   # Enable replays
   replays.enable = true;
-
-  # Enable startup sound on PC speaker (also plays after rebuilds)
-  startup-sound.enable = false;
 
   # Enable zerotier
   zerotier.enable = false;
