@@ -456,7 +456,7 @@ in
       nextcloud.enable = false;
 
       # Website domain
-      hostName = "sanic.space";
+      hostName = "ehnis.sanic.space";
 
     };
 
