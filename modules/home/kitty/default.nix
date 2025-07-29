@@ -32,7 +32,7 @@ in
         url_style               dotted
         enable_audio_bell       no
         confirm_os_window_close 0
-        background_opacity      0.2
+        background_opacity      0
         window_margin_width     5
         tab_bar_edge            top
         tab_bar_style           powerline

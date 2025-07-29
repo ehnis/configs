@@ -179,7 +179,7 @@ in
     dockerCompat = true;
   };
 
-  virtualisation.libvirtd.enable = true;
+  virtualisation.libvirtd.enable = false;
 
   # Enable TPM emulation (optional)
   virtualisation.libvirtd.qemu = {
@@ -195,7 +195,7 @@ in
   # Enable USB redirection (optional)
   virtualisation.spiceUSBRedirection.enable = true;
 
-  programs.virt-manager.enable = true;
+  programs.virt-manager.enable = false;
 
   programs.ydotool.enable = true;
 
@@ -467,8 +467,6 @@ in
     # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL NUKE THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
     enable = true;
 
-    impermanence = false;
-
     # Enable system compression
     compression = true;
 
@@ -537,6 +535,7 @@ in
     systemPackages =
       with pkgs;
       [
+        ffmpeg-full
         xsane
         (pkgs.xsane.override { gimpSupport = true; })
         obsidian

@@ -125,11 +125,6 @@ in
         windowrule = [
           "nomaxsize, class:^(polkit-mate-authentication-agent-1)$"
           "pin, class:^(polkit-mate-authentication-agent-1)$"
-          "opacity 0.99 override 0.99 override, title:^(QDiskInfo)$"
-          "opacity 0.99 override 0.99 override, title:^(MainPicker)$"
-          "opacity 0.99 override 0.99 override, class:^(org.prismlauncher.PrismLauncher)$"
-          "opacity 0.99 override 0.99 override, class:^(mpv)$"
-          "opacity 0.99 override 0.99 override, class:^(org.qbittorrent.qBittorrent)$"
         ];
         windowrulev2 = [
           "fullscreenstate 0 2, class:(firefox), title:^(.*Discord.* — Mozilla Firefox.*)$"
@@ -324,7 +319,7 @@ in
         label = [
           {
             monitor = "";
-            text = "Введите пароль от пользователя $USER $TIME $ATTEMPTS";
+            text = "Ввfalseе пароль от пользователя $USER $TIME $ATTEMPTS";
             color = "rgba(200, 200, 200, 1.0)";
             font_size = 25;
             font_family = "Noto Sans";

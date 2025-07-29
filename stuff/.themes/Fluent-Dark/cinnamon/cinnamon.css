@@ -906,7 +906,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 
 .calendar-other-month-day {
   color: rgba(255, 255, 255, 0.7);
-  opacity: 1;
+  opacity: 0;
 }
 
 .calendar-week-number {

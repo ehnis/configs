@@ -16,10 +16,6 @@
       url = "git+https://github.com/Gerg-L/spicetify-nix?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hypr-dynamic-cursors = {
-      url = "git+https://github.com/VirtCode/hypr-dynamic-cursors?shallow=1";
-      inputs.hyprland.follows = "hyprland";
-    };
     nix-index-database = {
       url = "git+https://github.com/nix-community/nix-index-database?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -28,28 +24,13 @@
       url = "git+https://github.com/nixpak/nixpak?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    fabric = {
-      url = "git+https://github.com/Fabric-Development/fabric?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    fabric-gray = {
-      url = "git+https://github.com/Fabric-Development/gray?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    fabric-cli = {
-      url = "git+https://github.com/HeyImKyu/fabric-cli?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    anicli-ru.url = "github:vypivshiy/ani-cli-ru";
     nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?shallow=1&ref=nixos-unstable";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?shallow=1";
     #chaotic.url = "git+https://github.com/chaotic-cx/nyx/nyxpkgs-unstable";
     pipewire-screenaudio.url = "git+https://github.com/IceDBorn/pipewire-screenaudio?shallow=1";
     #determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nix-alien.url = "git+https://github.com/thiagokokada/nix-alien?shallow=1";
-    zen-browser.url = "git+https://github.com/0xc000022070/zen-browser-flake?shallow=1";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
-    impermanence.url = "git+https://github.com/nix-community/impermanence?shallow=1";
     nix-search.url = "git+https://github.com/diamondburned/nix-search?shallow=1";
   };
 
@@ -58,7 +39,6 @@
     let
       system = "x86_64-linux";
       modules-list = [
-        inputs.impermanence.nixosModules.impermanence
         home-manager.nixosModules.home-manager
         {
           home-manager = {
