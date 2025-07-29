@@ -123,6 +123,7 @@ in
           "$mod, mouse:273, resizewindow"
         ];
         windowrule = [
+           "opacity 0.99 override 0.99 override, class:^(org.prismlauncher.PrismLauncher)$"
           "nomaxsize, class:^(polkit-mate-authentication-agent-1)$"
           "pin, class:^(polkit-mate-authentication-agent-1)$"
         ];
