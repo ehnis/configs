@@ -160,7 +160,6 @@ in
           "animation slide left, swaync-control-center"
         ];
         exec-once = [
-          "/run/wrappers/bin/sudo ${pkgs.plymouth}/bin/plymouth quit"
           #"pactl load-module module-null-sink sink_name=audiorelay-virtual-mic-sink sink_properties=device.description=Virtual-Mic-Sink; pactl load-module module-remap-source master=audiorelay-virtual-mic-sink.monitor source_name=audiorelay-virtual-mic-sink source_properties=device.description=Virtual-Mic"
           #"firefox & sleep 1; firefox --new-window https://discord.com/channels/@me"
           "wl-paste --type text --watch cliphist store"
@@ -253,6 +252,19 @@ in
           bind=,escape,submap,reset
         submap=reset
       '';
+    };
+    systemd.user.services.mpris-proxy = {
+      Unit = {
+        Description = "MPRIS Proxy";
+        After = ["network.target"];
+      };
+      Service = {
+        ExecStart = "${pkgs.playerctl}/bin/playerctl -a metadata";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = ["hyprland-session.target"];
+      };
     };
     systemd.user.services.polkit_mate = {
       Install = {

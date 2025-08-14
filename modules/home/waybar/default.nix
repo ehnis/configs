@@ -37,6 +37,17 @@ in
         #waybar {
           background: none;
         }
+        #custom-mpris {
+          border-radius: 8px;
+          padding: 0 10px;
+         margin: 2px 5px;
+          min-width: 250px;
+         transition: background-color 200ms;
+        }
+
+        #custom-mpris:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
         .modules-left {
           background: rgba(0,0,0,0.2);
           border-radius: 0 0 15px 0;
@@ -373,6 +384,7 @@ in
           modules-left = [
             "group/powermenu"
             "group/stuff"
+            "custom/mpris"
           ];
           modules-center = [
             "hyprland/window"
@@ -419,6 +431,17 @@ in
             on-click = "systemctl poweroff";
             tooltip = false;
           };
+          "custom/mpris" = {
+            format = "{}";
+              "icons"= {
+              "Paused"= "⏸";
+              "Playing"= "▶";
+              "Stopped" ="■";
+          };
+            exec = "playerctl metadata --format '{\"text\": \"{player}: {status} {title} - {artist}\"}'";
+            return-type = "json";
+            on-click = "playerctl play-pause";
+};
            "hyprland/language" = {
             format = "{}";
             format-en = "🇺🇸";
@@ -629,7 +652,7 @@ in
           };
           "temperature" = {
             interval = 1;
-            hwmon-path = ["/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input" "/sys/class/hwmon/hwmon3/temp1_input"];
+            hwmon-path = ["/sys/class/hwmon/hwmon0/temp1_input" "/sys/class/hwmon/hwmon1/temp1_input" "/sys/class/hwmon/hwmon2/temp1_input"];
             format = "<span color='#7AA2F7'> {temperatureC}°C  </span>";
             tooltip-format = "Core Temp: {temperatureC}°C ";
           };

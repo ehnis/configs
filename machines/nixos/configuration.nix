@@ -520,6 +520,12 @@ in
 
   environment = {
 
+      sessionVariables = {
+     PATH = [ 
+       "${pkgs.playerctl}/bin"
+     ];
+   };
+
     pathsToLink = [ "/share/zsh" ];
 
     variables = {
@@ -535,6 +541,8 @@ in
     systemPackages =
       with pkgs;
       [
+        playerctl
+        waybar-mpris
         ffmpeg-full
         xsane
         (pkgs.xsane.override { gimpSupport = true; })

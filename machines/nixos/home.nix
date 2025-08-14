@@ -13,7 +13,8 @@
 
   # Enable rich presence
   services.arrpc.enable = true;
-
+  
+  services.playerctld.enable = true;
   # Enable firefox customization
   firefox.enable = false; # Reminder for dumb me to change it later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

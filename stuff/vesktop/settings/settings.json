@@ -100,7 +100,7 @@
             "enabled": false
         },
         "CallTimer": {
-            "enabled": false
+            "enabled": true
         },
         "ClearURLs": {
             "enabled": false
@@ -283,7 +283,7 @@
             "enabled": false
         },
         "NoF1": {
-            "enabled": false
+            "enabled": true
         },
         "NoMaskedUrlPaste": {
             "enabled": false
@@ -448,7 +448,7 @@
             "enabled": false
         },
         "SpotifyControls": {
-            "enabled": false
+            "enabled": true
         },
         "SpotifyCrack": {
             "enabled": true
