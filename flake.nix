@@ -53,7 +53,6 @@
       ];
       user = "ehnis";
       user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
-      user_iso = "nixos";
     in
     {
       nixosConfigurations = {
@@ -66,32 +65,9 @@
             { home-manager.users."${user}" = import ./machines/nixos/home.nix; }
           ];
         };
-        nixos-offline = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit
-              inputs
-              user
-              user_iso
-              user-hash
-              ;
-          };
-          modules = modules-list ++ [
-            ./machines/nixos-offline/configuration.nix
-            { home-manager.users."${user_iso}" = import ./machines/nixos/home.nix; }
-          ];
-        };
-        iso = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs user user_iso;
-          };
-          modules = modules-list ++ [
-            ./machines/iso/configuration.nix
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          ];
-        };
       };
       homeConfigurations = {
-        l0lk3k = home-manager.lib.homeManagerConfiguration {
+        ehnis = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.${system};
           modules = [
             ./machines/nixos/home-options.nix

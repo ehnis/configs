@@ -192,10 +192,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1755807308,
-        "narHash": "sha256-zXkmMwTH/w0EpJtKrHJcCh6Kv2dPnp2y5hwuSg0udqM=",
+        "lastModified": 1756022458,
+        "narHash": "sha256-J1i35r4HfNDdPpwL0vOBaZopQudAUVtartEerc1Jryc=",
         "ref": "refs/heads/master",
-        "rev": "e6422763eb4594099a889d05304c3cfd06e47c8f",
+        "rev": "9e3a33c0bcbc25619e540b9dfea372282f8a9740",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager"
@@ -280,10 +280,10 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1755781160,
-        "narHash": "sha256-Vfp1nLxR2afmzwNKgKWukxtlYznNM9WpvxFjO6MvZ4A=",
+        "lastModified": 1756022257,
+        "narHash": "sha256-BVYvquLQY3VjkqosOrLBPLUo2AwujQGS40DTuHYsYdg=",
         "ref": "refs/heads/main",
-        "rev": "50a242f16abfc49efc6f89ea9cd14a3544888a25",
+        "rev": "ced38b1b0f46f9fbdf9d37644d27bdbd2a29af1d",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/hyprwm/Hyprland"
@@ -562,10 +562,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1755404379,
-        "narHash": "sha256-Q6ZxZDBmD/B988Jjbx7/NchxOKIpOKBBrx9Yb0zMzpQ=",
+        "lastModified": 1756008611,
+        "narHash": "sha256-rfTBWuTXi9/X7GhtF562FKNXKh2kvKb6dwI5lV1SjPE=",
         "ref": "refs/heads/main",
-        "rev": "ebbc1c05f786ae39bb5e04e57bf2c10c44a649e3",
+        "rev": "52dec1cb33a614accb9e01307e17816be974d24d",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/nix-index-database"
@@ -709,10 +709,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1755804167,
-        "narHash": "sha256-j4QCks2TM6d8vz2nL1ss6Xl1cOYruf0++ggHsEJeRLY=",
+        "lastModified": 1756064598,
+        "narHash": "sha256-v60OgTprkhnsNwrN2PjXGZag14YJ6XWkkZ2v2fQ4d6Y=",
         "ref": "refs/heads/main",
-        "rev": "cfa95fb7da8934b301009a6ffd145f8cbfd655d6",
+        "rev": "27b566927d44b545d2c9b22751f88bd7a3ef0a4e",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/NUR"
@@ -789,10 +789,10 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1755613017,
-        "narHash": "sha256-QVT/L4QQr77IOq8z2L9atYIOZn78fwLfwDgbY/L+k50=",
+        "lastModified": 1756009939,
+        "narHash": "sha256-lD4Zn37DWEx0X1DqM3npH68b7oh81H8BaaO3c6Ol/DQ=",
         "ref": "refs/heads/master",
-        "rev": "df3f3ff6db7e1f553288592496f6293d32164d8a",
+        "rev": "2bedaf52261ef2adbe71af70820aeb41dfe9a5ef",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/Gerg-L/spicetify-nix"

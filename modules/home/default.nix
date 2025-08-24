@@ -12,6 +12,5 @@
     ./flatpak
     ./theming
     ./neovim
-    ./firefox
   ];
 }

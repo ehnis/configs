@@ -106,45 +106,7 @@ let
             else:
                 print("Couldn't find patch location - review manually. Sorry.")
       '';
-  #mkNixPak = inputs.nixpak.lib.nixpak {
-  #  inherit (pkgs) lib;
-  #  inherit pkgs;
-  #};
-  #sandboxed-vesktop = mkNixPak {
-  #  config = { sloth, ... }: {
-  #    app.package = pkgs.vesktop;
-  #    dbus.policies = {
-  #      #"org.pulseaudio.Server" = "own";
-  #      #"org.pipewire.Telephony" = "own";
-  #      #"org.freedesktop.portal.Desktop" = "own";
-  #      #"org.freedesktop.portal.Documents" = "own";
-  #      #"org.freedesktop.impl.portal.desktop.hyprland" = "own";
-  #      #"org.erikreider.swaync.cc" = "own";
-  #      #"org.freedesktop.Notifications" = "own";
-  #      #"org.freedesktop.systemd1" = "own";
-  #      #"ca.desrt.dconf" = "own";
-  #      #"org.freedesktop.DBus" = "own";
-  #      #"org.a11y.Bus" = "own";
-  #      #"fr.arouillard.waybar" = "own";
-  #      #"org.gtk.vfs.Daemon" = "own";
-  #      #"org.freedesktop.impl.portal.PermissionStore" = "own";
-  #      "org.*" = "talk";
-  #    };
-  #    bubblewrap = {
-  #      network = true;
-  #      bind.rw = [
-  #        (sloth.concat' sloth.homeDir "/.config/vesktop")
-  #        (sloth.env "XDG_RUNTIME_DIR")
-  #      ];
-  #      bind.ro = [
-  #        (sloth.concat' sloth.homeDir "/Downloads")
-  #      ];
-  #      bind.dev = [
-  #        "/dev/dri"
-  #      ];
-  #    };
-  #  };
-  #};
+ 
 in
 {
   imports = [
@@ -297,8 +259,6 @@ in
   # Allow making users through useradd
   users.mutableUsers = true;
 
-  virtualisation.vmware.host.enable = false;
-
   # Enable WayDroid
   virtualisation.waydroid.enable = false;
   #alvr
@@ -315,30 +275,8 @@ in
   # Enable zerotier
   zerotier.enable = false;
 
-  # Enable mlocate (find files on system quickly) (Deprecated, will be removed soon)
-  #mlocate.enable = true;
-
   # Enable locate (find files on system quickly)
   services.locate.enable = true;
-
-  virtualisation.vmVariant = {
-
-    # Set options for vm that is built using nixos-rebuild build-vm
-    systemd.user.services.mpvpaper.enable = false;
-    virtualisation = {
-      qemu.options = [
-        "-display sdl,gl=on"
-        "-device virtio-vga-gl"
-        "-enable-kvm"
-        "-audio driver=sdl,model=virtio"
-      ];
-      cores = 6;
-      diskSize = 1024 * 8;
-      msize = 16384 * 16;
-      memorySize = 1024 * 4;
-    };
-
-  };
 
   flatpak = {
 
@@ -521,12 +459,6 @@ in
 
   environment = {
 
-      sessionVariables = {
-     PATH = [ 
-       "${pkgs.playerctl}/bin"
-     ];
-   };
-
     pathsToLink = [ "/share/zsh" ];
 
     variables = {
@@ -542,9 +474,6 @@ in
     systemPackages =
       with pkgs;
       [
-        oscavmgr
-        playerctl
-        waybar-mpris
         ffmpeg-full
         xsane
         (pkgs.xsane.override { gimpSupport = true; })
@@ -557,16 +486,10 @@ in
         nemo-with-extensions
         nemo
         gimp3-with-plugins
-        lsd
         gamescope
         nixfmt-rfc-style
-        gdb
         gdu
-        gcc
         nixd
-        nodejs
-        yarn
-        ccls
         (firefox.override {
           nativeMessagingHosts = [
             (inputs.pipewire-screenaudio.packages.${pkgs.system}.default.overrideAttrs (
@@ -579,16 +502,13 @@ in
         gamemode
         screen
         unrar
-        android-tools
         zip
         jdk23
         mpv
-        remmina
         ayugram-desktop
         adwaita-icon-theme
         osu-lazer-bin
         steam
-        moonlight-qt
         prismlauncher
         nvtopPackages.amd
         qbittorrent
@@ -598,10 +518,7 @@ in
         bottles
         networkmanager_dmenu
         neovide
-        comma
         lact
-        libreoffice
-        distrobox
         qalculate-gtk
         p7zip
         krisp-patcher
