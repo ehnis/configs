@@ -301,7 +301,8 @@ in
 
   # Enable WayDroid
   virtualisation.waydroid.enable = false;
-
+  #alvr
+  programs.alvr.enable = true;
   # Autologin
   services.getty.autologinUser = user;
 
@@ -541,6 +542,7 @@ in
     systemPackages =
       with pkgs;
       [
+        oscavmgr
         playerctl
         waybar-mpris
         ffmpeg-full
@@ -557,7 +559,6 @@ in
         gimp3-with-plugins
         lsd
         gamescope
-        kdiskmark
         nixfmt-rfc-style
         gdb
         gdu
@@ -634,6 +635,14 @@ in
     printing.enable = true;
 
     gvfs.enable = true;
+    
+    ollama.enable = true;
+
+    ollama.environmentVariables = {
+        OLLAMA_HOST="ehnis.sanic.space";
+        OLLAMA_ORIGINS="*";
+      };
+
 
     openssh.enable = true;
 

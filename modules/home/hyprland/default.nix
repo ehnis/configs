@@ -206,7 +206,6 @@ in
         };
         animations = {
           enabled = true;
-          first_launch_animation = false;
           bezier = [
             "fade, 0.165, 0.84, 0.44, 1"
             "woosh, 0.445, 0.05, 0, 1"
