@@ -423,6 +423,7 @@ in
             format = "{}";
             format-en = "🇺🇸";
             format-ru = "🇷🇺";
+            format-de = "🇩🇪";
             tooltip = false;
           };
           "custom/reboot" = {
