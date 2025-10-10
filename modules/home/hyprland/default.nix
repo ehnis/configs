@@ -168,7 +168,7 @@ in
           "killall screen; ~/bot/start-bot.sh"
         ];
         input = {
-          kb_layout = "us,ru,de";
+          kb_layout = "us,ru";
           kb_options = "grp:alt_shift_toggle";
           repeat_delay = 200;
           follow_mouse = 1;
@@ -365,7 +365,7 @@ in
     };
     programs.rofi = mkIf cfg.rofi {
       enable = true;
-      package = pkgs.rofi-wayland;
+      package = pkgs.rofi;
       font = "JetBrainsMono NF 14";
       theme = ../../../stuff/theme.rasi;
     };

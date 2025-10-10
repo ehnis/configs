@@ -176,6 +176,8 @@ in
   # Run non-nix apps
   programs.nix-ld.enable = true;
 
+
+
   #boot.crashDump.enable = true;
   services.sunshine = {
      enable = false;
@@ -474,7 +476,9 @@ in
     systemPackages =
       with pkgs;
       [
-        koreader
+        wlx-overlay-s
+        android-tools
+        bs-manager
         lsd
         ffmpeg-full
         xsane
@@ -554,14 +558,8 @@ in
     printing.enable = true;
 
     gvfs.enable = true;
-    
-    ollama.enable = true;
 
-    ollama.environmentVariables = {
-        OLLAMA_HOST="ehnis.sanic.space";
-        OLLAMA_ORIGINS="*";
-      };
-
+    logmein-hamachi.enable = true;
 
     openssh.enable = true;
 
