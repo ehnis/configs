@@ -476,6 +476,8 @@ in
     systemPackages =
       with pkgs;
       [
+        libreoffice
+        kdePackages.okular
         wlx-overlay-s
         android-tools
         bs-manager
