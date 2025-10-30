@@ -2,10 +2,50 @@
 with lib;
 let
   cfg = config.zapret;
+  
+  # Список доменов VRChat
+  vrchatHostlist = pkgs.writeText "vrchat-hosts.txt" ''
+    vrchat.com
+    vrchat.net
+    api.vrchat.cloud
+    status.vrchat.com
+    vrchat.cloud
+    pipeline.vrchat.cloud
+    assets.vrchat.com
+    creators.vrchat.com
+    docs.vrchat.com
+    wiki.vrchat.com
+    vrchat.community
+    vrchatassets.com
+    vrcdn.live
+    vrcdn.video
+    vrcdn.cloud
+    files.vrchat.cloud
+    cdn.vrchat.com
+    www.quora.com
+  '';
+
+  # Конфигурационный файл zapret
+  zapretConfig = pkgs.writeText "zapret-config" ''
+    # Основные настройки
+    MODE=nfqws
+    
+    # Порт для прослушивания (tpws)
+    TPWS_PORT=988
+    
+    # Опции для nfqws
+    NFQWS_OPT_HTTP="--filter-tcp=80 --hostlist=/opt/zapret/ipset/zapret-hosts-user.txt --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig"
+    NFQWS_OPT_HTTPS="--filter-tcp=443 --hostlist=/opt/zapret/ipset/zapret-hosts-user.txt --dpi-desync=multisplit --dpi-desync-split-pos=2,sniext+1 --dpi-desync-split-seqovl=679"
+    NFQWS_OPT_QUIC="--filter-udp=443 --hostlist=/opt/zapret/ipset/zapret-hosts-user.txt --dpi-desync=fake --dpi-desync-repeats=6"
+    
+    # Дополнительные порты из вашей конфигурации
+    NFQWS_OPT_EXTRA="--filter-tcp=2053,2083,2087,2096,8443 --filter-udp=19294-19344,50000-50100"
+  '';
+
 in
 {
   options.zapret = {
-    enable = mkEnableOption "Enable DPI (Deep packet inspection) bypass";
+    enable = mkEnableOption "Включить обход DPI с помощью Zapret";
   };
 
   config = mkIf cfg.enable {
@@ -15,6 +55,21 @@ in
     };
     users.groups.tpws = { };
     
+    # Создаем необходимые директории и файлы конфигурации
+    system.activationScripts.zapret-setup = {
+      text = ''
+        mkdir -p /opt/zapret/ipset
+        mkdir -p /etc/zapret
+        
+        cp ${vrchatHostlist} /opt/zapret/ipset/zapret-hosts-user.txt
+        
+        cp ${zapretConfig} /etc/zapret/config
+        
+        chown -R tpws:tpws /opt/zapret
+        chmod -R 755 /opt/zapret
+      '';
+    };
+
     systemd.services.zapret = {
       enable = true;
       after = [ "network-online.target" ];
@@ -35,88 +90,28 @@ in
         RemainAfterExit = true;
         User = "tpws";
         Group = "tpws";
-        WorkingDirectory = "/tmp";
+        WorkingDirectory = "/opt/zapret";
+        
         ExecStart = "${pkgs.bash}/bin/bash -c 'zapret start'";
         ExecStop = "${pkgs.bash}/bin/bash -c 'zapret stop'";
-        EnvironmentFile = pkgs.writeText "zapret-environment" ''
-
-          MODE="nfqws"
-
-          FWTYPE="iptables"
-
-          MODE_HTTP=1
-
-
-          MODE_HTTP_KEEPALIVE=1
-
-
-          MODE_HTTP_KEEPALIVE=0
-
-          MODE_HTTPS=1
-
-
-          MODE_QUIC=0
-
-
-          MODE_QUIC=1
-
-
-	  QUIC_PORTS=50000-65535
-
-          MODE_FILTER=none
-
-          DISABLE_IPV6=1
-
-          INIT_APPLY_FW=1
-
-          #NFQWS_OPT_DESYNC="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000"
-
-          #NFQWS_OPT_DESYNC="--dpi-desync=split2"
-
-	  #NFQWS_OPT_DESYNC="--dpi-desync=split2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4"
-
-
-          NFQWS_OPT_DESYNC="--dpi-desync=split2 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,split2 --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
-
-
-	  #NFQWS_OPT_DESYNC_HTTP="--dpi-desync=fake --dpi-desync-ttl=11 --dpi-desync-fake-http=0x00000000 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum" 
-
-
-	  #NFQWS_OPT_DESYNC_HTTP_SUFFIX="--dpi-desync=syndata"
-
-
-	  #NFQWS_OPT_DESYNC_HTTPS="--dpi-desync=fake,split --dpi-desync-fooling=badseq --dpi-desync-split-pos=1 --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync=fake,disorder2 --dpi-desync-ttl=4 --dpi-desync-ttl6=0 --dpi-desync-fooling=badsum"
-
-
-          NFQWS_OPT_DESYNC="--dpi-desync=split2 --dpi-desync-any-protocol --hostlist=${../../../stuff/youtube-hosts} --new --dpi-desync-any-protocol --dpi-desync=fake,split2 --dpi-desync-ttl=9 --dpi-desync-fooling=md5sig"
-
-
-	  #NFQWS_OPT_DESYNC="--dpi-desync=fake,disorder2 --dpi-desync-split-pos=1 --dpi-desync-ttl=0 --dpi-desync-fooling=md5sig,badsum --dpi-desync-repeats=6 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fake-tls=${../../../stuff/tls_clienthello_www_google_com.bin} "
-
-
-	  NFQWS_OPT_DESYNC_QUIC="--dpi-desync=fake,tamper --dpi-desync-any-protocol"
-
-          TMPDIR=/tmp
-
-        '';
       };
     };
-    services = {
-      resolved.enable = false;
-      dnscrypt-proxy = {
-        enable = true;
-        settings = {
-          server_names = [
-            "cloudflare"
-            "scaleway-fr"
-            "google"
-            "yandex"
-          ];
-          listen_addresses = [
-            "127.0.0.1:53"
-            "[::1]:53"
-          ];
-        };
+
+    services.resolved.enable = false;
+
+    services.dnscrypt-proxy = {
+      enable = true;
+      settings = {
+        server_names = [
+          "cloudflare"
+          "scaleway-fr" 
+          "google"
+          "yandex"
+        ];
+        listen_addresses = [
+          "127.0.0.1:53"
+          "[::1]:53"
+        ];
       };
     };
     
@@ -131,27 +126,23 @@ in
         allowedTCPPorts = [
           22
           80
-          9993
-          51820
-          8080
           443
-          1935
-          49152
-          8125
           53
+          988
+          2053
+          2083
+          2087
+          2096
+          8443
           25565
         ];
         allowedUDPPorts = [
+          53
+          443
           22
           80
-          9993
-          51820
-          8080
-          443
-          1935
-          49152
-          8125
           53
+          988
           25565
         ];
       };
