@@ -269,13 +269,10 @@ in
   services.getty.autologinUser = user;
 
   # Enable DPI (Deep packet inspection) bypass
-  zapret.enable = false;
-
+ zapret.enable = false;
+ 
   # Enable replays
-  replays.enable = true;
-
-  # Enable zerotier
-  zerotier.enable = false;
+  replays.enable = false;
 
   # Enable locate (find files on system quickly)
   services.locate.enable = true;
@@ -383,7 +380,7 @@ in
   my-services = {
 
     # Enable automatic Cloudflare DDNS
-    cloudflare-ddns.enable = true;
+    cloudflare-ddns.enable = false;
 
     nginx = {
 
@@ -476,7 +473,6 @@ in
     systemPackages =
       with pkgs;
       [
-        gmic
         ollama
         libreoffice
         kdePackages.okular
@@ -485,8 +481,6 @@ in
         bs-manager
         lsd
         ffmpeg-full
-        xsane
-        (pkgs.xsane.override { gimpSupport = true; })
         obsidian
         youtube-music
         kdePackages.kdenlive
@@ -562,8 +556,6 @@ in
     printing.enable = true;
 
     gvfs.enable = true;
-
-    logmein-hamachi.enable = true;
 
     openssh.enable = true;
 

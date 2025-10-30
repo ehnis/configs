@@ -37,7 +37,7 @@ in
       };
     };
     services = {
-      resolved.enable = true;
+      resolved.enable = false;
       dnscrypt-proxy2 = {
         enable = true;
         settings = {
