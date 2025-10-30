@@ -6,19 +6,21 @@
 }:
 with lib;
 let
+  package = pkgs.btop;
   cfg = config.btop;
 in
 {
   options.btop = {
-    enable = mkEnableOption "Enable btop process manager";
+    enable = mkEnableOption "btop process manager";
   };
 
   config = mkIf cfg.enable {
     programs.btop = {
       enable = true;
+      package = package;
       settings = {
-        color_theme = "${pkgs.btop}/share/btop/themes/dracula.theme";
-        update_ms = 100;
+        color_theme = "${package}/share/btop/themes/dracula.theme";
+        update_ms = 200;
         theme_background = false;
       };
     };

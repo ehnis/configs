@@ -3,363 +3,245 @@
   inputs,
   user-hash,
   user,
+  min-flag,
+  avg-flag,
+  lib,
+  config,
   ...
 }:
 let
-  krisp-patcher =
-    pkgs.writers.writePython3Bin "krisp-patcher"
-      {
-        libraries = with pkgs.python3Packages; [
-          capstone
-          pyelftools
-        ];
-        flakeIgnore = [
-          "E501" # line too long (82 > 79 characters)
-          "F403" # 'from module import *' used; unable to detect undefined names
-          "F405" # name may be undefined, or defined from star imports: module
-        ];
-      }
-      ''
-        import sys
-        import shutil
-
-        from elftools.elf.elffile import ELFFile
-        from capstone import *
-        from capstone.x86 import *
-
-        if len(sys.argv) < 2:
-            print(f"Usage: {sys.argv[0]} [path to discord_krisp.node]")
-            # "Unix programs generally use 2 for command line syntax errors and 1 for all other kind of errors."
-            sys.exit(2)
-
-        executable = sys.argv[1]
-
-        elf = ELFFile(open(executable, "rb"))
-        symtab = elf.get_section_by_name('.symtab')
-
-        krisp_initialize_address = symtab.get_symbol_by_name("_ZN7discordL17DoKrispInitializeEv")[0].entry.st_value
-        isSignedByDiscord_address = symtab.get_symbol_by_name("_ZN7discord4util17IsSignedByDiscordERKNSt4__Cr12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE")[0].entry.st_value
-
-        text = elf.get_section_by_name('.text')
-        text_start = text['sh_addr']
-        text_start_file = text['sh_offset']
-        # This seems to always be zero (.text starts at the right offset in the file). Do it just in case?
-        address_to_file = text_start_file - text_start
-
-        # Done with the ELF now.
-        # elf.close()
-
-        krisp_initialize_offset = krisp_initialize_address - address_to_file
-        isSignedByDiscord_offset = krisp_initialize_address - address_to_file
-
-        f = open(executable, "rb")
-        f.seek(krisp_initialize_offset)
-        krisp_initialize = f.read(256)
-        f.close()
-
-        # States
-        found_issigned_by_discord_call = False
-        found_issigned_by_discord_test = False
-        found_issigned_by_discord_je = False
-        found_already_patched = False
-        je_location = None
-        je_size = 0
-
-        # We are looking for a call to IsSignedByDiscord, followed by a test, followed by a je.
-        # Then we replace the je with nops.
-
-        md = Cs(CS_ARCH_X86, CS_MODE_64)
-        md.detail = True
-        for i in md.disasm(krisp_initialize, krisp_initialize_address):
-            if i.id == X86_INS_CALL:
-                if i.operands[0].type == X86_OP_IMM:
-                    if i.operands[0].imm == isSignedByDiscord_address:
-                        found_issigned_by_discord_call = True
-
-            if i.id == X86_INS_TEST:
-                if found_issigned_by_discord_call:
-                    found_issigned_by_discord_test = True
-
-            if i.id == X86_INS_JE:
-                if found_issigned_by_discord_test:
-                    found_issigned_by_discord_je = True
-                    je_location = i.address
-                    je_size = len(i.bytes)
-                    break
-
-            if i.id == X86_INS_NOP:
-                if found_issigned_by_discord_test:
-                    found_already_patched = True
-                    break
-
-        if je_location:
-            print(f"Found patch location: 0x{je_location:x}")
-
-            shutil.copyfile(executable, executable + ".orig")
-            f = open(executable, 'rb+')
-            f.seek(je_location - address_to_file)
-            f.write(b'\x90' * je_size)   # je can be larger than 2 bytes given a large enough displacement :(
-            f.close()
-        else:
-            if found_already_patched:
-                print("Couldn't find patch location - already patched.")
-            else:
-                print("Couldn't find patch location - review manually. Sorry.")
-      '';
- 
+  collectUniqueInputs =
+    inputsMap: seenPaths:
+    let
+      results = lib.mapAttrsToList (
+        name: value:
+        if value == null || !(value ? outPath) || (lib.elem value.outPath seenPaths) then
+          [ ]
+        else
+          let
+            currentInput = {
+              inherit name;
+              path = value.outPath;
+            };
+            children =
+              if value ? inputs then collectUniqueInputs value.inputs (seenPaths ++ [ value.outPath ]) else [ ];
+          in
+          [ currentInput ] ++ children
+      ) inputsMap;
+    in
+    lib.flatten results;
+  allInputsRaw = collectUniqueInputs (removeAttrs inputs [ "self" ]) [ ];
+  groupedByName = lib.groupBy (x: x.name) allInputsRaw;
+  finalInputsList = lib.flatten (
+    lib.mapAttrsToList (
+      name: group:
+      if (lib.length group) == 1 then
+        group
+      else
+        lib.imap0 (idx: item: {
+          name = "${item.name}-${toString idx}";
+          path = item.path;
+        }) group
+    ) groupedByName
+  );
+  inputsFarm = pkgs.linkFarm "flake-inputs" finalInputsList;
 in
 {
-  imports = [
-    ./hardware-configuration.nix
-    ../../modules/system
-  ];
 
-  systemd.services.lactd = {
+  powerManagement.cpuFreqGovernor = "performance";
 
-    enable = true;
+  qt.enable = true;
 
-    wantedBy = [ "multi-user.target" ];
+  nixpkgs.config.allowUnfree = true;
 
-    serviceConfig = {
+  time.timeZone = "Europe/Moscow";
 
-      ExecStart = "${pkgs.lact}/bin/lact daemon";
+  i18n.defaultLocale = "ru_RU.UTF-8";
 
-      #ExecStartPre = "${pkgs.coreutils-full}/bin/sleep 10";
+  console.keyMap = "ru";
 
-      Restart = "always";
+  system.stateVersion = "24.11";
 
-      Nice = -10;
+  wivrn.enable = true;
 
-    };
+  nix.gc.automatic = false;
 
-  };
+  singbox.enable = true;
 
-  services.preload.enable = true;
+  plymouth.enable = true;
 
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
-
-  virtualisation.libvirtd.enable = false;
-
-  # Enable TPM emulation (optional)
-  virtualisation.libvirtd.qemu = {
-    swtpm.enable = true;
-    ovmf.packages = [ pkgs.OVMFFull.fd ];
-  };
-
-  programs.git.enable = true;
-   
-
-  programs.git.lfs.enable = true;
-
-  # Enable USB redirection (optional)
-  virtualisation.spiceUSBRedirection.enable = true;
-
-  programs.virt-manager.enable = false;
-
-  programs.ydotool.enable = true;
-
-  # Disable annoying firewall
-  networking.firewall.enable = false;
-
-  # Enable singbox proxy to my VPS with WireGuard
-  singbox-wg.enable = true;
-
-  # Enable singbox proxy to my XRay vpn (uncomment in default.nix in ../../modules/system)
-  #singbox.enable = true;
-
-  # Enable AmneziaVPN client
-  programs.amnezia-vpn.enable = true;
-
-  # Run non-nix apps
-  programs.nix-ld.enable = true;
-
-
-
-  #boot.crashDump.enable = true;
-  services.sunshine = {
-     enable = false;
-     capSysAdmin = true;
-    };
-
-  # Enable RAM compression
-  zramSwap.enable = true;
-
-  # Enable stuff in /bin and /usr/bin
-  services.envfs.enable = false;
-
-  # Enable IOMMU
-  boot.kernelParams = [
-    "iommu=pt"
-    "quiet"
-  ];
-
-  # Enable some important system zsh stuff
-  programs.zsh.enable = true;
-
-  # Enable portals
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  xdg.portal.config.common.default = "*";
-
-  # Enable OpenTabletDriver
   hardware.opentabletdriver.enable = true;
 
-  hardware.sane.enable = true; # enables support for SANE scanners
+  zapret.enable = false;
 
-  # Enable PulseAudio
-  services.pulseaudio.enable = false;
+  replays.enable = if !min-flag then true else false;
 
-  # Places /tmp in RAM
-  boot.tmp.useTmpfs = true;
+  startup-sound.enable = false;
 
-  # Use mainline (or latest stable) kernel instead of LTS kernel
-  #boot.kernelPackages = pkgs.linuxPackages_testing;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  #chaotic.scx.enable = true;
+  zerotier.enable = false;
 
-  # Enable SysRQ
-  boot.kernel.sysctl."kernel.sysrq" = 1;
-
-  # Restrict amount of annoying cache
-  boot.kernel.sysctl."vm.dirty_bytes" = 50000000;
-  boot.kernel.sysctl."vm.dirty_background_bytes" = 50000000;
-
-  # Adds systemd to initrd (speeds up boot process a little, and makes it prettier)
-  boot.initrd.systemd.enable = true;
-
-  # Disable usual coredumps (I hate them)
-  security.pam.loginLimits = [
-    {
-      domain = "*";
-      item = "core";
-      value = "0";
-    }
-  ];
-
-  # Enable systemd coredumps
-  systemd.coredump.enable = false;
-
-  # Enable generation of NixOS documentation for modules (slows down builds)
-  documentation.nixos.enable = false;
-
-  # Enable systemd-networkd for internet
-  #systemd.network.wait-online.enable = false;
-  #boot.initrd.systemd.network.enable = true;
-  #systemd.network.enable = true;
-  #networking.useNetworkd = true;
-
-  # Enable dhcpcd for using internet using ethernet cable
-  #networking.dhcpcd.enable = true;
-
-  # Enable NetworkManager
-  #systemd.services.NetworkManager-wait-online.enable = false;
-  networking.networkmanager.enable = true;
-
-  # Allow making users through useradd
-  users.mutableUsers = true;
-
-  # Enable WayDroid
-  virtualisation.waydroid.enable = false;
-  #alvr
-  programs.alvr.enable = true;
-  # Autologin
-  services.getty.autologinUser = user;
-
-  # Enable DPI (Deep packet inspection) bypass
- zapret.enable = false;
- 
-  # Enable replays
-  replays.enable = false;
-
-  # Enable locate (find files on system quickly)
-  services.locate.enable = true;
-
-  flatpak = {
-
-    # Enable system flatpak
+  zramSwap = {
     enable = true;
+    memoryPercent = 100;
+  };
 
-    # Packages to install from flatpak
-    packages = [
-      "io.github.Soundux"
-    ];
+  cape = {
+    enable = false;
+    users = [ user ];
+  };
+
+  # Enable custom man page generation and nix-option-search
+  # Can result in additional 10-20 build time if some default/example in option references local relative path, use defaultText if needed, and use strings in example
+  # Darwin and stable cause additional eval time, around 10-15 seconds
+  docs = {
+    enable = false;
+    nos = {
+      enable = false;
+      darwin = false;
+      stable = false;
+    };
+  };
+
+  networking = {
+
+    firewall.enable = false;
+
+    networkmanager = {
+      enable = true;
+      wifi.backend = "iwd";
+      plugins = with pkgs; [
+        networkmanager-fortisslvpn
+        networkmanager-iodine
+        networkmanager-l2tp
+        networkmanager-openconnect
+        networkmanager-openvpn
+        networkmanager-sstp
+        networkmanager-strongswan
+        networkmanager-vpnc
+      ];
+    };
 
   };
+
+  flatpak =
+    if !(avg-flag || min-flag) then
+      {
+
+        # Enable system flatpak (currently breaks xdg portals)
+        enable = false;
+
+        packages = [
+          "io.github.Soundux"
+        ];
+
+      }
+    else
+      { };
 
   fonts = {
 
-    # Enable some default fonts
     enableDefaultPackages = true;
 
-    # Add some fonts
     packages = with pkgs; [
+      vista-fonts
+      corefonts
       noto-fonts
-      #(nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
       nerd-fonts.jetbrains-mono
     ];
 
   };
 
-  users.users."${user}" = {
+  users = {
 
-    # Marks user as real, human user
-    isNormalUser = true;
+    defaultUserShell = pkgs.zsh;
 
-    # Sets password for this user using hash generated by mkpasswd
-    hashedPassword = user-hash;
+    mutableUsers = true;
 
-    extraGroups = [
-      "wheel"
-      "uinput"
-      "mlocate"
-      "nginx"
-      "input"
-      "kvm"
-      "ydotool"
-      "adbusers"
-      "video"
-      "corectrl"
-      "libvirtd"
-      "libvirt"
-      "uccp"
-      "lp"
-      "scanner"
-    ];
+    groups = {
+      ${user}.gid = config.users.users.${user}.uid;
+      l0lk3k.gid = config.users.users.l0lk3k.uid;
+      public = {};
+    };
 
+    users = {
+      ${user} = {
+        isNormalUser = true;
+        hashedPassword = user-hash;
+        group = user;
+        uid = 1000;
+        initialPassword = if user-hash == null then "1234" else null;
+        initialHashedPassword = lib.mkForce null;
+        home = "/home/${user}";
+        extraGroups = [
+          "wheel"
+          "public"
+          "uinput"
+          "mlocate"
+          "libvirtd"
+          "nginx"
+          "input"
+          "kvm"
+          "ydotool"
+          "adbusers"
+          "video"
+        ];
+      };
+      l0lk3k = {
+        isNormalUser = true;
+        group = "l0lk3k";
+        uid = 1001;
+        initialPassword = "1234";
+        home = "/home/l0lk3k";
+        extraGroups = [
+          "mlocate"
+          "public"
+          "libvirtd"
+          "input"
+          "kvm"
+          "video"
+        ];
+      };
+    };
   };
 
-  nix.settings = {
+  nix = {
 
-    # Disable IFD to speed up evaluation
-    allow-import-from-derivation = false;
+    package = pkgs.nixVersions.latest;
 
-    # Deduplicates stuff in /nix/store
-    auto-optimise-store = true;
+    settings = {
 
-    # Enable Hyprland cache
-    substituters = [ "https://hyprland.cachix.org" ];
-    trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+      # eval-cores = 0;
 
-    # Enable flakes
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
+      # Disable IFD to speed up evaluation
+      # allow-import-from-derivation = false;
 
+      # Deduplicates stuff in /nix/store
+      auto-optimise-store = true;
+
+      # Change cache providers (lower priority number = higher priority)
+      substituters = [
+        # "https://hyprland.cachix.org"
+        "https://cache.nixos.org?priority=1"
+      ];
+      # trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+
+      # Enable flakes
+      experimental-features = [
+        "nix-command"
+        "ca-derivations"
+        "flakes"
+      ];
+    };
   };
 
-  obs = {
-
-    # Enable OBS
-    enable = true;
-
-    # Enable virtual camera
-    virt-cam = true;
-
-  };
+  obs =
+    if !(avg-flag || min-flag) then
+      {
+        enable = true;
+        virt-cam = true;
+      }
+    else
+      { };
 
   graphics = {
 
@@ -367,100 +249,121 @@ in
 
     nvidia.enable = false;
 
+    vulkan_video = true;
+
     amdgpu = {
-
       enable = true;
-
-      pro = false;
-
+      pro = if !(avg-flag || min-flag) then true else false;
     };
 
   };
 
-  my-services = {
+  my-services =
+    if !(avg-flag || min-flag) then
+      {
 
-    # Enable automatic Cloudflare DDNS
-    cloudflare-ddns.enable = false;
+        nginx = {
+          enable = true;
+          cape.enable = true;
+          website.enable = true;
+          nextcloud.enable = false;
+          hostName = "ehnis.sanic.space";
+        };
 
-    nginx = {
-
-      # Enable nginx
-      enable = false;
-
-      # Enable my goofy website
-      website.enable = false;
-
-      # Enable nextcloud
-      nextcloud.enable = false;
-
-      # Website domain
-      hostName = "ehnis.sanic.space";
-
-    };
-
-  };
+      }
+    else
+      { };
 
   disks = {
 
     # Enable base disks configuration (NOT RECOMMENDED TO DISABLE, DISABLING IT WILL NUKE THE SYSTEM IF THERE IS NO ANOTHER FILESYSTEM CONFIGURATION)
     enable = true;
 
-    # Enable system compression
+    impermanence = true;
+
     compression = true;
-
-    second-disk = {
-
-      # Enable additional disk (must be btrfs)
-      enable = true;
-
-      # Enable compression on additional disk
-      compression = true;
-
-      # Filesystem label of the partition that is used for mounting
-      label = "Games";
-
-      # Which subvolume to mount
-      subvol = "games";
-
-      # Path to a place where additional disk will be mounted
-      path = "/home/${user}/Games";
-
-    };
 
     swap = {
 
       file = {
-
-        # Enable swapfile
         enable = false;
-
-        # Path to swapfile
         path = "/var/lib/swapfile";
-
-        # Size of swapfile in MB
-        size = 16 * 1024;
-
+        size = 4 * 1024;
       };
 
-      partition = {
+      partition.enable = false;
 
-        # Enable swap partition
+    };
+
+  };
+
+  home-manager = {
+
+    users.${user} = import ./home.nix;
+    users.l0lk3k = import ./home.nix;    
+
+    extraSpecialArgs = {
+      inherit avg-flag min-flag;
+      #kekma = {
+     #   nix = config.docs.man-cache-nix;
+    #    home = config.docs.man-cache-home;
+   #   };
+    };
+
+  };
+
+  boot = {
+
+    tmp.useTmpfs = true;
+
+    kernelPackages = lib.mkDefault pkgs.linuxPackages_zen;
+
+    initrd.systemd.enable = true;
+
+    kernelParams = [
+      "iommu=pt"
+      "quiet"
+      "plymouth.use-simpledrm"
+    ];
+
+    kernel.sysctl = {
+      "net.core.default_qdisc" = "cake";
+      "kernel.sysrq" = 1;
+    };
+
+    binfmt.registrations.exe = {
+      magicOrExtension = "MZ";
+      interpreter = "/etc/profiles/per-user/${user}/bin/run-exe";
+      recognitionType = "magic";
+    };
+
+    loader = {
+      timeout = 0;
+      efi.canTouchEfiVariables = true;
+      systemd-boot = {
         enable = true;
-
-        # Label of swap partition
-        label = "swap";
-
+        memtest86.enable = true;
       };
-
     };
 
   };
 
   environment = {
 
-    pathsToLink = [ "/share/zsh" ];
+    etc = {
+      "determinate/config.json".text = builtins.toJSON { garbageCollector.strategy = "disabled"; };
+      inputs.source = inputsFarm;
+    };
+
+    pathsToLink = [
+      "/share/zsh"
+      "/share/xdg-desktop-portal"
+      "/share/applications"
+    ];
 
     variables = {
+      APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
+      QT_QPA_PLATFORMTHEME = "qt5ct";
       GTK_THEME = "Fluent-Dark";
       ENVFS_RESOLVE_ALWAYS = "1";
       MOZ_ENABLE_WAYLAND = "1";
@@ -472,105 +375,292 @@ in
 
     systemPackages =
       with pkgs;
+      with inputs;
+      # Keep in every ISO
       [
-        ollama
-        libreoffice
-        kdePackages.okular
-        wlx-overlay-s
-        android-tools
-        bs-manager
-        lsd
-        ffmpeg-full
-        obsidian
-        youtube-music
-        kdePackages.kdenlive
-        whatsapp-for-linux
-        krita
         nemo-fileroller
         nemo-with-extensions
         nemo
-        gimp3-with-plugins
-        gamescope
-        nixfmt-rfc-style
+        amnezia-vpn
+        gemini-cli
+        jq
+        wayvr
+        bs-manager
+        xhost
+        dante
+        ente-auth
+        mtkclient
+        sidequest
+        libsForQt5.qt5ct
+        patchelf
+        file
+        mpv
+        gnome-boxes
+        libsForQt5.qtstyleplugin-kvantum
+        kdePackages.qtstyleplugin-kvantum
+        lsd
+        kdiskmark
+        nixfmt
         gdu
         nixd
-        (firefox.override {
-          nativeMessagingHosts = [
-            (inputs.pipewire-screenaudio.packages.${pkgs.system}.default.overrideAttrs (
-              finalAttrs: previousAttrs: { cargoHash = "sha256-H/Uf6Yo8z6tZduXh1zKxiOqFP8hW7Vtqc7p5GM8QDws="; }
-            ))
-          ];
-        })
         wget
+        zenity
         killall
-        gamemode
         screen
         unrar
         zip
-        jdk23
-        mpv
-        ayugram-desktop
         adwaita-icon-theme
-        osu-lazer-bin
-        steam
-        prismlauncher
-        nvtopPackages.amd
-        qbittorrent
-        pavucontrol
-        any-nix-shell
+        vmpk
         wl-clipboard
-        bottles
         networkmanager_dmenu
         neovide
-        lact
-        qalculate-gtk
-        p7zip
-        krisp-patcher
-        inputs.nix-alien.packages.${system}.nix-alien
-        inputs.nix-search.packages.${system}.default
-        (discord.override {
-          withOpenASAR = true;
-          withVencord = true;
-        })
+        _7zz-rar
+        quickshell.packages.${system}.default
+        nix-alien.packages.${system}.nix-alien
+        nix-search.packages.${system}.default
+        (nvtopPackages.full.override { nvidia = false; })
+        (kdePackages.qt6ct.overrideAttrs (prev: {
+          patches = prev.patches or [ ] ++ [ ../../stuff/qt6ct-shenanigans.patch ];
+          buildInputs =
+            prev.buildInputs or [ ]
+            ++ (with kdePackages; [
+              kconfig
+              kcolorscheme
+              kiconthemes
+              qqc2-desktop-style
+            ]);
+        }))
+        (aria2.overrideAttrs (prev: {
+          patches = prev.patches or [ ] ++ [ ../../stuff/max-connection-to-unlimited.patch ];
+        }))
+        # Below are for offline build
+        (python3.withPackages (
+          ps: with ps; [
+            iniparse
+            markdown-it-py
+            mdit-py-plugins
+            mdurl
+            python-dateutil
+            remarshal
+            rich
+            rich-argparse
+            tomli
+            tomlkit
+            u-msgpack-python
+          ]
+        ))
+        stdenv
+        crudini
+        lndir
+        texinfo
+        xkbcomp
+        xkeyboard-config
+        libX11
       ]
-      ++ (import ../../modules/system/stuff pkgs).scripts;
+      # Remove from min ISO
+      ++ (
+        if !min-flag then
+          [
+            scanmem
+            kdePackages.qtdeclarative
+            comma
+            remmina
+            mangohud
+            jdk25
+            moonlight-qt
+            osu-lazer-bin
+            mindustry
+            xonotic
+            # superTux
+            supertuxkart
+            pavucontrol
+            qalculate-gtk
+            distrobox
+            qbittorrent
+            ayugram-desktop
+            gdb
+            gcc
+            nodejs
+            libreoffice
+            protonplus
+            gimp3-with-plugins
+            gamescope
+            android-tools
+            (prismlauncher.override {
+              prismlauncher-unwrapped = prismlauncher-unwrapped.overrideAttrs (prev: {
+                patches = prev.patches or [ ] ++ [ ../../stuff/prismlauncher.patch ];
+              });
+            })
+            (bottles.override {
+              removeWarningPopup = true;
+            })
+            (discord-canary.override {
+              withOpenASAR = true;
+              withVencord = true;
+            })
+          ]
+        else
+          [ ]
+      )
+      # Remove from 8G and min ISO
+      ++ (
+        if !(avg-flag || min-flag) then
+          [
+            ungoogled-chromium
+            heroic
+            gsettings-desktop-schemas
+          ]
+        else
+          [ ]
+      );
 
   };
 
-  boot.loader = {
+  virtualisation = {
 
-    efi.canTouchEfiVariables = true;
+    spiceUSBRedirection.enable = true;
 
-    systemd-boot.enable = true;
+    # Set options for vm that is built using nixos-rebuild build-vm
+    vmVariant = {
+      systemd.user.services.mpvpaper.enable = false;
+      virtualisation = {
+        qemu.options = [
+          "-display sdl,gl=on"
+          "-device virtio-vga-gl"
+          "-enable-kvm"
+          "-audio driver=sdl,model=virtio"
+        ];
+        cores = 4;
+        diskSize = 1024 * 8;
+        msize = 16384 * 16;
+        memorySize = 1024 * 8;
+      };
+    };
 
-    systemd-boot.memtest86.enable = true;
+    libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+        verbatimConfig = "max_core = 0";
+      };
+    };
 
-    timeout = 0;
+    podman =
+      if !(avg-flag || min-flag) then
+        {
+          enable = true;
+          dockerCompat = true;
+        }
+      else
+        { };
 
   };
 
-  nix.package = pkgs.nixVersions.git;
+  systemd = {
+
+    # Fix early start of graphical-session.target, see https://github.com/NixOS/nixpkgs/pull/297434#issuecomment-2348783988
+    user.targets.nixos-fake-graphical-session.enable = false;
+
+    coredump.enable = false;
+
+    services = {
+
+      # Fix early start of graphical-session.target, see https://github.com/NixOS/nixpkgs/pull/297434#issuecomment-2348783988
+      display-manager.environment.XDG_CURRENT_DESKTOP = "X-NIXOS-SYSTEMD-AWARE";
+
+      NetworkManager-wait-online.enable = false;
+
+      quest-adb-reverse = {
+        description = "Quest 3S ADB Reverse (Root)";
+        serviceConfig = {
+          Type = "forking";
+          Restart = "no";
+          Environment = "HOME=/root";
+          ExecStartPre = "${pkgs.bash}/bin/bash -c \"${pkgs.psmisc}/bin/killall adb || true\"";
+          ExecStart = "${pkgs.android-tools}/bin/adb reverse tcp:9757 tcp:9757";
+        };
+      };
+
+      systemd-bsod = {
+        enable = true;
+        wantedBy = [ "sysinit.target" ];
+        serviceConfig.ExecStart = "${pkgs.systemd}/lib/systemd/systemd-bsod --continuous";
+      };
+
+    };
+
+  };
 
   services = {
 
-    printing.enable = true;
-
     gvfs.enable = true;
+
+    locate.enable = true;
 
     openssh.enable = true;
 
+    tailscale.enable = true;
+
+    zerotierone.enable = true;
+
+    systembus-notify.enable = true;
+
+    gnome.gnome-keyring.enable = true;
+
+    displayManager = {
+      defaultSession = "hyprland-uwsm";
+      autoLogin = {
+        user = user;
+        enable = true;
+      };
+    };
+
+    scx = {
+      enable = true;
+      scheduler = "scx_bpfland";
+    };
+
+    sunshine = {
+      autoStart = true;
+      enable = false;
+      capSysAdmin = true;
+      openFirewall = true;
+    };
+
+    earlyoom = {
+      enable = true;
+      enableNotifications = true;
+    };
+
+    xserver = {
+      enable = true;
+      displayManager.lightdm = {
+        enable = true;
+        greeter.enable = false;
+      };
+    };
+
+    udev.extraRules = ''
+      ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2833", ATTR{idProduct}=="5013", RUN+="${pkgs.systemd}/bin/systemctl restart quest-adb-reverse.service"
+    '';
+
+    printing = {
+      enable = true;
+      drivers = with pkgs; [
+        cups-filters
+        cups-browsed
+        hplipWithPlugin
+      ];
+    };
+
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
+
     pipewire = {
       enable = true;
-      #package = pkgs.pipewire.overrideAttrs (finalAttrs: previousAttrs: {
-      #  src = pkgs.fetchFromGitLab {
-      #    domain = "gitlab.freedesktop.org";
-      #    owner = "pipewire";
-      #    repo = "pipewire";
-      #    rev = "fb4475b5dabf853290d8f682649818649621d973";
-      #    sha256 = "sha256-R++9vtrDgTbfeQgauC+wlRBQLaYaIHOanBKXJGqTLg8=";
-      #  };
-      #  buildInputs = previousAttrs.buildInputs ++ [ pkgs.libebur128 ];
-      #});
       alsa.enable = true;
       alsa.support32Bit = true;
       jack.enable = true;
@@ -585,26 +675,65 @@ in
 
     polkit.enable = true;
 
+    # Disable usual coredumps (I hate them)
+    pam.loginLimits = [
+      {
+        domain = "*";
+        item = "core";
+        value = "0";
+      }
+    ];
+
   };
 
   programs = {
 
-    dconf.enable = true;
+    firejail.enable = true;
 
-    adb.enable = true;
+    gamemode.enable = true;
+
+    zsh.enable = true;
+
+    nix-ld.enable = true;
+
+    ydotool.enable = if !min-flag then true else false;
+
+    seahorse.enable = true;
+
+    steam.enable = true;
+
+    dconf.enable = true;
 
     nh.enable = true;
 
-    neovim = {
-
-      defaultEditor = true;
-
-      viAlias = true;
-
-      vimAlias = true;
-
+    uwsm = {
       enable = true;
+      package = pkgs.uwsm.overrideAttrs { patches = ../../stuff/uwsm_uuctl.patch; };
+      waylandCompositors = {
+        hyprland = {
+          prettyName = "Hyprland";
+          comment = "Hyprland compositor managed by UWSM";
+          binPath = "${inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/Hyprland"; # https://github.com/hyprwm/Hyprland/pull/12484
+        };
+      };
+    };
 
+    git = {
+      enable = true;
+      lfs.enable = true;
+      config.safe.directory = "*";
+    };
+
+    appimage = {
+      enable = true;
+      binfmt = true;
+    };
+
+    neovim = {
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+      enable = true;
     };
 
   };
@@ -613,26 +742,10 @@ in
 
     enable = true;
 
-    settings = {
-
-      default = [
-        "kitty.desktop"
-      ];
-
-    };
+    settings.default = [
+      "kitty.desktop"
+    ];
 
   };
-
-  users.defaultUserShell = pkgs.zsh;
-
-  nixpkgs.config.allowUnfree = true;
-
-  time.timeZone = "Europe/Moscow";
-
-  i18n.defaultLocale = "ru_RU.UTF-8";
-
-  console.keyMap = "ru";
-
-  system.stateVersion = "24.11";
 
 }

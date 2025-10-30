@@ -1,5 +1,106 @@
-pkgs: {
+{ pkgs, ... }:
+let
   scripts = [
+    (pkgs.writers.writePython3Bin "krisp-patcher"
+      {
+        libraries = with pkgs.python3Packages; [
+          capstone
+          pyelftools
+        ];
+        flakeIgnore = [
+          "E501" # line too long (82 > 79 characters)
+          "F403" # 'from module import *' used; unable to detect undefined names
+          "F405" # name may be undefined, or defined from star imports: module
+        ];
+      }
+      ''
+        import sys
+        import shutil
+
+        from elftools.elf.elffile import ELFFile
+        from capstone import *
+        from capstone.x86 import *
+
+        if len(sys.argv) < 2:
+            print(f"Usage: {sys.argv[0]} [path to discord_krisp.node]")
+            # "Unix programs generally use 2 for command line syntax errors and 1 for all other kind of errors."
+            sys.exit(2)
+
+        executable = sys.argv[1]
+
+        elf = ELFFile(open(executable, "rb"))
+        symtab = elf.get_section_by_name('.symtab')
+
+        krisp_initialize_address = symtab.get_symbol_by_name("_ZN7discordL17DoKrispInitializeEv")[0].entry.st_value
+        isSignedByDiscord_address = symtab.get_symbol_by_name("_ZN7discord4util17IsSignedByDiscordERKNSt4__Cr12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE")[0].entry.st_value
+
+        text = elf.get_section_by_name('.text')
+        text_start = text['sh_addr']
+        text_start_file = text['sh_offset']
+        # This seems to always be zero (.text starts at the right offset in the file). Do it just in case?
+        address_to_file = text_start_file - text_start
+
+        # Done with the ELF now.
+        # elf.close()
+
+        krisp_initialize_offset = krisp_initialize_address - address_to_file
+        isSignedByDiscord_offset = krisp_initialize_address - address_to_file
+
+        f = open(executable, "rb")
+        f.seek(krisp_initialize_offset)
+        krisp_initialize = f.read(256)
+        f.close()
+
+        # States
+        found_issigned_by_discord_call = False
+        found_issigned_by_discord_test = False
+        found_issigned_by_discord_je = False
+        found_already_patched = False
+        je_location = None
+        je_size = 0
+
+        # We are looking for a call to IsSignedByDiscord, followed by a test, followed by a je.
+        # Then we replace the je with nops.
+
+        md = Cs(CS_ARCH_X86, CS_MODE_64)
+        md.detail = True
+        for i in md.disasm(krisp_initialize, krisp_initialize_address):
+            if i.id == X86_INS_CALL:
+                if i.operands[0].type == X86_OP_IMM:
+                    if i.operands[0].imm == isSignedByDiscord_address:
+                        found_issigned_by_discord_call = True
+
+            if i.id == X86_INS_TEST:
+                if found_issigned_by_discord_call:
+                    found_issigned_by_discord_test = True
+
+            if i.id == X86_INS_JE:
+                if found_issigned_by_discord_test:
+                    found_issigned_by_discord_je = True
+                    je_location = i.address
+                    je_size = len(i.bytes)
+                    break
+
+            if i.id == X86_INS_NOP:
+                if found_issigned_by_discord_test:
+                    found_already_patched = True
+                    break
+
+        if je_location:
+            print(f"Found patch location: 0x{je_location:x}")
+
+            shutil.copyfile(executable, executable + ".orig")
+            f = open(executable, 'rb+')
+            f.seek(je_location - address_to_file)
+            f.write(b'\x90' * je_size)   # je can be larger than 2 bytes given a large enough displacement :(
+            f.close()
+        else:
+            if found_already_patched:
+                print("Couldn't find patch location - already patched.")
+            else:
+                print("Couldn't find patch location - review manually. Sorry.")
+      ''
+    )
     (pkgs.writeShellScriptBin "dinfo" ''
       Kernel="$(uname -r)"
       uptime="$(uptime -p | sed 's/up //')"
@@ -47,17 +148,17 @@ pkgs: {
         num=4
       fi
       name=$(lspci | grep VGA | cut -d ":" -f3 | cut -d "[" -f3 | cut -d "]" -f1)
-      temp1=$(cat /sys/class/hwmon/hwmon''${num}/temp2_input)
+      temp1=$(cat /sys/class/hwmon/hwmon''${num}/temp1_input)
       temp=$(echo $temp1 | rev | cut -c 4- | rev)
       text="<span color='#990000'>  ''${usage}%  󰢮 </span>"
-      tooltip="$name\rИпользование: ''${usage}%\rТемпература: $temp°C"
+      tooltip="$name\rGPU Usage: ''${usage}%\rGPU Temp: $temp°C"
       cat <<EOF
       {"text":"$text","tooltip":"$tooltip",}
       EOF
     '')
     (pkgs.writeShellScriptBin "nixos" ''
       cat <<EOF
-      {"text":"<span color='#000000'>🐱 </span>","tooltip":"<span color='#FFFFFF'>⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠗⣪⣵⣶⠞⣃⣄⡻⠇⣿⣿⣿⣿⣿⣶⣿⡇⣿⣿\r⢸⣿⣿⣿⣿⣿⣿⣿⣿⡿⢡⣾⣿⣿⠁⠚⠧⠿⠛⠜⢸⣿⣿⣿⣿⡏⣿⡇⣿⣿\r⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇⣿⡿⣛⣋⢅⣤⣷⡯⣥⣒⠎⣙⡛⠿⠿⠿⢋⡇⣿⣿\r⢨⣭⣭⣭⣭⣭⣭⣭⣭⢡⣴⣾⠏⣴⣯⣍⠻⣿⣮⠻⢷⣌⢻⣧⢰⣶⡟⡅⣿⣿\r⢸⣿⣿⣿⣿⣿⣿⡿⣥⣾⣿⠇⣾⢿⣧⣤⣤⣌⡟⢳⠿⠛⠀⣿⠸⢋⣼⣧⣛⣻\r⢈⣉⣉⣉⣉⣉⢉⠁⣿⣿⠏⣾⢟⣨⣛⠻⣛⣻⡻⣿⣶⣮⢐⢡⣾⡈⣿⣿⣿⣿\r⢀⣠⣤⣶⣶⡶⢒⠀⠿⡿⢸⡏⠼⢢⡩⣅⠈⢹⣿⢿⡛⢗⢸⢘⣟⣣⣛⣛⣛⣛\r⢸⣿⣿⣿⡿⣣⣿⢿⡷⣭⠘⡀⠐⣻⣷⠪⣛⠦⣤⣤⣬⡤⢠⡈⢼⣇⣿⣿⣿⣿\r⢸⣿⣿⡟⣰⣿⣿⣦⡛⢷⣾⣿⠡⣿⣿⣿⣶⣿⣷⣶⠶⣶⣆⢩⢸⣿⣿⣿⣿⣿\r⢸⣿⣿⢱⣿⣿⣿⣿⣿⡦⠙⣿⣟⠹⣿⣿⣿⣿⣯⣷⣿⣿⢣⣿⡇⢿⣿⣿⣿⣿\r⢸⣿⡏⣿⣿⣿⣿⣿⠟⣵⣷⠹⣿⣷⣤⣉⣥⣛⠘⣋⠛⢣⣿⣿⡇⣠⡹⣿⣿⣿\r⢸⣿⣧⠻⣿⣿⡿⢋⣾⣿⣿⣧⠹⠿⡿⠿⢿⣿⠿⢋⣔⣻⠿⣫⣾⣿⣿⡌⢿⣿</span>",}
+      {"text":"<span color='#4575DA'> </span>","tooltip":"<span color='#4575DA'>           ▓▓▓▓      ▒▒▒▒▒▒    ▒▒▒▒           \n           ▓▓▓▓▓      ▒▒▒▒▒▒  ▒▒▒▒▒▒          \n            ▓▓▓▓▓      ▒▒▒▒▒▒▒▒▒▒▒            \n             ▓▓▓▓▓       ▒▒▒▒▒▒▒▒             \n       ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒              \n     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒      ▓▓▓     \n                            ▒▒▒▒▒    ▓▓▓▓▓    \n            ▒▒▒▒▒            ▒▒▒▒▒  ▓▓▓▓▓     \n           ▒▒▒▒▒              ▒▒▒▒▓▓▓▓▓▓      \n ▒▒▒▒▒▒▒▒▒▒▒▒▒▒                ▒▒▓▓▓▓▓▓▓▓▓▓▓▓ \n▒▒▒▒▒▒▒▒▒▒▒▒▒▒                  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n ▒▒▒▒▒▒▒▒▒▒▒▒▓▓                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ \n      ▒▒▒▒▒▒▓▓▓▓              ▓▓▓▓▓           \n     ▒▒▒▒▒▒ ▓▓▓▓▓            ▓▓▓▓▓            \n    ▒▒▒▒▒    ▓▓▓▓▓                            \n     ▒▒▒      ▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒     \n              ▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒       \n             ▓▓▓▓▓▓▓▓       ▒▒▒▒▒             \n            ▓▓▓▓▓▓▓▓▓▓▓      ▒▒▒▒▒            \n           ▓▓▓▓▓  ▓▓▓▓▓▓      ▒▒▒▒▒           \n           ▓▓▓▓    ▓▓▓▓▓▓      ▒▒▒▒          </span>",}
       EOF
     '')
     (pkgs.writeShellScriptBin "nixos.sh" ''
@@ -258,16 +359,96 @@ pkgs: {
       	keyword windowrule opacity 1 override 1 override, title:^(.*)$;\
               keyword decoration:rounding 0"
           systemctl --user stop waybar
+          systemctl --user stop replays
           systemctl --user stop hyprpaper
           pkill hyprpaper
           exit
       fi
       hyprctl reload
+      systemctl --user start replays
       systemctl --user start waybar
       systemctl --user start hyprpaper
       exit
     '')
-    (pkgs.writeShellScriptBin "sheesh.sh" "pkexec env PATH=$PATH HOME=$HOME DISPLAY=$DISPLAY WAYLAND_DISPLAY=$WAYLAND_DISPLAY XDG_SESSION_TYPE=$XDG_SESSION_TYPE XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR neovide /etc/nixos")
+    (pkgs.writeShellScriptBin "check-follows" ''
+      # This script scans flake.lock to find dependencies of your inputs
+      # that match the name of one of your top-level inputs but are not
+      # currently set to "follow" it.
+      
+      set -euo pipefail
+      
+      if ! [ -f "flake.lock" ]; then
+          echo "Error: flake.lock not found."
+          exit 1
+      fi
+      
+      echo "Scanning for missed 'follows'..."
+      
+      # Logic:
+      # 1. Get the map of top-level inputs from the "root" node.
+      # 2. Iterate through every other node in the lock file.
+      # 3. For each node, check its inputs.
+      # 4. If a node has an input name that exists at the top level, 
+      #    but the node IDs don't match, it's a candidate for "follows".
+      
+      jq -r '
+        .nodes.root.inputs as $top_inputs
+        | .nodes
+        | to_entries
+        | .[]
+        | select(.key != "root")
+        | .key as $parent_node
+        | .value.inputs // {}
+        | to_entries
+        | .[]
+        | # Normalize the dependency pointer: if it is a list (a follows path), 
+          # take the last element which is the final target node ID.
+          (if .value | type == "array" then .value[-1] else .value end) as $dep_target
+        | select($top_inputs[.key] != null and $top_inputs[.key] != $dep_target)
+        | "Input \u001b[1;36m\($parent_node)\u001b[0m has a dependency \u001b[1;33m\(.key)\u001b[0m pointing to \u001b[32m\($dep_target)\u001b[0m, but your top-level \u001b[1;33m\(.key)\u001b[0m points to \u001b[32m\($top_inputs[.key])\u001b[0m."
+      ' flake.lock
+    '')
+    (pkgs.writeShellScriptBin "sheesh.sh" ''
+      THE_MOUNT_POINT="$HOME/.local/state/nixos-config"
+      USER_ID="$(id -u)"
+      GROUP_ID="$(id -g)"
+      USER_NAME="$(id -un)"
+      USER_HOME="$HOME"
+      WAYLAND_DISPLAY_VAR="$WAYLAND_DISPLAY"
+      DISPLAY_VAR="$DISPLAY"
+      XAUTHORITY_VAR="$XAUTHORITY"
+      XDG_RUNTIME_DIR_VAR="$XDG_RUNTIME_DIR"
+
+      pkexec unshare -m --propagation slave -- bash -c '
+        MOUNT_POINT="$9"
+
+        cleanup() {
+          if findmnt -M "$MOUNT_POINT" > /dev/null; then
+            umount "$MOUNT_POINT"
+          fi
+          if [ -d "$MOUNT_POINT" ]; then
+            rmdir "$MOUNT_POINT"
+          fi
+        }
+
+        trap cleanup EXIT
+
+        mkdir -p "$MOUNT_POINT"
+        chown "$1:$2" "$MOUNT_POINT"
+        bindfs --force-user=$1 --force-group=$2 /etc/nixos "$MOUNT_POINT"
+
+        runuser -u "$3" -- \
+          env \
+            HOME="$4" \
+            WAYLAND_DISPLAY="$5" \
+            DISPLAY="$6" \
+            XAUTHORITY="$7" \
+            XDG_RUNTIME_DIR="$8" \
+            NEOVIDE_MOUNT_POINT="$MOUNT_POINT" \
+            neovide "$MOUNT_POINT"
+
+      ' bash "$USER_ID" "$GROUP_ID" "$USER_NAME" "$USER_HOME" "$WAYLAND_DISPLAY_VAR" "$DISPLAY_VAR" "$XAUTHORITY_VAR" "$XDG_RUNTIME_DIR_VAR" "$THE_MOUNT_POINT"
+    '')
     (pkgs.writeShellScriptBin "finder.sh" ''
       if [ ! -z "$@" ]
       then
@@ -307,8 +488,142 @@ pkgs: {
         echo "!!-- You can print this help by typing !!"
       fi
     '')
+    (pkgs.writeShellScriptBin "startup-sound" ''
+      beep -f 130 -l 100 -n -f 262 -l 100 -n -f 330 -l 100 -n -f 392 -l 100 -n -f 523 -l 100 -n -f 660 -l 100 -n -f 784 -l 300 -n -f 660 -l 300 -n -f 146 -l 100 -n -f 262 -l 100 -n -f 311 -l 100 -n -f 415 -l 100 -n -f 523 -l 100 -n -f 622 -l 100 -n -f 831 -l 300 -n -f 622 -l 300 -n -f 155 -l 100 -n -f 294 -l 100 -n -f 349 -l 100 -n -f 466 -l 100 -n -f 588 -l 100 -n -f 699 -l 100 -n -f 933 -l 300 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 933 -l 100 -n -f 1047 -l 400
+    '')
+    (pkgs.writers.writePython3Bin "notify_trunc"
+      {
+        libraries = [
+          pkgs.python3Packages.pygobject3
+        ];
+        flakeIgnore = [
+          "E402" # module level import not at top of file (needed for gi.require_version)
+          "W293" # blank line contains whitespace
+          "E501" # line too long
+          "E302" # expected 2 blank lines
+          "E305" # expected 2 blank lines after class/function
+          "E261" # at least two spaces before inline comment
+        ];
+        makeWrapperArgs = [
+          "--prefix GI_TYPELIB_PATH : ${pkgs.harfbuzz.out}/lib/girepository-1.0"
+          "--prefix GI_TYPELIB_PATH : ${pkgs.pango.out}/lib/girepository-1.0"
+          "--prefix GI_TYPELIB_PATH : ${pkgs.gobject-introspection.out}/lib/girepository-1.0"
+        ];
+      }
+      ''
+        import sys
+        import gi
+        import cairo  # We import the actual python module, not via gi
+
+        # Fix the warning by specifying versions first
+        gi.require_version('Pango', '1.0')
+        gi.require_version('PangoCairo', '1.0')
+
+        from gi.repository import Pango, PangoCairo
+
+        def truncate_to_fit(text, font_desc, max_width_px):
+            # Use the 'cairo' module directly for the surface
+            surface = cairo.ImageSurface(cairo.Format.ARGB32, 0, 0)
+            context = cairo.Context(surface)
+            
+            layout = PangoCairo.create_layout(context)
+            layout.set_font_description(Pango.FontDescription(font_desc))
+            
+            # Check full width first
+            layout.set_text(text, -1)
+            width, _ = layout.get_pixel_size()
+            
+            # Pango pixels are 1024 units. We convert to standard pixels for comparison.
+            # However, get_pixel_size returns device units (standard pixels),
+            # so we compare directly.
+            if width <= max_width_px:
+                return text
+
+            # Binary search for the perfect cut point
+            low = 0
+            high = len(text)
+            best_fit = text[:1] + "..." # Default fallback
+            
+            while low <= high:
+                mid = (low + high) // 2
+                candidate = text[:mid] + "..."
+                layout.set_text(candidate, -1)
+                w, _ = layout.get_pixel_size()
+                
+                if w <= max_width_px:
+                    best_fit = candidate
+                    low = mid + 1
+                else:
+                    high = mid - 1
+                    
+            return best_fit
+
+        if __name__ == "__main__":
+            # Simple usage check
+            if len(sys.argv) < 3:
+                print("Usage: ./script.py <MAX_PX> <FONT> <LINE1> [LINE2 ...]")
+                sys.exit(1)
+
+            max_px = int(sys.argv[1])
+            font = sys.argv[2]
+            
+            # Process all remaining arguments as separate lines
+            for line in sys.argv[3:]:
+                print(truncate_to_fit(line, font, max_px))
+      ''
+    )
     (pkgs.writeShellScriptBin "update-damn-nixos" ''
-      notify-send "Обновление" "Обновление системы, мурр UwU"; if pkexec nixos-rebuild switch -v > /home/$1/.cache/nixos-rebuild.log 2>&1; then notify-send "Мяяу! Успмяувех ^w^" "Обновление завершено без ошибок"; else notify-send "Ошибка" "Бо :( Во время обновления произошла ошибка, лог обновления находится в /home/$1/.cache/nixos-rebuild.log"; fi
+      LOG_FILE="$HOME/.cache/nixos-rebuild.log"
+      rm -f "$LOG_FILE"
+      NOTIFY_ID=$(notify-send -p "Обновление" "Ожидание ввода пароля...")
+
+      if [ -z "$NOTIFY_ID" ]; then
+        echo "Could not create notification. Aborting." >&2
+        exit 1
+      fi
+
+      pkexec nixos-rebuild switch -v &> "$LOG_FILE" &
+      REBUILD_PID=$!
+
+      while [[ ! -s "$LOG_FILE" ]]; do
+        if [[ -d "/proc/$REBUILD_PID" ]]; then
+          sleep 0.1
+        else
+          break
+        fi
+      done
+
+      START_TIME=$(date +%s)
+      while [[ -d "/proc/$REBUILD_PID" ]]; do
+        mapfile -t LOG_LINES < <(tail -n 3 $LOG_FILE | sed 's/^\s*//')
+        if [ ''${#LOG_LINES[@]} -gt 0 ]; then
+            TRUNCATED_LINES=$(notify_trunc 300 "Noto Sans 12" "''${LOG_LINES[@]}")
+        else
+            TRUNCATED_LINES="..."
+        fi
+        CURR_TIME=$(date +%s)
+        notify-send -r "$NOTIFY_ID" "Обновление" "Прошло $((CURR_TIME - START_TIME)) секунд \n\n$TRUNCATED_LINES"
+        sleep 0.1
+      done
+
+      wait "$REBUILD_PID"
+      EXIT_CODE=$?
+
+      kek() {
+        if [[ $(notify-send -u critical -A "openlog=Открыть логи" "$1" "$2") == "openlog" ]]; then
+          neovide -- -c "normal! G" "$LOG_FILE"
+        fi
+      }
+
+      if [ $EXIT_CODE -eq 0 ]; then
+        notify-send "Успех" "Система успешно обновлена."
+      elif [ $EXIT_CODE -eq 1 ]; then
+        kek "Ошибка сборки" "Произошла ошибка во время сборки. Лог: $LOG_FILE"
+      elif [ $EXIT_CODE -eq 2 ]; then
+        kek "Ошибка активации" "Сборка прошла успешно, но активация не удалась. Лог: $LOG_FILE"
+      else
+        kek "Неизвестная ошибка" "Произошла ошибка с кодом $EXIT_CODE. Лог: $LOG_FILE"
+      fi
     '')
     (pkgs.writeShellScriptBin "toggle-restriction" ''
       if grep '    power_cap: 125.0' "/etc/lact/config.yaml"; then
@@ -319,5 +634,11 @@ pkgs: {
         sed -i 's/    power_cap: 60.0/    power_cap: 125.0/' /etc/lact/config.yaml
       fi
     '')
+  ];
+in
+{
+  environment.systemPackages = scripts ++ [
+    pkgs.bindfs
+    pkgs.imagemagick
   ];
 }

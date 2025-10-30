@@ -5,20 +5,49 @@
 }:
 with lib;
 let
+  root_label = null;
+  boot_label = "boot";
+  swap_label = null;
+  second_label = null;
   cfg = config.disks;
+  impermanence_subvolume_script = ''
+    mkdir /btrfs_tmp
+    mount -L ${if root_label == null then "nixos" else root_label} /btrfs_tmp
+    if [[ -e /btrfs_tmp/root ]]; then
+        mkdir -p /btrfs_tmp/old_roots
+        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+    fi
+
+    delete_subvolume_recursively() {
+        IFS=$'\n'
+        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+            delete_subvolume_recursively "/btrfs_tmp/$i"
+        done
+        btrfs subvolume delete "$1"
+    }
+
+    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+        delete_subvolume_recursively "$i"
+    done
+
+    btrfs subvolume create /btrfs_tmp/root
+    umount /btrfs_tmp
+  '';
 in
 {
   options.disks = {
-    compression = mkEnableOption "Enable system compression";
+    compression = mkEnableOption "system compression";
+    impermanence = mkEnableOption "impermanence (remove all files except those that are needed)";
     second-disk = {
-      enable = mkEnableOption "Enable additional disk (must be btrfs)";
-      compression = mkEnableOption "Enable compression on additional disk";
-      label = mkOption {
-        type = types.str;
-        default = "Games";
-        example = "stuff";
-        description = "Filesystem label of the partition that is used for mounting";
-      };
+      enable = mkEnableOption "additional disk (must be btrfs)";
+      compression = mkEnableOption "compression on additional disk";
+      # label = mkOption {
+      #   type = types.str;
+      #   default = "Games";
+      #   example = "stuff";
+      #   description = "Filesystem label of the partition that is used for mounting";
+      # };
       path = mkOption {
         type = types.str;
         default = "/mnt/Games";
@@ -34,7 +63,7 @@ in
     };
     swap = {
       file = {
-        enable = mkEnableOption "Enable swapfile";
+        enable = mkEnableOption "swapfile";
         path = mkOption {
           type = types.str;
           default = "/var/lib/swapfile";
@@ -49,27 +78,111 @@ in
         };
       };
       partition = {
-        enable = mkEnableOption "Enable swap partition";
-        label = mkOption {
-          type = types.str;
-          default = "swap";
-          example = "swappart";
-          description = "Label of swap partition";
-        };
+        enable = mkEnableOption "swap partition";
+        # label = mkOption {
+        #   type = types.str;
+        #   default = "swap";
+        #   example = "swappart";
+        #   description = "Label of swap partition";
+        # };
       };
     };
     enable = mkOption {
       type = types.bool;
       default = true;
       example = false;
-      description = "Enable base disks configuration";
+      description = "base disks configuration";
     };
   };
 
   config = mkIf cfg.enable {
 
+    hardware.block.scheduler."nvme[0-9]*" = "none";
+
+    environment.persistence."/persistent" = mkMerge [
+      (mkIf (!cfg.impermanence) { enable = false; })
+      (mkIf cfg.impermanence {
+        enable = true;
+        hideMounts = true;
+        directories = [
+          "/var/log"
+          "/var/lib/bluetooth"
+          "/var/lib/nixos"
+          "/var/lib/systemd/coredump"
+          "/etc/NetworkManager/system-connections"
+          "/website"
+          "/etc/nixos"
+          "/var/lib/libvirt"
+          "/var/lib/flatpak"
+          "/var/db"
+          "/var/lib/zerotier-one"
+          {
+            directory = "/var/lib/acme";
+            user = "acme";
+            group = "acme";
+            mode = "u=rwx,g=rx,o=rx";
+          }
+          {
+            directory = "/var/lib/suricata";
+            user = "suricata";
+            group = "suricata";
+            mode = "u=rwx,g=rx,o=rx";
+          }
+          {
+            directory = "/var/lib/cape";
+            user = "cape";
+            group = "cape";
+            mode = "u=rwx,g=,o=";
+          }
+          {
+            directory = "/var/lib/postgresql";
+            user = "postgres";
+            group = "postgres";
+            mode = "u=rwx,g=rx,o=";
+          }
+        ];
+        files = [
+          "/etc/ssh/ssh_host_ed25519_key"
+          "/etc/ssh/ssh_host_ed25519_key.pub"
+          "/etc/ssh/ssh_host_rsa_key"
+          "/etc/ssh/ssh_host_rsa_key.pub"
+          "/config.json"
+          "/etc/machine-id"
+          "/cloudflare1.conf"
+          "/cloudflare2.conf"
+        ]
+        ++ lib.optionals cfg.swap.file.enable [ swap.file.path ];
+      })
+    ];
+
+    boot.initrd.systemd.services.impermanence_subvolume = mkIf cfg.impermanence {
+      wantedBy = [
+        "initrd.target"
+      ];
+      after = [
+        "initrd-root-device.target"
+      ];
+      before = [
+        "sysroot.mount"
+      ];
+      unitConfig.DefaultDependencies = "no";
+      description = "Change subvolume for impermanence";
+      #path = [ pkgs.btrfs-progs pkgs.coreutils pkgs.util-linux pkgs.mount ];
+      serviceConfig.Type = "oneshot";
+      script = impermanence_subvolume_script;
+    };
+
+    boot.supportedFilesystems.btrfs = mkIf cfg.impermanence true;
+
+    boot.initrd.supportedFilesystems.btrfs = mkIf cfg.impermanence true;
+
+    # services.btrfs.autoScrub = {
+    #   enable = true;
+    #   interval = "weekly";
+    # };
+
     fileSystems."/" = {
-      device = "/dev/disk/by-label/nixos";
+      device = "/dev/disk/by-label/${if root_label == null then "nixos" else root_label}";
       fsType = "btrfs";
       options = [
         "subvol=root"
@@ -77,8 +190,18 @@ in
       ];
     };
 
+    fileSystems."/persistent" = mkIf cfg.impermanence {
+      device = "/dev/disk/by-label/${if root_label == null then "nixos" else root_label}";
+      neededForBoot = true;
+      fsType = "btrfs";
+      options = [
+        "subvol=persistent"
+        "compress-force=zstd"
+      ];
+    };
+
     fileSystems."/nix" = {
-      device = "/dev/disk/by-label/nixos";
+      device = "/dev/disk/by-label/${if root_label == null then "nixos" else root_label}";
       fsType = "btrfs";
       options = [
         "subvol=nix"
@@ -87,7 +210,7 @@ in
     };
 
     fileSystems."/home" = {
-      device = "/dev/disk/by-label/nixos";
+      device = "/dev/disk/by-label/${if root_label == null then "nixos" else root_label}";
       fsType = "btrfs";
       options = [
         "subvol=home"
@@ -96,12 +219,16 @@ in
     };
 
     fileSystems."/boot" = {
-      device = "/dev/disk/by-label/boot";
+      device = "/dev/disk/by-label/${if boot_label == null then "boot" else boot_label}";
       fsType = "vfat";
+      options = [
+        "noauto"
+        "x-systemd.automount"
+      ];
     };
 
     fileSystems."${cfg.second-disk.path}" = mkIf cfg.second-disk.enable {
-      device = "/dev/disk/by-label/${cfg.second-disk.label}";
+      device = "/dev/disk/by-label/${if second_label == null then "Games" else second_label}";
       fsType = "btrfs";
       options =
         optionals cfg.second-disk.compression [ "compress-force=zstd" ]
@@ -118,7 +245,8 @@ in
       ]
       ++ optionals cfg.swap.partition.enable [
         {
-          device = "/dev/disk/by-label/${cfg.swap.partition.label}";
+          options = [ "nofail" ];
+          device = "/dev/disk/by-label/${if swap_label == null then "swap" else swap_label}";
         }
       ];
   };

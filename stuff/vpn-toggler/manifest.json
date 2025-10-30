@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Zen sing-box Toggle",
+  "version": "2.0",
+  "description": "Persistent connection toggle for sing-box.",
+  "permissions": [
+    "http://127.0.0.1:9090/*",
+    "http://localhost:9090/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Zen Proxy Toggle",
+    "default_icon": "icon-direct.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "zen-toggle@nixos.org"
+    }
+  }
+}

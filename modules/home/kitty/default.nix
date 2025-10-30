@@ -9,7 +9,7 @@ let
 in
 {
   options.kitty = {
-    enable = mkEnableOption "Enable kitty terminal emulator";
+    enable = mkEnableOption "kitty terminal emulator";
   };
 
   config = mkIf cfg.enable {
@@ -17,14 +17,18 @@ in
       enable = true;
       shellIntegration.enableZshIntegration = true;
       font = {
-        name = "JetBrainsMono NF";
+        name = "JetBrainsMono NF Medium";
         size = 12;
       };
       keybindings = {
         "ctrl+left" = "neighboring_window left";
-        "shift+left" = "move_window right";
+        "ctrl+up" = "neighboring_window up";
+        "ctrl+right" = "neighboring_window right";
         "ctrl+down" = "neighboring_window down";
-        "shift+down" = "move_window up";
+        "shift+left" = "move_window left";
+        "shift+up" = "move_window up";
+        "shift+right" = "move_window right";
+        "shift+down" = "move_window down";
       };
       extraConfig = ''
         mouse_hide_wait         2.0
@@ -32,7 +36,7 @@ in
         url_style               dotted
         enable_audio_bell       no
         confirm_os_window_close 0
-        background_opacity      0
+        background_opacity      0.2
         window_margin_width     5
         tab_bar_edge            top
         tab_bar_style           powerline

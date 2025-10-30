@@ -1,80 +1,275 @@
 {
   inputs = {
-    home-manager = {
-      url = "git+https://github.com/nix-community/home-manager?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nix-flatpak.url = "github:gmodena/nix-flatpak/latest";
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs = {
+        pyproject-nix.follows = "pyproject-nix";
+        uv2nix.follows = "uv2nix";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     hyprland-plugins = {
-      url = "git+https://github.com/hyprwm/hyprland-plugins?shallow=1";
-      inputs.hyprland.follows = "hyprland";
+      url = "github:hyprwm/hyprland-plugins";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        hyprland.follows = "hyprland";
+      };
     };
-    nur = {
-      url = "git+https://github.com/nix-community/NUR?shallow=1";
+    nix-alien = {
+      url = "github:thiagokokada/nix-alien";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nix-index-database.follows = "nix-index-database";
+      };
+    };
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
+    uv2nix = {
+      url = "github:pyproject-nix/uv2nix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        pyproject-nix.follows = "pyproject-nix";
+      };
+    };
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     spicetify-nix = {
-      url = "git+https://github.com/Gerg-L/spicetify-nix?shallow=1";
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    pyproject-nix = {
+      url = "github:pyproject-nix/pyproject.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-index-database = {
-      url = "git+https://github.com/nix-community/nix-index-database?shallow=1";
+      url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpak = {
-      url = "git+https://github.com/nixpak/nixpak?shallow=1";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?shallow=1&ref=nixos-unstable";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?shallow=1";
-    #chaotic.url = "git+https://github.com/chaotic-cx/nyx/nyxpkgs-unstable";
-    pipewire-screenaudio.url = "git+https://github.com/IceDBorn/pipewire-screenaudio?shallow=1";
-    #determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    nix-alien.url = "git+https://github.com/thiagokokada/nix-alien?shallow=1";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
-    nix-search.url = "git+https://github.com/diamondburned/nix-search?shallow=1";
+    nixpkgs-xr = {
+      url = "github:nix-community/nixpkgs-xr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    quickshell = {
+      url = "github:quickshell-mirror/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    pipewire-screenaudio = {
+      url = "github:IceDBorn/pipewire-screenaudio";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-search = {
+      url = "github:diamondburned/nix-search";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    my-internet = {
+      url = "github:sameerasw/my-internet";
+      flake = false;    
+    };
+    nos = {
+      url = "github:madsbv/nix-options-search";
+      flake = false;
+    };
+    hazy = {
+      url = "github:Astromations/Hazy";
+      flake = false;
+    };
+    pmparser = {
+      url = "github:ouadev/proc_maps_parser";
+      flake = false;
+    };
+    libcef-transparency-linux = {
+      url = "github:fixpointer/libcef-transparency-linux";
+      flake = false;
+    };
+    cape = {
+      url = "github:kevoreilly/CAPEv2";
+      flake = false;
+    };
+    xrizer = {
+      url = "github:Supreeeme/xrizer";
+      flake = false;
+    };
+    sine = {
+      url = "github:CosmoCreeper/Sine";
+      flake = false;
+    };
+    sine-bootloader = {
+      url = "github:sineorg/bootloader";
+      flake = false;
+    };
+    nebula-zen = {
+      url = "github:JustAdumbPrsn/Zen-Nebula";
+      flake = false;
+    };
   };
 
   outputs =
-    { nixpkgs, home-manager, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
     let
-      system = "x86_64-linux";
+      # Needed for offline installation, so that I could access config.system.build.toplevel without causing infinite recursion
+      iso-wrapper = (
+        prev_system:
+        let
+          system = prev_system // {
+            specialArgs = prev_system.specialArgs // {
+              user-hash = null;
+              user = user_iso;
+              inherit
+                inputs
+                self
+                umport
+                system-modules
+                home-modules
+                ;
+            };
+          };
+          orig_system = nixpkgs.lib.nixosSystem (
+            system
+            // {
+              specialArgs = system.specialArgs // {
+                wrapped = false;
+                orig = { };
+              };
+            }
+          );
+        in
+        nixpkgs.lib.nixosSystem (
+          system
+          // {
+            specialArgs = system.specialArgs // {
+              wrapped = true;
+              orig = orig_system;
+            };
+            modules = system.modules ++ [
+              "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+            ];
+          }
+        )
+      );
+
+      umport = (import ./modules/umport.nix { inherit (nixpkgs) lib; }).umport;
+
+      system-modules = umport {
+        paths = [ ./modules/system ];
+        recursive = false;
+      };
+
+      home-modules =
+        umport {
+          paths = [ ./modules/home ];
+          recursive = false;
+        }
+        ++ [
+          inputs.nix-index-database.homeModules.nix-index
+          inputs.zen-browser.homeModules.twilight
+        ];
+
       modules-list = [
+        inputs.impermanence.nixosModules.impermanence
         home-manager.nixosModules.home-manager
         {
           home-manager = {
             extraSpecialArgs = {
-              inherit inputs;
+              inherit
+                inputs
+                self
+                umport
+                home-modules
+                ;
             };
             backupFileExtension = "backup";
+            overwriteBackup = true;
             useGlobalPkgs = true;
             useUserPackages = true;
+            users.root = import ./machines/nixos/home-root.nix;
           };
         }
-      ];
-      user = "ehnis";
-      user-hash = "$y$j9T$EdzvK4wCXlFTLQYN/LUFJ/$iAJ1pjZ3tT7Uq.mf59cgdyntO4sLhsVA7XDwfEYaPu/";
+      ]
+      ++ system-modules;
+
+      user = "mihikav";
+      user-hash = "$y$j9T$4mZLE7lfsr4hRCj.e9JDa/$nQtJZhMlM9ju8B7TQcj.And83mfU4/fakqnODGzz..5";
+      user_iso = "nixos";
     in
     {
       nixosConfigurations = {
         nixos = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit inputs user user-hash;
+            inherit
+              inputs
+              user
+              user-hash
+              self
+              umport
+              system-modules
+              home-modules
+              ;
+            min-flag = false;
+            avg-flag = false;
           };
           modules = modules-list ++ [
             ./machines/nixos/configuration.nix
-            { home-manager.users."${user}" = import ./machines/nixos/home.nix; }
+            ./machines/nixos/hardware-configuration.nix
           ];
         };
-      };
-      homeConfigurations = {
-        ehnis = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
-          modules = [
-            ./machines/nixos/home-options.nix
-          ];
-          extraSpecialArgs = {
-            inherit inputs system user;
+        iso = iso-wrapper {
+          specialArgs = {
+            min-flag = false;
+            avg-flag = false;
           };
+          modules = modules-list ++ [ ./machines/iso/configuration.nix ];
+        };
+        iso8G = iso-wrapper {
+          specialArgs = {
+            min-flag = false;
+            avg-flag = true;
+          };
+          modules = modules-list ++ [ ./machines/iso8G/configuration.nix ];
+        };
+        isoMIN = iso-wrapper {
+          specialArgs = {
+            min-flag = true;
+            avg-flag = false;
+          };
+          modules = modules-list ++ [ ./machines/isoMIN/configuration.nix ];
         };
       };
     };

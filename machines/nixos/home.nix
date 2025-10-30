@@ -1,117 +1,112 @@
 {
+  min-flag,
+  avg-flag,
+  home-modules,
+  pkgs,
   inputs,
-  config,
   ...
 }:
 {
 
-  # Import other modules
-  imports = [
-    ../../modules/home
-    inputs.nix-index-database.homeModules.nix-index
-  ];
+  imports = home-modules;
 
-  # Enable rich presence
-  services.arrpc.enable = true;
+  xdg.configFile."bookmarks.html".source = ../../stuff/bookmarks.html;
 
-  # Version at which home-manager was first configured (Don't change it)
+  manual.manpages.enable = false;
+
+  umu.enable = true;
+
+  thunderbird.enable = true;
+
+  zen.enable = true;
+
   home.stateVersion = "25.05";
 
-  # Enable spotify with theme
   spicetify.enable = true;
 
-  # Enable Anime4K non-AI upscaler
   home.file.".config/mpv".source = ../../stuff/mpv;
 
-  # Enable neovim, console based text editor
   neovim.enable = true;
 
-  # Enable theming stuff like cursor theme, icon theme and etc
   theming.enable = true;
 
-  # Enable swaync notification manager
+  cava.enable = true;
+
   swaync.enable = true;
 
-  # Enable kitty terminal emulator
   kitty.enable = true;
 
-  # Enable zsh shell
   zsh.enable = true;
 
-  # Enable file associations
   file-associations.enable = true;
 
-  # Enable waybar panel
   waybar.enable = true;
 
-  # Enable btop process manager
   btop.enable = true;
 
-  xdg.userDirs = {
+  programs = {
 
-    # Create folders like Downloads, Documents automatically
-    createDirectories = true;
-    enable = true;
+    opencode = {
+      enable = true;
+      enableMcpIntegration = true;
+      package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode;
+    };
 
-    documents = "/home/${config.home.username}/Документы";
-
-    download = "/home/${config.home.username}/Загрузки";
-
-    music = "/home/${config.home.username}/Музыка";
-
-    pictures = "/home/${config.home.username}/Изображения";
-
-    videos = "/home/${config.home.username}/Видео";
+    mcp = {
+      enable = true;
+      servers.context7 = {
+        url = "https://mcp.context7.com/mcp";
+        headers = {
+          CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
+        };
+      };
+    };
 
   };
 
-  flatpak = {
+  services = {
 
-    # Enable user flatpak
+    easyeffects.enable = true;
+
+    ollama = {
+      enable = true;
+      package = pkgs.ollama-vulkan;
+    };
+
+  };
+
+  mpd = {
     enable = false;
-
-    # Packages to install from flatpak
-    packages = [ "io.github.Soundux" ];
-
+    ncmpcpp = false;
   };
+
+  flatpak =
+    if !(avg-flag || min-flag) then
+      {
+        enable = true;
+        packages = [
+          "io.github.Soundux"
+        ];
+      }
+    else
+      { };
 
   hyprland = {
-
-    # Enable base Hyprland configuration (required for options below)
     enable = true;
-
-    # Use Hyprland package from nixpkgs
+    from-unstable = false;
     stable = false;
-
-    # Enable Hyprland plugins
     enable-plugins = false;
-
-    # Enable video wallpapers with mpvpaper
     mpvpaper = false;
-
-    # Enable image wallpapers with hyprpaper
     hyprpaper = true;
-
-    # Enable power options menu
     wlogout = true;
-
-    # Enable locking program
     hyprlock = true;
-
-    # Enable rofi (used as applauncher and dmenu)
     rofi = true;
-
   };
 
   fastfetch = {
 
-    # Enable fastfetch configuration (required for options below)
     enable = true;
-
-    # Enable fastfetch printing when zsh starts up
     zsh-start = true;
-
-    # Path to the logo that fastfetch will output
     logo-path = ../../stuff/logo.png;
 
   };

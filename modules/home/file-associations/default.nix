@@ -9,7 +9,7 @@ let
 in
 {
   options.file-associations = {
-    enable = mkEnableOption "Enable declarative file associations";
+    enable = mkEnableOption "declarative file associations";
   };
 
   config = mkIf cfg.enable {
@@ -40,12 +40,19 @@ in
         "application/x-lzip-compressed-tar" = "org.gnome.FileRoller.desktop";
         "application/x-tarz " = "org.gnome.FileRoller.desktop";
         "application/zip" = "org.gnome.FileRoller.desktop";
+        "application/vnd.microsoft.portable-executable" = "umu.desktop";
+        "application/x-msi" = "umu.desktop";
+        "application/x-msdownload" = "umu.desktop";
         #"inode/directory" = "nemo.desktop";
-        "inode/directory" = "nemo.desktop";
-        "text/html" = "firefox.desktop";
+        "inode/directory" = "org.gnome.Nautilus.desktop";
+        "text/html" = "zen-twilight.desktop";
         "video/mp4" = "mpv.desktop";
         "audio/mpeg" = "mpv.desktop";
         "audio/flac" = "mpv.desktop";
+        "x-scheme-handler/http" = "zen-twilight.desktop";
+        "x-scheme-handler/https" = "zen-twilight.desktop";
+        "x-scheme-handler/about" = "zen-twilight.desktop";
+        "x-scheme-handler/unknown" = "zen-twilight.desktop";
       };
     };
   };
