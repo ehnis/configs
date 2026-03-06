@@ -148,8 +148,6 @@ in
           "/etc/ssh/ssh_host_rsa_key.pub"
           "/config.json"
           "/etc/machine-id"
-          "/cloudflare1.conf"
-          "/cloudflare2.conf"
         ]
         ++ lib.optionals cfg.swap.file.enable [ swap.file.path ];
       })
@@ -214,6 +212,14 @@ in
       fsType = "btrfs";
       options = [
         "subvol=home"
+        "compress-force=zstd"
+      ];
+    };
+
+    fileSystems."/sesiki" = {
+      device = "/dev/disk/by-label/Sesi";
+      fsType = "btrfs";
+      options = [
         "compress-force=zstd"
       ];
     };

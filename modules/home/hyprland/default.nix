@@ -236,7 +236,7 @@ in
         exec-once = [
           "app2unit -- wl-paste --watch cliphist store"
           "fumon"
-          "hyprctl setcursor oreo_spark_black_bordered_cursors 24"
+          "hyprctl setcursor Bibata-Modern-Classic 24"
         ];
         input = {
           kb_layout = "us,ru";
