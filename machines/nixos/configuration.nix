@@ -147,6 +147,11 @@ in
       corefonts
       noto-fonts
       nerd-fonts.jetbrains-mono
+      (runCommand "custom-cool-jazz" {} ''
+        mkdir -p $out/share/fonts/truetype
+        cp ${../../stuff/Cooljazz.ttf} $out/share/fonts/truetype/
+      '')
+
     ];
 
   };
@@ -378,6 +383,15 @@ in
       with inputs;
       # Keep in every ISO
       [
+        (writeShellScriptBin "7z" ''
+        exec ${pkgs._7zz}/bin/7zz "$@"
+        '')
+        unzip
+        zip
+        alcom
+        vrc-get
+        vrcx
+        unityhub
         nemo-fileroller
         nemo-with-extensions
         nemo
@@ -406,7 +420,6 @@ in
         wget
         zenity
         killall
-        screen
         unrar
         zip
         adwaita-icon-theme
@@ -670,7 +683,15 @@ in
   };
 
   security = {
+    
+    wrappers.screen = {
+      source = "${pkgs.screen}/bin/screen";
+      owner = "root";
+      group = "root";
+      setuid = true;
+    };
 
+    
     rtkit.enable = true;
 
     polkit.enable = true;
@@ -690,11 +711,57 @@ in
 
     firejail.enable = true;
 
+    tmux.enable = true;
+
     gamemode.enable = true;
 
     zsh.enable = true;
 
     nix-ld.enable = true;
+
+      nix-ld.libraries = with pkgs; [
+  libz
+  icu
+  nss
+  nspr
+  openssl
+  curl
+  expat
+  # Графика
+  gtk3
+  cairo
+  pango
+  glib
+  gdk-pixbuf
+  atk
+  at-spi2-atk
+  at-spi2-core
+  harfbuzz
+  libxkbcommon
+  # X11 (новые имена)
+  libX11
+  libXcomposite
+  libXcursor
+  libXdamage
+  libXext
+  libXfixes
+  libXi
+  libXrender
+  libXtst
+  libXrandr
+  libXinerama
+  libxshmfence
+  # Система
+  libGL
+  libdrm
+  mesa
+  udev
+  alsa-lib
+  libpulseaudio
+  fontconfig
+  freetype
+  dbus
+    ];
 
     ydotool.enable = if !min-flag then true else false;
 
