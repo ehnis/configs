@@ -152,7 +152,6 @@ in
           "$mod, E, exec, app2unit -- nemo"
           "$mod, V, togglefloating,"
           "$mod, P, pseudo,"
-          "$mod, J, togglesplit,"
           "$mod, F, fullscreen,"
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"

@@ -293,7 +293,6 @@ in
     };
     programs.zen-browser = {
       enable = true;
-      suppressXdgMigrationWarning = true;
       package = (pkgs.wrapFirefox zen-package { icon = "zen-twilight"; }).override {
         extraPrefs = cfg_orig.extraPrefs;
         extraPrefsFiles = cfg_orig.extraPrefsFiles;

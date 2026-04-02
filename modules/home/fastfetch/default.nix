@@ -74,11 +74,11 @@ in
           #  key = "├─󰍹";
           #  keyColor = "green";
           #}
-          {
-            type = "brightness";
-            key = "├─󰃞";
-            keyColor = "green";
-          }
+          #{
+           # type = "brightness";
+           # key = "├─󰃞";
+           # keyColor = "green";
+          #}
           {
             type = "battery";
             key = "├─";

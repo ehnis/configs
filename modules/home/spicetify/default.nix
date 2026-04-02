@@ -12,24 +12,16 @@ let
     pname = "pmparser";
     version = "1.0";
     src = inputs.pmparser;
+
     patchPhase = ''
       substituteInPlace Makefile \
-        --replace 'CFLAGS=-std=gnu99 -pedantic  -Wall' 'CFLAGS=-std=gnu99 -pedantic -fpic -Wall'
+        --replace-fail 'CFLAGS=-std=gnu99 -pedantic  -Wall' 'CFLAGS=-std=gnu99 -pedantic -fpic -Wall'
     '';
+
     installPhase = ''
-      rm -rf .git
-      cp -r ./. $out
-    '';
-  };
-  libcef = pkgs.stdenv.mkDerivation {
-    pname = "libcef-transparency-linux";
-    version = "1.0";
-    src = inputs.libcef-transparency-linux;
-    buildPhase = ''
-      gcc -Wall -masm=intel -I${pmparser}/include -o patcher_lib.so -shared -fpic -z defs patcher_lib.c -lc -l:libpmparser.a -L${pmparser}/build
-    '';
-    installPhase = ''
-      cp -r ./. $out
+      mkdir -p $out/lib $out/include
+      cp build/libpmparser.a $out/lib/
+      cp include/pmparser.h $out/include/
     '';
   };
   hazy_orig = inputs.hazy;
@@ -69,7 +61,6 @@ in
           wrapProgramShell $out/share/spotify/spotify \
             ''${gappsWrapperArgs[@]} \
             --prefix LD_LIBRARY_PATH : "$librarypath" \
-            --prefix LD_AUDIT : "${libcef}/patcher_lib.so" \
             --prefix PATH : "${lib.getBin pkgs.zenity}/bin" \
             ${
               if config.programs.spicetify.wayland != false then

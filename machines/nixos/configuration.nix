@@ -69,6 +69,8 @@ in
   singbox.enable = true;
 
   plymouth.enable = true;
+  
+  services.hardware.openrgb.enable = true;
 
   hardware.opentabletdriver.enable = true;
 
@@ -182,7 +184,6 @@ in
           "public"
           "uinput"
           "mlocate"
-          "libvirtd"
           "nginx"
           "input"
           "kvm"
@@ -200,7 +201,6 @@ in
         extraGroups = [
           "mlocate"
           "public"
-          "libvirtd"
           "input"
           "kvm"
           "video"
@@ -386,6 +386,7 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
+        discord
         unzip
         zip
         alcom
@@ -395,7 +396,6 @@ in
         nemo-fileroller
         nemo-with-extensions
         nemo
-        amnezia-vpn
         gemini-cli
         jq
         wayvr
@@ -526,46 +526,6 @@ in
         else
           [ ]
       );
-
-  };
-
-  virtualisation = {
-
-    spiceUSBRedirection.enable = true;
-
-    # Set options for vm that is built using nixos-rebuild build-vm
-    vmVariant = {
-      systemd.user.services.mpvpaper.enable = false;
-      virtualisation = {
-        qemu.options = [
-          "-display sdl,gl=on"
-          "-device virtio-vga-gl"
-          "-enable-kvm"
-          "-audio driver=sdl,model=virtio"
-        ];
-        cores = 4;
-        diskSize = 1024 * 8;
-        msize = 16384 * 16;
-        memorySize = 1024 * 8;
-      };
-    };
-
-    libvirtd = {
-      enable = true;
-      qemu = {
-        swtpm.enable = true;
-        verbatimConfig = "max_core = 0";
-      };
-    };
-
-    podman =
-      if !(avg-flag || min-flag) then
-        {
-          enable = true;
-          dockerCompat = true;
-        }
-      else
-        { };
 
   };
 
@@ -739,6 +699,7 @@ in
   harfbuzz
   libxkbcommon
   # X11 (новые имена)
+  libepoxy
   libX11
   libXcomposite
   libXcursor
