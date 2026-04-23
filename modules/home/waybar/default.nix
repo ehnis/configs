@@ -15,7 +15,7 @@ in
       enable = true;
       systemd = {
         enable = true;
-        target = "hyprland-session.target";
+        targets = [ "hyprland-session.target" ];
       };
       style = ''
         @define-color accent #000000;

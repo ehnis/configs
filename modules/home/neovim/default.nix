@@ -283,6 +283,7 @@ in
       rustup
       vscode-extensions.ms-vscode.cpptools
       hexpatch
+      source-code-pro
       tinyxxd
       bash-language-server
       shellcheck
@@ -570,6 +571,7 @@ in
           scope = { enabled = true, show_start = true, show_end = true }, -- Enable scope guides
         }
         if vim.g.neovide == true then
+	vim.o.guifont = "Source Code Pro:h12"
           -- Copy to system clipboard (Normal/Visual mode)
           vim.keymap.set({"n", "x"}, "<C-S-c>", '"+y', {desc = "Copy system clipboard"})
           

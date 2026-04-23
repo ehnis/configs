@@ -56,7 +56,7 @@
     };
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
@@ -231,6 +231,7 @@
     in
     {
       nixosConfigurations = {
+        system = "x86_64-linux";
         nixos = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit
@@ -246,6 +247,7 @@
             avg-flag = false;
           };
           modules = modules-list ++ [
+          { nixpkgs.hostPlatform = "x86_64-linux"; }
             ./machines/nixos/configuration.nix
             ./machines/nixos/hardware-configuration.nix
           ];

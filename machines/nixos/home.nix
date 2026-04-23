@@ -10,6 +10,10 @@
 
   imports = home-modules;
 
+  gtk.gtk4.theme = null;
+  
+  xdg.userDirs.setSessionVariables = false;
+
   xdg.configFile."bookmarks.html".source = ../../stuff/bookmarks.html;
 
   manual.manpages.enable = false;

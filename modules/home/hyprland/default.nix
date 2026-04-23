@@ -79,7 +79,7 @@ in
       esbuild
       fd
       dart-sass
-      swww
+      awww
       hyprpicker
       wttrbar
     ];
