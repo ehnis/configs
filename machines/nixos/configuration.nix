@@ -1,4 +1,4 @@
-{
+  {
   pkgs,
   inputs,
   user-hash,
@@ -72,6 +72,13 @@ in
   
   services.hardware.openrgb.enable = true;
 
+  hardware.sane = {
+    enable = true;
+    extraBackends = [ pkgs.hplipWithPlugin ];
+  };
+
+  
+
   hardware.opentabletdriver.enable = true;
 
   zapret.enable = false;
@@ -103,7 +110,6 @@ in
       stable = false;
     };
   };
-
   networking = {
 
     firewall.enable = false;
@@ -166,8 +172,6 @@ in
 
     groups = {
       ${user}.gid = config.users.users.${user}.uid;
-      l0lk3k.gid = config.users.users.l0lk3k.uid;
-      public = {};
     };
 
     users = {
@@ -180,6 +184,7 @@ in
         initialHashedPassword = lib.mkForce null;
         home = "/home/${user}";
         extraGroups = [
+          "printing"
           "wheel"
           "public"
           "uinput"
@@ -187,22 +192,9 @@ in
           "nginx"
           "input"
           "kvm"
+          "libvirtd"
           "ydotool"
           "adbusers"
-          "video"
-        ];
-      };
-      l0lk3k = {
-        isNormalUser = true;
-        group = "l0lk3k";
-        uid = 1001;
-        initialPassword = "1234";
-        home = "/home/l0lk3k";
-        extraGroups = [
-          "mlocate"
-          "public"
-          "input"
-          "kvm"
           "video"
         ];
       };
@@ -305,14 +297,13 @@ in
   home-manager = {
 
     users.${user} = import ./home.nix;
-    users.l0lk3k = import ./home.nix;    
 
     extraSpecialArgs = {
       inherit avg-flag min-flag;
-      #kekma = {
-     #   nix = config.docs.man-cache-nix;
-    #    home = config.docs.man-cache-home;
-   #   };
+      kekma = {
+        nix = config.docs.man-cache-nix;
+        home = config.docs.man-cache-home;
+      };
     };
 
   };
@@ -386,6 +377,11 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
+        filezilla
+        kdePackages.okular
+        virt-manager
+        xsane
+        hplip
         discord
         unzip
         zip
@@ -404,7 +400,6 @@ in
         dante
         ente-auth
         mtkclient
-        sidequest
         libsForQt5.qt5ct
         patchelf
         file
@@ -482,13 +477,10 @@ in
             jdk25
             moonlight-qt
             osu-lazer-bin
-            mindustry
-            xonotic
             # superTux
             supertuxkart
             pavucontrol
             qalculate-gtk
-            distrobox
             qbittorrent
             ayugram-desktop
             gdb
@@ -529,7 +521,51 @@ in
 
   };
 
+    virtualisation = {
+
+    spiceUSBRedirection.enable = true;
+
+    # Set options for vm that is built using nixos-rebuild build-vm
+    vmVariant = {
+      systemd.user.services.mpvpaper.enable = false;
+      virtualisation = {
+        qemu.options = [
+          "-display sdl,gl=on"
+          "-device virtio-vga-gl"
+          "-enable-kvm"
+          "-audio driver=sdl,model=virtio"
+        ];
+        cores = 4;
+        diskSize = 1024 * 8;
+        msize = 16384 * 16;
+        memorySize = 1024 * 8;
+      };
+    };
+    libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+        verbatimConfig = "max_core = 0";
+      };
+    };
+
+    podman =
+      if !(avg-flag || min-flag) then
+        {
+          enable = true;
+          dockerCompat = true;
+        }
+      else
+        { };
+
+  };
+
   systemd = {
+
+    services.libvirtd.serviceConfig = {
+  LoadCredential = "";
+  SetCredential = "";
+};
 
     # Fix early start of graphical-session.target, see https://github.com/NixOS/nixpkgs/pull/297434#issuecomment-2348783988
     user.targets.nixos-fake-graphical-session.enable = false;
@@ -542,18 +578,6 @@ in
       display-manager.environment.XDG_CURRENT_DESKTOP = "X-NIXOS-SYSTEMD-AWARE";
 
       NetworkManager-wait-online.enable = false;
-
-      quest-adb-reverse = {
-        description = "Quest 3S ADB Reverse (Root)";
-        serviceConfig = {
-          Type = "forking";
-          Restart = "no";
-          Environment = "HOME=/root";
-          ExecStartPre = "${pkgs.bash}/bin/bash -c \"${pkgs.psmisc}/bin/killall adb || true\"";
-          ExecStart = "${pkgs.android-tools}/bin/adb reverse tcp:9757 tcp:9757";
-        };
-      };
-
       systemd-bsod = {
         enable = true;
         wantedBy = [ "sysinit.target" ];
@@ -567,6 +591,13 @@ in
   services = {
 
     gvfs.enable = true;
+
+    printing = {
+      enable = true;
+      drivers = [ 
+       pkgs.hplipWithPlugin 
+      ];
+    };
 
     locate.enable = true;
 
@@ -616,15 +647,6 @@ in
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2833", ATTR{idProduct}=="5013", RUN+="${pkgs.systemd}/bin/systemctl restart quest-adb-reverse.service"
     '';
-
-    printing = {
-      enable = true;
-      drivers = with pkgs; [
-        cups-filters
-        cups-browsed
-        hplipWithPlugin
-      ];
-    };
 
     avahi = {
       enable = true;
@@ -687,7 +709,6 @@ in
   openssl
   curl
   expat
-  # Графика
   gtk3
   cairo
   pango
@@ -698,7 +719,6 @@ in
   at-spi2-core
   harfbuzz
   libxkbcommon
-  # X11 (новые имена)
   libepoxy
   libX11
   libXcomposite
@@ -712,7 +732,6 @@ in
   libXrandr
   libXinerama
   libxshmfence
-  # Система
   libGL
   libdrm
   mesa
