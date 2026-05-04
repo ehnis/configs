@@ -382,7 +382,6 @@ in
         virt-manager
         xsane
         hplip
-        discord
         unzip
         zip
         alcom
@@ -477,8 +476,6 @@ in
             jdk25
             moonlight-qt
             osu-lazer-bin
-            # superTux
-            supertuxkart
             pavucontrol
             qalculate-gtk
             qbittorrent

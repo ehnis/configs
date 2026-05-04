@@ -240,7 +240,7 @@ in
         input = {
           kb_layout = "us,ru";
           kb_options = "grp:alt_shift_toggle";
-          repeat_delay = 150;
+          repeat_delay = 200;
           repeat_rate = 35;
           follow_mouse = 1;
           touchpad = {
