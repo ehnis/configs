@@ -70,18 +70,11 @@
 
   services = {
 
-    easyeffects.enable = true;
-
     ollama = {
       enable = true;
       package = pkgs.ollama-vulkan;
     };
 
-  };
-
-  mpd = {
-    enable = false;
-    ncmpcpp = false;
   };
 
   flatpak =

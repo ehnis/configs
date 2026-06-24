@@ -16,16 +16,12 @@
           --title="Выберите доп. службы для запуска" \
           --text="singbox - это VPN\n\neasyeffects - звуковые эффекты, например шумоподавление\n\nreplays - служба повторов, записывает последние 5 минут, сохранять можно с помощью Ctrl + Super + R, повторы сохраняются в ~/Games/Replays\n\nopentabletdriver - служба для работы графических планшетов\n\n\n\nВсе эти службы потребляют ОЗУ и ЦП" \
           --extra-button="singbox" \
-          --extra-button="easy-effects" \
           --extra-button="replays" \
           --extra-button="opentabletdriver")
 
         case $selected_button in
           "singbox")
             sudo systemctl start singbox
-            ;;
-          "easy-effects")
-            systemctl --user start easyeffects
             ;;
           "replays")
             systemctl --user start replays

@@ -488,11 +488,7 @@ in
             gimp3-with-plugins
             gamescope
             android-tools
-            (prismlauncher.override {
-              prismlauncher-unwrapped = prismlauncher-unwrapped.overrideAttrs (prev: {
-                patches = prev.patches or [ ] ++ [ ../../stuff/prismlauncher.patch ];
-              });
-            })
+            prismlauncher
             (bottles.override {
               removeWarningPopup = true;
             })
@@ -650,6 +646,8 @@ in
       nssmdns4 = true;
       openFirewall = true;
     };
+    
+    #v2raya.enable = true;
 
     pipewire = {
       enable = true;
