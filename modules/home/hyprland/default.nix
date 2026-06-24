@@ -184,9 +184,9 @@ in
         ];
         monitor = [ 
           "DP-2, 1920x1080@165, 0x0, 1"
-          "DP-1, 1440x900@75, -1440x0, 1"
+          "DP-1, 1440x900@75, -1440x0, auto"
           "HDMI-A-1, 1920x1080@60, 1920x0, 1"
-          "HDMI-A-2, 1280x1024@75, -1280x-1024, 1"
+          "HDMI-A-2, 1280x1024@75, -1280x-1024, auto"
         ];
         bindr = [
           ''$mod, $mod_L, exec, pkill rofi || rofi -show drun -show-icons -hover-select -me-select-entry ''' -me-accept-entry MousePrimary -run-command 'bash -c "exec_path=\$(echo \"\$*\" | grep -oP \"(^|(?<=\s))(?![^=\s]+=[^\s]+)[/\w\.-]+\" | head -n1); n=\$(basename \"\$exec_path\" | sed \"s/\\\\x2d/-/g\" | tr -cd \"[:alnum:]. _-\"); app2unit -a \"\$n\" -- \"\$@\"" -- {cmd}' ''
