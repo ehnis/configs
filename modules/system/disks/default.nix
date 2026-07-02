@@ -110,7 +110,6 @@ in
           "/var/lib/nixos"
           "/var/lib/systemd/coredump"
           "/etc/NetworkManager/system-connections"
-          "/website"
           "/etc/nixos"
           "/var/lib/libvirt"
           "/var/lib/flatpak"
@@ -146,10 +145,9 @@ in
           "/etc/ssh/ssh_host_ed25519_key.pub"
           "/etc/ssh/ssh_host_rsa_key"
           "/etc/ssh/ssh_host_rsa_key.pub"
-          "/config.json"
           "/etc/machine-id"
         ]
-        ++ lib.optionals cfg.swap.file.enable [ swap.file.path ];
+        ++ lib.optionals cfg.swap.file.enable [ cfg.swap.file.path ];
       })
     ];
 
@@ -173,11 +171,6 @@ in
     boot.supportedFilesystems.btrfs = mkIf cfg.impermanence true;
 
     boot.initrd.supportedFilesystems.btrfs = mkIf cfg.impermanence true;
-
-    # services.btrfs.autoScrub = {
-    #   enable = true;
-    #   interval = "weekly";
-    # };
 
     fileSystems."/" = {
       device = "/dev/disk/by-label/${if root_label == null then "nixos" else root_label}";

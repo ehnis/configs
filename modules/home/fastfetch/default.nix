@@ -32,7 +32,7 @@ in
           type = "kitty-direct";
           source = cfg.logo-path;
           width = 50;
-          height = 20;
+          height = 22;
         };
         display = {
           separator = " ";

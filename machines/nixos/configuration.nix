@@ -87,8 +87,6 @@ in
 
   startup-sound.enable = false;
 
-  zerotier.enable = false;
-
   zramSwap = {
     enable = true;
     memoryPercent = 100;
@@ -377,6 +375,10 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
+        shotcut
+        davinci-resolve
+        handbrake
+        kdePackages.kdenlive
         filezilla
         kdePackages.okular
         virt-manager

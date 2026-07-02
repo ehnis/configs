@@ -90,7 +90,7 @@ dependencies = [
     "CAPE-parsers>=0.1.36",
     "maco==1.1.8",
     "imagehash>=4.3.2",
-    "deepdiff>=9.0.0",
+    "deepdiff>=9.1.0",
     "flask>=3.1.3",
     "flask-restful>=0.3.10",
     "flask-sqlalchemy==3.0.5",
@@ -100,11 +100,11 @@ dependencies = [
     "networkx[default,extra]>=2.1",
     "pyclamd>=0.4.0",
     "pydot>=1.2.4",
-    "regex>=2026.4.4",
+    "regex>=2026.6.28",
     "scp>=0.15.0",
     "urlextract==1.5.0",
     "pdfminer==20191125",
-    "pg-activity>=3.6.1",
+    "pg-activity>=3.6.2",
     "bingraph",
     "httpreplay",
     "socks5man",
@@ -116,6 +116,7 @@ dependencies = [
 [project.optional-dependencies]
 maco = ["maco"]
 gcp = ["google-cloud-storage", "google-cloud-pubsub"]
+yara = ["plyara"]
 mcp = ["fastmcp", "httpx"]
 
 [dependency-groups]
@@ -138,6 +139,18 @@ dev = [
     "pre-commit>=2.19.0",
 ]
 
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+bingraph = { git = "https://github.com/CAPESandbox/binGraph" }
+httpreplay = { git = "https://github.com/CAPESandbox/httpreplay" }
+socks5man = { git = "https://github.com/CAPESandbox/socks5man" }
+xlmmacrodeobfuscator = { git = "https://github.com/DissectMalware/XLMMacroDeobfuscator.git" }
+batch-deobfuscator = { git = "https://github.com/DissectMalware/batch_deobfuscator" }
+peepdf-3 = { git = "https://github.com/digitalsleuth/peepdf-3" }
+pyattck = { git = "https://github.com/CAPESandbox/pyattck/" }
 
 [tool.black]
 line-length = 132
@@ -218,13 +231,4 @@ files = [
       packages = [
         "dummy"
       ]
-
-[tool.uv.sources]
-bingraph = { git = "https://github.com/CAPESandbox/binGraph" }
-httpreplay = { git = "https://github.com/CAPESandbox/httpreplay" }
-socks5man = { git = "https://github.com/CAPESandbox/socks5man" }
-xlmmacrodeobfuscator = { git = "https://github.com/DissectMalware/XLMMacroDeobfuscator.git" }
-batch-deobfuscator = { git = "https://github.com/DissectMalware/batch_deobfuscator" }
-peepdf-3 = { git = "https://github.com/digitalsleuth/peepdf-3" }
-pyattck = { git = "https://github.com/CAPESandbox/pyattck/" }
       

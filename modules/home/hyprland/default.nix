@@ -111,6 +111,7 @@ in
           inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.hyprlandPlugins.hyprtrails
         ];
       enable = true;
+      configType = "hyprlang";
       settings = {
         "$mod" = "SUPER";
         bind = [
@@ -133,10 +134,10 @@ in
           "$mod CTRL, R, exec, app2unit -- killall -SIGUSR1 gpu-screen-recorder && notify-send 'GPU-Screen-Recorder' 'Повтор успешно сохранён'"
           "$mod CTRL, U, exec, app2unit -- update-damn-nixos"
           "$mod CTRL, V, exec, rofi -modi clipboard:cliphist-rofi -show clipboard -show-icons -hover-select -me-select-entry '' -me-accept-entry MousePrimary"
-          "$mod ALT, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 1}')"
-          "$mod ALT, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 2) {print $2 - 1} else {print 1}}')"
-          "$mod CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 100}')"
-          "$mod CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 101) {print $2 - 100} else {print 1}}')"
+          "$mod ALT, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 1}')"
+          "$mod ALT, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 2) {print $2 - 1} else {print 1}}')"
+          "$mod CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 100}')"
+          "$mod CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 101) {print $2 - 100} else {print 1}}')"
           "$mod CTRL, F, fullscreenstate, 0 2"
           "$mod CTRL, C, exec, hyprctl kill"
           "$mod, I, exec, app2unit -- toggle-restriction"
@@ -151,7 +152,6 @@ in
           "$mod, M, exec, app2unit -- wlogout -b 2 -L 500px -R 500px -c 30px -r 30px,"
           "$mod, E, exec, app2unit -- nemo"
           "$mod, V, togglefloating,"
-          "$mod, P, pseudo,"
           "$mod, F, fullscreen,"
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"
@@ -316,7 +316,6 @@ in
           disable_logs = true;
         };
         dwindle = {
-          pseudotile = true;
           preserve_split = true;
         };
         misc = {

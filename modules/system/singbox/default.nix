@@ -234,7 +234,7 @@ in
         after = [ "graphical.target" ];
         wantedBy = [ "graphical.target" ];
         serviceConfig = {
-          ExecStart = "${pkgs.sing-box}/bin/sing-box -c /config.json run";
+          ExecStart = "${pkgs.sing-box}/bin/sing-box -c /home/mihikav/config.json run";
           ExecStopPost = cleanup_script;
         };
       };
