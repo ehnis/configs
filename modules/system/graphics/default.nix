@@ -10,7 +10,6 @@ in
 {
   options.graphics = {
     enable = mkEnableOption "graphics";
-    nvidia.enable = mkEnableOption "NVIDIA specific stuff (can be used together with AMDGPU)";
     vulkan_video = mkEnableOption "experimental mesa flags for vulkan video stuff";
     amdgpu = {
       enable = mkEnableOption "some AMDGPU specific stuff (can be used together with NVIDIA)";
@@ -28,16 +27,8 @@ in
         (mkIf cfg.amdgpu.enable { initrd.enable = false; })
         (mkIf cfg.amdgpu.pro { opencl.enable = true; })
       ];
-      nvidia = mkIf cfg.nvidia.enable {
-        modesetting.enable = true;
-        powerManagement.enable = true;
-        open = true;
-        nvidiaSettings = true;
-        #package = config.boot.kernelPackages.nvidiaPackages.beta;
-      };
     };
     services.xserver.videoDrivers = mkMerge [
-      (mkIf cfg.nvidia.enable [ "nvidia" ])
       (mkIf cfg.amdgpu.enable [ "amdgpu" ])
     ];
     environment.variables = {

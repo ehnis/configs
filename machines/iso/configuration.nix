@@ -238,7 +238,6 @@ in
       nixpkgs.hostPlatform = "x86_64-linux";
       hardware.enableAllHardware = true;
       hardware.enableRedistributableFirmware = true;
-      graphics.nvidia.enable = lib.mkForce true;
     }
   ];
 }

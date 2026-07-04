@@ -242,8 +242,6 @@ in
 
     enable = true;
 
-    nvidia.enable = false;
-
     vulkan_video = true;
 
     amdgpu = {
@@ -620,8 +618,8 @@ in
     };
 
     sunshine = {
-      autoStart = true;
-      enable = false;
+      autoStart = false;
+      enable = true;
       capSysAdmin = true;
       openFirewall = true;
     };
