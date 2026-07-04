@@ -8,10 +8,6 @@
   ...
 }:
 let
-  #bundle = pkgs.fetchurl {
-  #  url = "https://github.com/DADA30000/dotfiles/releases/download/vmware/VMware-Workstation-Full-17.6.3-24583834.x86_64.bundle";
-  #  hash = "sha256-eVdZF3KN7UxtC4n0q2qBvpp3PADuto0dEqwNsSVHjuA=";
-  #};
   patchGrubDir =
     dir:
     pkgs.runCommand "patched-efi-dir" { } ''
@@ -68,10 +64,10 @@ let
       echo -e "\e[32mСоединение установлено!\e[0m"
     fi
     sleep 1
-    url="https://github.com/DADA30000/dotfiles"
+    url="https://github.com/ehnis/configs"
     clear
     if gum confirm --default=false "Поменять URL репозитория с файлами конфигурации? (скрипт запускает start.sh из репозитория, репозиторий должен быть публичным)"; then
-      url=$(gum input --placeholder "Пример: https://github.com/DADA30000/dotfiles")
+      url=$(gum input --placeholder "Пример: https://github.com/ehnis/configs")
     fi
     if GIT_ASKPASS=true git ls-remote "$url" > /dev/null 2>&1; then
       clear
