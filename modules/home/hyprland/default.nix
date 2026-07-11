@@ -137,7 +137,7 @@ in
           "$mod ALT, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 1}')"
           "$mod ALT, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 2) {print $2 - 1} else {print 1}}')"
           "$mod CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2 + 100}')"
-          "$mod CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 101) {print $2 - 100} else {print 1}}')"
+          "$mod CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor | grep float | awk '{if ($2 >= 101) {print $2 - 100} else {print 1}}')"
           "$mod CTRL, F, fullscreenstate, 0 2"
           "$mod CTRL, C, exec, hyprctl kill"
           "$mod, I, exec, app2unit -- toggle-restriction"
@@ -183,8 +183,8 @@ in
           "$mod, mouse_up, workspace, e-1"
         ];
         monitor = [ 
-          "DP-2, 1920x1080@165, 0x0, 1"
-          "DP-1, 1440x900@75, -1440x0, auto"
+          "DP-1, 1920x1080@165, 0x0, 1"
+          "DP-2, 1440x900@75, -1440x0, auto"
           "HDMI-A-1, 1920x1080@60, 1920x0, 1"
           "HDMI-A-2, 1280x1024@75, -1280x-1024, auto"
         ];

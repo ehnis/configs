@@ -72,6 +72,16 @@ in
   
   services.hardware.openrgb.enable = true;
 
+  hardware.bluetooth = {
+  enable = true;
+  powerOnBoot = true;
+  settings = {
+    General = {
+      Plugins = "sixaxis";
+    };
+  };
+};
+
   hardware.sane = {
     enable = true;
     extraBackends = [ pkgs.hplipWithPlugin ];
@@ -312,6 +322,8 @@ in
 
     initrd.systemd.enable = true;
 
+    kernelModules = [ "uinput" "hid-sony"];
+
     kernelParams = [
       "iommu=pt"
       "quiet"
@@ -373,9 +385,7 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
-        shotcut
-        davinci-resolve
-        handbrake
+        blender
         kdePackages.kdenlive
         filezilla
         kdePackages.okular
