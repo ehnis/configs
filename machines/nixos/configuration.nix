@@ -118,6 +118,18 @@ in
       stable = false;
     };
   };
+  services.open-webui = {
+  enable = false;
+  package = (import inputs.nixpkgs-stable {
+    system = pkgs.system;
+    config.allowUnfree = true;
+  }).open-webui;
+  port = 8080;
+  environment = {
+    OLLAMA_API_BASE_URL = "http://127.0.0.1:11434"; 
+    WEBUI_AUTH = "False"; 
+  };
+};
   networking = {
 
     firewall.enable = false;
@@ -385,6 +397,8 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
+        gallery-dl
+        krita
         blender
         kdePackages.kdenlive
         filezilla
@@ -506,6 +520,11 @@ in
               withOpenASAR = true;
               withVencord = true;
             })
+            (discord.override {
+              withOpenASAR = true;
+              withVencord = true;
+            })
+            
           ]
         else
           [ ]
@@ -632,6 +651,9 @@ in
       enable = true;
       capSysAdmin = true;
       openFirewall = true;
+      settings = {
+        output_name = "DP-1";
+        };
     };
 
     earlyoom = {
@@ -647,18 +669,12 @@ in
       };
     };
 
-    udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2833", ATTR{idProduct}=="5013", RUN+="${pkgs.systemd}/bin/systemctl restart quest-adb-reverse.service"
-    '';
-
     avahi = {
       enable = true;
       nssmdns4 = true;
       openFirewall = true;
     };
     
-    #v2raya.enable = true;
-
     pipewire = {
       enable = true;
       alsa.enable = true;
