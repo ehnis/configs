@@ -205,6 +205,8 @@ in
         home = "/home/${user}";
         extraGroups = [
           "printing"
+          "networkmanager"
+          "lp"
           "wheel"
           "public"
           "uinput"
@@ -415,7 +417,6 @@ in
         nemo-fileroller
         nemo-with-extensions
         nemo
-        gemini-cli
         jq
         wayvr
         bs-manager

@@ -4,6 +4,7 @@
   home-modules,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 {
@@ -25,6 +26,8 @@
   home.stateVersion = "25.05";
 
   spicetify.enable = true;
+
+  systemd.user.services.easyeffects.Service.TimeoutStopSec = lib.mkForce 1;
 
   home.file.".config/mpv".source = ../../stuff/mpv;
 
@@ -68,23 +71,9 @@
 
   services = {
 
-    ollama = {
-      enable = true;
-      package = pkgs.ollama-vulkan;
-    };
+    easyeffects.enable = true;
 
   };
-
-  flatpak =
-    if !(avg-flag || min-flag) then
-      {
-        enable = true;
-        packages = [
-          "io.github.Soundux"
-        ];
-      }
-    else
-      { };
 
   hyprland = {
     enable = true;
