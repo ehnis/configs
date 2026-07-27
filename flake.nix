@@ -230,7 +230,7 @@
       ++ system-modules;
 
       user = "mihikav";
-      user-hash = "$y$j9T$4mZLE7lfsr4hRCj.e9JDa/$nQtJZhMlM9ju8B7TQcj.And83mfU4/fakqnODGzz..5";
+      user-hash = "$y$j9T$1rh9CQ0qxhpb9m2Xvrh9n/$sCkFESg7jOaz9VPD6O0O1dQqb0FgBGC3tRry354DwJ5";
       user_iso = "nixos";
     in
     {
