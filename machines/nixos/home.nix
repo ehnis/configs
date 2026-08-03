@@ -81,7 +81,7 @@
     stable = false;
     enable-plugins = false;
     mpvpaper = false;
-    hyprpaper = true;
+    #hyprpaper = true;
     wlogout = true;
     hyprlock = true;
     rofi = true;

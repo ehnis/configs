@@ -399,21 +399,12 @@ in
         (writeShellScriptBin "7z" ''
         exec ${pkgs._7zz}/bin/7zz "$@"
         '')
-        gallery-dl
-        krita
-        blender
-        kdePackages.kdenlive
         filezilla
         kdePackages.okular
-        virt-manager
         xsane
         hplip
         unzip
         zip
-        alcom
-        vrc-get
-        vrcx
-        unityhub
         nemo-fileroller
         nemo-with-extensions
         nemo
@@ -428,7 +419,6 @@ in
         patchelf
         file
         mpv
-        gnome-boxes
         libsForQt5.qtstyleplugin-kvantum
         kdePackages.qtstyleplugin-kvantum
         lsd
@@ -493,6 +483,16 @@ in
       ++ (
         if !min-flag then
           [
+            virt-manager
+            unityhub
+            alcom
+            vrcx
+            vrc-get
+            kdePackages.okular
+            gnome-boxes
+            kdePackages.kdenlive            
+            krita
+            blender
             scanmem
             kdePackages.qtdeclarative
             comma
@@ -535,7 +535,6 @@ in
         if !(avg-flag || min-flag) then
           [
             ungoogled-chromium
-            heroic
             gsettings-desktop-schemas
           ]
         else
@@ -624,7 +623,10 @@ in
 
     locate.enable = true;
 
-    openssh.enable = true;
+    openssh = {
+      enable = true;
+      ports = [ 9944 ];
+    };
 
     tailscale.enable = true;
 

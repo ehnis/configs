@@ -32,6 +32,14 @@
         home-manager.follows = "home-manager";
       };
     };
+     waybar = {
+     url = "github:Alexays/Waybar";
+     inputs.nixpkgs.follows = "nixpkgs";
+    };
+    split-monitor-workspaces = {
+      url = "github:zjeffer/split-monitor-workspaces";
+      inputs.hyprland.follows = "hyprland";
+    };
     uv2nix = {
       url = "github:pyproject-nix/uv2nix";
       inputs = {
